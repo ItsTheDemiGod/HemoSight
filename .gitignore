@@ -1,0 +1,37 @@
+# Datasets are never committed. data/raw is READ-ONLY source material.
+data/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.ipynb_checkpoints/
+.pytest_cache/
+.ruff_cache/
+
+# Model artefacts
+*.pth
+*.pt
+*.onnx
+*.ckpt
+*.safetensors
+
+# Node / frontend
+node_modules/
+dist-ssr/
+*.local
+
+# Experiment outputs (file-based tracking; keep the logs in CLAUDE.md instead)
+runs/
+mlruns/
+*.db
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
