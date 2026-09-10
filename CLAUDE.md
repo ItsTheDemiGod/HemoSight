@@ -147,13 +147,13 @@ Every task starts unchecked. Tick a checkbox only when the task is actually comp
 and its output exists on disk.
 
 ### Phase 0: Scaffold
-- [ ] Create the repository directory structure
-- [ ] Write `pyproject.toml` pinning Python 3.12 and the core dependencies
-- [ ] Write `.gitignore` excluding `data/`, caches, model artefacts and `node_modules`
-- [ ] Write `README.md` pointing to CLAUDE.md as the source of truth
-- [ ] Write this CLAUDE.md with claims, constraints, inventory, phase plan and logs
-- [ ] Create and populate the Python virtual environment
-- [ ] Verify the environment imports the package and passes the smoke test
+- [x] Create the repository directory structure
+- [x] Write `pyproject.toml` pinning Python 3.12 and the core dependencies
+- [x] Write `.gitignore` excluding `data/`, caches, model artefacts and `node_modules`
+- [x] Write `README.md` pointing to CLAUDE.md as the source of truth
+- [x] Write this CLAUDE.md with claims, constraints, inventory, phase plan and logs
+- [x] Create and populate the Python virtual environment
+- [x] Verify the environment imports the package and passes the smoke test
 - [ ] Initialise the git repository and make the first commit
 
 ### Phase 1: Data audit, manifests, overlap check, patient-level splits
@@ -295,6 +295,28 @@ dependence (a conservative result that improves when the check clears them).
 because results computed under a wrong assumption tend to survive into write-ups.
 **Consequences.** Cross-site evaluation depends on Eyes-Defy-Anemia being usable until
 the overlap check completes.
+
+### 2026-09-10 — PyTorch installed CPU-only; no GPU available
+**Decision.** Installed the default `torch` wheel, which resolved to a CPU build
+(`torch 2.14.0+cpu`, `cuda.is_available() == False`).
+**Rationale.** No CUDA device was detected on this machine, so a CUDA wheel would have
+added several GB for nothing.
+**Alternatives considered.** Forcing a CUDA index URL; deferred until a GPU exists.
+**Consequences.** Phase 3 (Monte Carlo simulation) and Phase 5 (CNN baseline) are the
+compute-heavy phases and will be slow. Revisit before Phase 3: either obtain GPU access
+and reinstall from the CUDA index, or design the simulator around vectorised NumPy and
+a reduced photon count, and log which path was taken.
+
+### 2026-09-10 — `data/` excluded from git in full, including its subdirectory markers
+**Decision.** `.gitignore` excludes `data/` entirely, so the `.gitkeep` files in
+`data/interim/`, `data/processed/` and `data/synthetic/` are ignored too.
+**Rationale.** The hard constraint that no dataset is ever committed outweighs the
+convenience of committed directory markers.
+**Alternatives considered.** Negation patterns to keep the markers tracked; rejected as
+an unnecessary hole in a rule that should be absolute.
+**Consequences.** A fresh clone has no `data/` tree. Any script that writes to
+`data/interim`, `data/processed` or `data/synthetic` must create its directory with
+`mkdir(parents=True, exist_ok=True)` rather than assume it exists.
 
 ---
 
