@@ -20,6 +20,11 @@ venv/
 *.ckpt
 *.safetensors
 
+# Figures are DATASET-DERIVED IMAGERY. 9 of 10 dataset licences are unverified
+# (reports/phase1_dataset_licences.md), so rendered dataset pixels must not be
+# committed. Every figure is regenerable: see reports/README.md.
+reports/figures/
+
 # Node / frontend
 node_modules/
 dist-ssr/

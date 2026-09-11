@@ -1,0 +1,48 @@
+# Phase 1 split configuration. Changing anything here changes every downstream
+# number, so treat it as frozen: edit only with a DECISION LOG entry.
+
+seed: 20260911
+
+fractions:
+  # Applied at GROUP level (leak-proof groups), not image level.
+  train: 0.60
+  calibration: 0.20   # reserved exclusively for conformal prediction (N4)
+  test: 0.20
+
+# The calibration split exists only to fit conformal quantiles. It must never be
+# used for model selection, early stopping, or hyperparameter search.
+calibration_is_locked: true
+
+# Sites that count as ONE site because the overlap check proved shared content.
+# See DECISION LOG 2026-09-11.
+merged_sites:
+  ghana:
+    - cp_anemic
+    - ghana_conj
+    - ghana_nail
+
+# Named train-site / test-site pairs for the N1 cross-site generalization claim.
+# Only pairs with genuinely disjoint provenance are listed.
+cross_site_protocol:
+  - name: italy_to_india
+    train_sites: ["eyes_defy:Italy"]
+    test_sites: ["eyes_defy:India"]
+    target: hb_g_dl
+    note: "Both sites have full photographs and Hb. Primary N1 cross-site test."
+  - name: india_to_italy
+    train_sites: ["eyes_defy:India"]
+    test_sites: ["eyes_defy:Italy"]
+    target: hb_g_dl
+    note: "Reverse direction; population and camera differ."
+  - name: ghana_to_eyesdefy
+    train_sites: ["ghana"]
+    test_sites: ["eyes_defy:India", "eyes_defy:Italy"]
+    target: anemia_label
+    note: >
+      Classification only. The Ghana pool ships no Hb values, and its conjunctiva
+      images are pre-segmented crops with the sclera removed, so an N1 illuminant
+      estimate cannot be computed on them. Reported as a weak-transfer check.
+
+nus8:
+  folds: 3               # per-camera 3-fold CV, the standard NUS protocol
+  leave_one_camera_out: true

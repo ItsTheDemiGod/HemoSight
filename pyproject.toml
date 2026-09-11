@@ -15,8 +15,22 @@ dependencies = [
     "scipy>=1.11",
     "pandas>=2.1",
     "scikit-learn>=1.4",
-    "torch>=2.2",
-    "torchvision>=0.17",
+    # --- CUDA build, pinned deliberately -------------------------------------
+    # Installed from the PyTorch CUDA index, NOT from PyPI:
+    #     pip install torch torchvision \
+    #         --index-url https://download.pytorch.org/whl/cu126
+    #
+    # CPU WHEELS MUST NOT BE INSTALLED BY DEFAULT. The default PyPI index serves a
+    # CPU-only wheel on Windows; installing it silently disables the RTX 4060 and
+    # makes Phases 3, 5 and 8 unusably slow. The `+cu126` local version below is
+    # not published on PyPI, so a plain `pip install -e .` fails loudly with a
+    # resolution error instead of quietly degrading to CPU. That is intentional:
+    # supply the --index-url above and it resolves.
+    #
+    # See CLAUDE.md, TECH STACK, and the DECISION LOG correction dated 2026-09-11.
+    "torch==2.14.0+cu126",
+    "torchvision==0.29.0+cu126",
+    # -------------------------------------------------------------------------
     "opencv-python>=4.9",
     "rawpy>=0.19",
     "imageio>=2.34",
@@ -54,3 +68,10 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.per-file-ignores]
+# Report generators emit markdown tables and prose; wrapping those source lines
+# would make the generated output harder to read than the source.
+"scripts/phase1_audit.py" = ["E501"]
+"scripts/phase1_summary.py" = ["E501"]
+"scripts/phase1_5_remediation_report.py" = ["E501"]

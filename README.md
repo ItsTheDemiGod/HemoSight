@@ -23,9 +23,19 @@ results logs. Read it before doing any work here. Nothing in this README overrid
 ```powershell
 py -3.12 -m venv .venv
 .\.venv\Scripts\Activate.ps1
+
+# PyTorch must come from the CUDA index. The default PyPI index serves a
+# CPU-only wheel on Windows, which silently disables the GPU.
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu126
+
 pip install -e ".[dev]"
+python scripts\check_gpu.py   # must report cuda.is_available() = True
 pytest
 ```
+
+If `pip install -e ".[dev]"` reports that `torch==2.14.0+cu126` cannot be found, the
+CUDA install step above was skipped. That failure is deliberate — see the comment in
+`pyproject.toml`.
 
 ## Layout
 

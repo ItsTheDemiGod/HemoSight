@@ -25,38 +25,185 @@ back to a physical quantity, it needs justification in the DECISION LOG.
 
 ---
 
-## 2. THE SIX NOVELTY CLAIMS
+## 2. THE NOVELTY CLAIMS
 
 These drive every design decision.
 
-**N1. Calibration-free spectral super-resolution.** Use the sclera as an endogenous
-white reference to estimate the scene illuminant, removing the per-camera spectral
-profiling and per-use radiometric calibration that currently blocks
-hyperspectral-reconstruction methods from field deployment. **THIS IS THE HEADLINE
-CLAIM.**
+> **Revised 2026-09-11 (Phase 1.5).** N1 was split into three sub-claims, N2's
+> justification was corrected, N5 was rebuilt without SCIN, and N6 was scoped to what
+> the data actually supports. The **original wording of every changed claim is preserved
+> verbatim in the DECISION LOG** — nothing was deleted. Each revision cites the Phase 1
+> finding that forced it.
 
-**N2. Monte Carlo forward model** of layered eyelid tissue generates synthetic
-reflectance spectra across Hb 4-18 g/dL, oxygenation, blood volume fraction, layer
-thickness and melanin; projected through camera spectral sensitivity curves and
-illuminant SPDs to synthetic RGB. Train on simulation, test on real. This supplies
-severe-anemia cases that no public dataset contains.
+### CLAIM HIERARCHY (restructured 2026-09-11 after Phase 2.5 refuted N1)
 
-**N3. Physical interpretability.** Output hemoglobin concentration in g/dL and
-oxygenation, not a class probability. Explanations are chromophore concentration maps,
-not saliency heatmaps.
+| rank | claim | status |
+| --- | --- | --- |
+| **CO-PRIMARY (imaging arm)** | **N3 + N4 from photographs** — haemoglobin in g/dL with a calibrated interval and abstention | ⚠️ **contingent** — the Phase 3 gate failed; status depends on Phase 3.5 |
+| **CO-PRIMARY (PPG arm)** | **N3 + N4 from four-wavelength PPG** — the same physical estimation on a better-conditioned measurement | **promoted 2026-09-11**; not yet built |
+| **SECONDARY** | **N1** — as a **negative result plus a practical recommendation** | REFUTED as a method; the diagnosis stands |
+| supporting | **N2** — Monte Carlo forward model | unchanged in substance (Phase 3) |
+| supporting | **N5** — mechanistic fairness audit | unchanged in substance |
+| supporting | **N6** — multimodal fusion, scoped | unchanged in substance |
 
-**N4. Conformal prediction with selective abstention over a physical quantity.**
+**Why the PPG arm was promoted to co-primary (2026-09-11, Phase 3.5 Task 4).**
+`Hb_PPG_Dataset` is **not subject to the Phase 3 failure**, and the reason is
+structural rather than incidental:
+
+* **Four narrow wavelengths (660/730/850/940 nm), not three broad overlapping RGB
+  channels** — the measurement is closer to spectroscopy than to photography.
+* **A controlled source.** The LEDs are the illuminant. There is no ambient illuminant
+  to estimate, so the entire error term that defeated Phases 2, 2.5 and 3 — recovering
+  an unknown illuminant from the scene — **does not exist** in this modality.
+* **It is the project's best-labelled data:** 252 subjects with venous-blood HemoCue
+  reference, against 217 usable Eyes-Defy images. It is also, after the Phase 1.5
+  arbitration rejected the entire Ghana pool, one of only two trustworthy Hb sources
+  in the project (the other being Eyes-Defy, 217 rows).
+
+The Phase 3 gate result is specific to **ambient-light RGB photography**, not to
+non-invasive haemoglobin estimation in general. That distinction is the reason this
+project still has a viable primary claim.
+
+Scope change only — **no PPG model has been built yet**.
+
+**Why the headline moved.** N1 was the headline claim. Phase 2.5 refuted it: two
+independent endogenous ocular references (sclera, corneal specular highlight) were
+tested rigorously on the same held-out-iris protocol and **both lose to grey-world**, a
+whole-image statistic needing no segmentation, reference surface or anatomy. The
+project's remaining and now primary contribution is the physical estimation pipeline
+itself — reporting haemoglobin as a physical quantity with an honest uncertainty
+interval and a principled abstention, rather than a class probability.
+
+**N1's secondary contribution, stated positively:**
+1. A rigorous negative result — endogenous ocular white references do not support
+   calibration-free colour correction on mobile captures, measured on 100 subjects
+   across 3 devices and 3 lighting conditions.
+2. A practical recommendation — **grey-world on a tight periocular crop**, which
+   *improves* as the field of view narrows (**6.076 → 3.935 ΔE2000 at 25% FOV**),
+   because a wide frame is skin-dominated while a periocular crop is better balanced.
+   This is the normalisation every later phase uses.
+
+> ⚠️ **The Phase 2 diagnosis is INCOMPLETE and must not be presented as settled.**
+> Phase 2 attributed the sclera's failure to inter-individual reflectance variance.
+> Phase 2.5 then removed that term entirely by using a specular reference — and the
+> result did not improve: **specular vs sclera p = 0.29, no significant difference.**
+> Inter-individual reflectance variance is therefore **not the sole limiting factor**.
+> Something else contributes and has not been identified. Any write-up must say so.
+
+### N1 — Calibration-free spectral super-resolution (~~THE HEADLINE CLAIM~~ — **REFUTED**)
+
+> 🔴 **REFUTED 2026-09-11 (Phase 2.5). The claim below is retained verbatim as the
+> hypothesis that was tested; it is NOT a description of a working method.**
+>
+> Two independent endogenous ocular references were tested on the same held-out-iris
+> protocol. Neither beats grey-world, a whole-image statistic needing no segmentation,
+> no reference surface and no anatomy: grey-world **6.076** dE2000, specular+sclera
+> 7.047, sclera 7.427, specular 7.821, no correction 9.530. Specular and sclera are
+> statistically indistinguishable (p = 0.29), so removing the per-subject reflectance
+> term — the bottleneck Phase 2 identified — did not help. Grey-world's margin *widens*
+> under the tight crops deployment implies (3.935 dE2000 at 25% field of view).
+>
+> **The contribution of N1 is now the DIAGNOSIS, not the method:** a quantified account
+> of why endogenous ocular white references fail, with the failure attributed to
+> inter-individual reflectance variance (10% scleral yellowing = 4.40 deg) rather than
+> to segmentation (31 px mask perturbation = 0.40 deg) or estimation mathematics
+> (0.666 deg given a known reflectance, six sensors). **N1a survives intact.** See
+> `reports/phase2_5_specular.md` and the DECISION LOG.
+>
+> Downstream colour normalisation uses **grey-world on a tight periocular crop**.
+
+Use the sclera as an endogenous white reference to estimate the scene illuminant,
+removing the per-camera spectral profiling and per-use radiometric calibration that
+currently blocks hyperspectral-reconstruction methods from field deployment.
+
+Phase 1 found that the two largest conjunctiva datasets are pre-segmented cutouts with
+the sclera removed. That does **not** invalidate N1; it invalidates treating N1 as a
+single end-to-end claim. N1 is therefore three sub-claims, each with its own dataset and
+its own metric:
+
+**N1a — Illuminant estimation accuracy across sensors.**
+Validated on `nus8`: 6 cameras, 1,265 images, ground-truth illuminants.
+*Metric:* angular error and ΔE2000 against the colorchecker-derived illuminant.
+The colorchecker must be masked out of the input using `cc_coords`, or the answer leaks
+into the estimate.
+
+**N1b — The sclera is a valid endogenous white reference across devices and lighting.**
+Validated on `MOBIUS` (3 phones × 3 lighting conditions × 100 subjects) and `SBVPI`.
+**No haemoglobin labels are required for this test**, which is why it can use the only
+datasets that have real device diversity.
+*Protocol — self-consistency.* For one subject, images captured under different phones
+and lighting conditions depict the same tissue, so a valid white reference should make
+their corrected colour agree. Report the **ΔE2000 spread across conditions, per subject,
+before versus after sclera-referenced correction**, on conjunctival/scleral colour.
+*Controls:* grey-world, white-patch, and a no-correction baseline. The claim holds only
+if sclera-referenced correction reduces spread by more than those.
+
+**N1c — Sclera-referenced correction improves haemoglobin estimation end to end.**
+Validated on **Eyes-Defy-Anemia only**.
+*Metric:* Hb MAE, bias, and Bland-Altman limits, with and without the correction.
+**Hard limitation, to be stated in every claim built on N1c: 218 subjects, 2 sites, and
+2 regional variants of a single Samsung Galaxy S6 (`SM-G920F`, `SM-G920I`). No severe
+cases (minimum 7.0 g/dL).** N1c is the narrowest of the three and must never be reported
+without those numbers attached.
+
+### N2 — Monte Carlo forward model of layered eyelid tissue
+
+Generates synthetic reflectance spectra across Hb 4-18 g/dL, oxygenation, blood volume
+fraction, layer thickness and melanin; projected through camera spectral sensitivity
+curves and illuminant SPDs to synthetic RGB. Train on simulation, test on real.
+
+**Justification (corrected 2026-09-11).** The only real severe-anemia cases available
+(n=48, single site) carry mutually contradictory haemoglobin labels, as established in
+Phase 1. The Monte Carlo forward model is therefore the only source of reliably
+labelled severe anemia in this project. **Its purpose is label trustworthiness, not
+merely data quantity.**
+
+### N3 — Physical interpretability
+
+Output hemoglobin concentration in g/dL and oxygenation, not a class probability.
+Explanations are chromophore concentration maps, not saliency heatmaps.
+
+### N4 — Conformal prediction with selective abstention over a physical quantity
+
 Three-state output: screen negative / screen positive-refer / cannot decide. Spectral
 reconstruction residual provides a principled non-conformity signal.
 
-**N5. Mechanistic fairness audit.** Report performance stratified by skin tone and
-source device, and DECOMPOSE any gap into melanin absorption versus illuminant
-estimation error.
+### N5 — Mechanistic fairness audit
 
-**N6. Multimodal fusion with graceful degradation.** Conjunctiva, palm, nail and PPG
-are all measurements of the same molecule through different optical paths. Fuse into
-one physical estimate. Train with modality dropout so missing or low-quality inputs
-degrade gracefully rather than failing.
+Report performance stratified by skin tone and source device, and DECOMPOSE any gap
+into melanin absorption versus illuminant estimation error.
+
+**Method (rebuilt 2026-09-11, SCIN removed).**
+
+- **Skin tone:** estimated by **Individual Typology Angle (ITA)**, computed in closed
+  form from CIELAB on periocular skin regions, applied to **N1-calibrated images**.
+  Reusing the N1 pipeline is what makes the decomposition *mechanistic* rather than
+  descriptive: the same illuminant estimate that N1 produces is what makes ITA
+  comparable across captures.
+- **Population axis:** the India versus Italy sites within Eyes-Defy-Anemia.
+- **Device axis:** MOBIUS, 3 phones × 3 lighting conditions.
+- **Decomposition:** melanin versus illuminant-estimation error, testable in simulation
+  (N2) where melanin is known by construction.
+
+**Limitations, to be carried verbatim into the paper:** *there are no ground-truth skin
+tone labels in this project; ITA is a proxy, not a measurement; and the tone axis is
+confounded with site.*
+
+### N6 — Multimodal fusion with graceful degradation
+
+Conjunctiva, palm, nail and PPG are all measurements of the same molecule through
+different optical paths. Fuse into one physical estimate. Train with modality dropout so
+missing or low-quality inputs degrade gracefully rather than failing.
+
+**Scope (fixed 2026-09-11). These are limits, not open problems to be solved later.**
+
+- **Real multimodal fusion is conjunctiva + nail, CLASSIFICATION ONLY, never
+  regression.** The ~454 participants with paired body sites come from the Ghana pool,
+  which is BINARY-LABEL-ONLY (see N2's justification and the DECISION LOG). No fused,
+  calibrated Hb estimate in g/dL can be validated on paired modalities.
+- **Image + PPG fusion is simulation-only, permanently.** `Hb_PPG_Dataset` shares no
+  participants with any image dataset and never will, because no new data will be
+  collected. Any image+PPG result is a simulation result and must be labelled as one.
 
 ---
 
@@ -85,21 +232,26 @@ These are not negotiable and not subject to convenience.
 
 ## 4. DATASET INVENTORY
 
-All under `data/raw/`. Contents below reflect a shallow scaffold-time inspection; the
-authoritative audit is Phase 1.
+All under `data/raw/`. **Audited 2026-09-11**; full detail in `reports/phase1_data_audit.md`
+and `reports/phase1_summary.md`.
 
 | Folder | What it is | Role |
 | --- | --- | --- |
 | `nus8` | NUS 8-camera color constancy benchmark. Linear PNGs, colorchecker masks, ground-truth illuminant `.mat` per camera. | Validates N1 |
 | `SBVPI` | High-resolution periocular sclera segmentation dataset. No Hb labels. | Sclera segmentation |
-| `MOBIUS` | Mobile-captured sclera segmentation under varied conditions. No Hb labels. | Stress-tests sclera segmentation |
-| `CP-AnemiC dataset` | Conjunctival pallor, Ghana, children, with Hb values. | Hb labels, conjunctiva |
-| `Application of Machine Learning in Detecting Iron Deficiency Anemia Using Conjunctiva image Dataset from Ghana` | Ghana conjunctiva dataset (Mendeley `nt7r8hv2pz`). | Hb / anemia labels, conjunctiva |
-| `Detection of Anemia using Colour of the Fingernails Image Datasets from Ghana` | Ghana fingernails dataset (Mendeley `2xx4j3kjg2`). | Nail modality (N6) |
-| `dataset anemia` | Contents to be identified during the data audit. | TBD — see below |
+| `MOBIUS` | Mobile sclera segmentation. **3 phones × 3 lighting × 100 subjects**, recoverable from filenames. No Hb. | **N1b** and N5 device axis |
+| `CP-AnemiC dataset` | Conjunctival pallor, Ghana, children 6–60 months. Hb present but **REJECTED** (Phase 1.5). Contained inside the Ghana conjunctiva set. | Binary label only |
+| `Application of Machine Learning ... Conjunctiva image Dataset from Ghana` | Ghana conjunctiva (Mendeley `nt7r8hv2pz`). Superset of CP-AnemiC. No Hb. | Binary label only |
+| `Detection of Anemia using Colour of the Fingernails Image Datasets from Ghana` | Ghana fingernails (Mendeley `2xx4j3kjg2`). Shares a participant roster with the conjunctiva set. No Hb. | Nail modality (N6), binary only |
+| `dataset anemia` | **CONFIRMED Eyes-Defy-Anemia** (Phase 1). 218 subjects across India (95) and Italy (123); full photographs plus palpebral/forniceal masks; Hb in per-site `.xlsx`. | Conjunctiva, the ONLY cross-site Hb data (N1) |
 | `Hb_PPG_Dataset` | 252 subjects, four-wavelength PPG (660/730/850/940 nm), 200 Hz, 60 s, venous-blood Hb reference via HemoCue. CSV per subject plus `subject information.xlsx`. | PPG modality (N6) |
-| `scin-main` | SCIN dermatology dataset repo. Skin tone labels: self-reported Fitzpatrick, dermatologist-estimated Fitzpatrick, Monk Skin Tone. | Fairness (N5) |
-| Eyes-Defy-Anemia | Expected but may not yet be present under that name; check for it. | Conjunctiva, multi-site |
+| ~~Eyes-Defy-Anemia (expected separately)~~ | Present on disk as `dataset anemia`; see the row above. No separate folder exists. | — |
+
+**DELETED 2026-09-11:** `scin-main` was removed from `data/raw/` in Phase 1.5. It held
+no data (5 documentation files), and SCIN is dermatology imagery with no conjunctiva, no
+Hb and no participant overlap, so its skin-tone labels could not be attached to any
+subject here. N5 no longer depends on it. Recoverable from
+`github.com/google-research-datasets/scin` if ever needed.
 
 ### 🔴 KNOWN RISK — participant overlap (highest-priority Phase 1 item)
 
@@ -107,24 +259,47 @@ authoritative audit is Phase 1.
 and may contain overlapping participants. Any cross-site claim built on treating them
 as independent is invalid until overlap is ruled out.**
 
-Until an overlap check has been run and logged, these two sources are treated as **one
-site**. No paper text, figure or table may describe them as independent. Any result
-computed across them before the check is provisional and must be labelled as such in
-the RESULTS LOG.
+**VERDICT (2026-09-11): CONFIRMED AND WORSE THAN FEARED.** CP-AnemiC is not merely
+overlapping with the Ghana conjunctiva set — it is largely *contained inside* it. 419
+distinct MD5 hashes are shared; 87.3% of CP-AnemiC files are byte-identical to a Ghana
+file; 98.2% fall within pHash Hamming 10. They are permanently **one site**.
 
-### Scaffold-time observations (to confirm or overturn in Phase 1)
+No paper text, figure or table may describe them as independent, and no split may place
+one in train and the other in test. A second, independent problem was found in the same
+check: **CP-AnemiC's haemoglobin labels conflict on its duplicated images** (see the
+DECISION LOG, 2026-09-11).
 
-- `dataset anemia` contains `India/` and `Italy/` subject folders whose files follow
-  the pattern `<id>_palpebral.png` and `<id>_forniceal.png` alongside a source `.jpg`.
-  This strongly suggests it **is** the Eyes-Defy-Anemia dataset under a different
-  folder name. Confirm in Phase 1 before relying on it; if confirmed, it supplies the
-  second and third sites and is the main lever for honest cross-site evaluation.
-- `nus8` currently has three extracted cameras (`Canon600D`, `NikonD5200`,
-  `SamsungNX2000`), each with `png/`, `mask/` and `groundtruth.mat`, plus a
-  `raw_downloads/` folder of archives. The remaining cameras of the 8-camera benchmark
-  appear not to be extracted. Confirm coverage in Phase 1 — the N1 cross-device
-  argument is weaker with three cameras than with eight.
+### Phase 1 findings (2026-09-11) — these SUPERSEDE the scaffold-time guesses
+
+- ✅ **`dataset anemia` IS Eyes-Defy-Anemia.** Confirmed by Italian sheet metadata
+  (`Foglio1`, annotator notes "da segmentare la forniceale"), India+Italy sites, and
+  95+123=218 subjects with Hgb. It is the project's only source of full photographs
+  paired with haemoglobin.
+- ✅ **`nus8` now has SIX extracted cameras**: Canon EOS-1Ds Mark III, Canon600D,
+  Fujifilm X-M1, NikonD5200, Olympus E-PL6, SamsungNX2000. 1265 images, all parsed,
+  zero missing PNGs or colorchecker masks. **The extraction item is CLOSED.** Two of the
+  benchmark's eight (SonyA57, PanasonicGX1) remain unextracted — say "six sensors", not
+  eight. `SamsungNX2000/groundtruth.mat/` is empty; its ground truth is read from
+  `raw_downloads/` by `paths.resolve_nus8_gt()`.
+- 🔴 **CP-AnemiC and the Ghana conjunctiva set are ONE dataset**, not two sites. See the
+  overlap verdict above and the DECISION LOG.
+- 🔴 **CP-AnemiC and Ghana conjunctiva images have NO SCLERA.** Both are pre-segmented
+  conjunctiva cutouts on black backgrounds (>50% black in 100% of sampled images). N1's
+  white reference is absent from them, so the headline claim can only be validated
+  end-to-end on Eyes-Defy's 218 subjects.
+- 🔴 **CP-AnemiC Hb labels conflict on duplicated images**: 710 files, 498 unique images,
+  and 90 of 91 exact-duplicate groups carry more than one Hb value.
+- 🟢 **Ghana conjunctiva and fingernail sets share a participant roster** (non-anemic
+  numbers match 204/204, Jaccard 1.000). ~454 subjects with paired body sites — an N6
+  opportunity, though with binary labels only, no Hb.
+- 🟢 **MOBIUS carries real device diversity**: 3 phones x 3 lighting conditions x 100
+  subjects, recoverable from its filename grammar. No Hb.
+- 🔴 **`scin-main` contains NO DATA** — 5 files, all documentation. SCIN's images and
+  skin-tone labels live in a GCS bucket, and SCIN is dermatology imagery with no
+  participant correspondence to any anemia dataset. N5 is materially weakened.
 - SBVPI and MOBIUS carry no Hb labels; they are segmentation-only resources.
+
+Full detail: `reports/phase1_data_audit.md`, `reports/phase1_summary.md`.
 
 ---
 
@@ -138,6 +313,14 @@ the RESULTS LOG.
 - **Mobile (later phase):** Flutter, located at `C:\src\flutter`
 - **Experiment tracking:** local, file-based. No cloud services requiring accounts.
 - **Platform:** Windows. Use Windows-compatible paths and commands throughout.
+- **GPU:** NVIDIA GeForce RTX 4060 Laptop GPU, **8 GB VRAM** (8188 MiB), driver 610.62.
+  PyTorch must be installed from the CUDA index
+  (`--index-url https://download.pytorch.org/whl/cu126`); the default PyPI index
+  serves a CPU-only wheel on Windows and must never be used here.
+  **The 8 GB ceiling is a design constraint, not a footnote.** It caps batch size
+  and backbone choice in Phase 5 (CNN baseline) and Phase 8 (multimodal fusion,
+  where several modality encoders may be resident at once). Plan for gradient
+  accumulation and mixed precision rather than discovering the limit at train time.
 
 ---
 
@@ -157,26 +340,87 @@ and its output exists on disk.
 - [ ] Initialise the git repository and make the first commit
 
 ### Phase 1: Data audit, manifests, overlap check, patient-level splits
-- [ ] Inventory every dataset: file counts, formats, resolutions, colour encoding, EXIF and device metadata
-- [ ] Identify the contents of `dataset anemia` and confirm or refute that it is Eyes-Defy-Anemia
-- [ ] Parse every Hb label source into one tidy `labels` table (subject, site, Hb g/dL, age, sex, device, modality)
-- [ ] Build a per-dataset image manifest in `data/interim/manifests/` with a stable subject ID and provenance for every file
-- [ ] **Run the CP-AnemiC / Ghana-conjunctiva overlap check** (perceptual hashing, EXIF timestamps, filename structure, subject metadata) and log the verdict
-- [ ] Define and freeze patient-level, site-aware train/calibration/test splits; write them to `data/processed/splits/`
-- [ ] Characterise label distributions per site: Hb range, anemia prevalence, severe-anemia count, class balance
-- [ ] Record dataset licences and redistribution terms; confirm no data is committed to git
+- [x] Inventory every dataset: file counts, formats, resolutions, colour encoding, EXIF and device metadata
+- [x] Identify the contents of `dataset anemia` and confirm or refute that it is Eyes-Defy-Anemia
+- [x] Parse every Hb label source into one tidy `labels` table (subject, site, Hb g/dL, age, sex, device, modality)
+- [x] Build a per-dataset image manifest in `data/interim/manifests/` with a stable subject ID and provenance for every file
+- [x] **Run the CP-AnemiC / Ghana-conjunctiva overlap check** (perceptual hashing, EXIF timestamps, filename structure, subject metadata) and log the verdict
+- [x] Define and freeze patient-level, site-aware train/calibration/test splits; write them to `data/interim/splits/` *(path amended from `data/processed/splits/`; see DECISION LOG 2026-09-11)*
+- [x] Characterise label distributions per site: Hb range, anemia prevalence, severe-anemia count, class balance
+- [x] Record dataset licences and redistribution terms; confirm no data is committed to git
+
+### Phase 1.5: Remediation of the Phase 1 findings
+- [x] Restructure N1 into N1a (sensor accuracy), N1b (sclera as white reference), N1c (end-to-end Hb)
+- [x] Search exhaustively for uncropped / full-eye originals and record the result conclusively
+- [x] Arbitrate the Ghana-pool haemoglobin labels and implement `hb_label_trusted` as a hard manifest flag
+- [x] Correct N2's justification from "no public dataset contains severe anemia" to the label-trustworthiness argument
+- [x] Rebuild N5 without SCIN: ITA on N1-calibrated periocular skin; delete `data/raw/scin-main`
+- [x] Fix the figures licence exposure: gitignore `reports/figures/`, untrack it, document regeneration
+- [x] Fix N6's scope: conjunctiva+nail classification only; image+PPG simulation-only, permanently
+- [x] Write `reports/phase1_5_remediation.md` and update the "CANNOT support" list
 
 ### Phase 2: Sclera segmentation and illuminant estimation (N1)
-- [ ] Build loaders for SBVPI and MOBIUS with their segmentation masks
-- [ ] Train or adapt a sclera segmentation model; report IoU on SBVPI and on MOBIUS separately
-- [ ] Implement sclera-as-white-reference illuminant estimation from a segmented region
-- [ ] Validate illuminant estimation on `nus8` against ground-truth illuminants (angular error), per camera
-- [ ] Compare against standard colour-constancy baselines (grey-world, max-RGB, grey-edge) on the same split
-- [ ] Quantify sensitivity to mask error, specular highlights, scleral yellowing and vessel coverage
-- [ ] Apply the estimator to the conjunctiva datasets and inspect stability within and across sites
-- [ ] Write up the calibration-free argument with its failure modes stated explicitly
+- [x] Build loaders for SBVPI and MOBIUS with their segmentation masks
+- [x] Train or adapt a sclera segmentation model; report IoU on SBVPI and on MOBIUS separately
+- [x] Implement sclera-as-white-reference illuminant estimation from a segmented region
+- [x] Validate illuminant estimation on `nus8` against ground-truth illuminants (angular error), per camera
+- [x] Compare against standard colour-constancy baselines (grey-world, max-RGB, grey-edge) on the same split
+- [x] Quantify sensitivity to mask error, specular highlights, scleral yellowing and vessel coverage
+- [x] Apply the estimator to the conjunctiva datasets and inspect stability within and across sites *(scope amended: the Ghana conjunctiva pool has no sclera (Phase 1.5), so this ran on Eyes-Defy-Anemia only — see DECISION LOG 2026-09-11)*
+- [x] Write up the calibration-free argument with its failure modes stated explicitly
+- [x] N1b self-consistency on MOBIUS (3 phones x 3 lighting x 100 subjects), evaluated on a held-out region
+- [x] Per-image segmentation quality score, validated against MOBIUS's deliberately-bad frames
+- [x] Vasculature exclusion inside the sclera, checked against SBVPI's ground-truth vessel masks
+
+### Phase 2.5: Specular (corneal highlight) rescue attempt for N1 — TIME-BOXED
+**Hypothesis.** Under the dichromatic reflection model, specular reflection from a
+dielectric preserves the illuminant's SPD. A corneal highlight is therefore close to a
+direct sample of the scene illuminant and carries **no per-subject reflectance term** —
+precisely the variance that defeated the sclera in Phase 2. This is a hypothesis to
+test, not a claim to confirm.
+
+**Thresholds declared BEFORE running (2026-09-11):**
+- **Feasibility gate:** if fewer than **30%** of images yield a detectable AND
+  unsaturated corneal highlight, STOP at Task 1 and report non-viability.
+- **SUPPORTED:** specular beats grey-world on held-out-iris within-subject dE2000
+  spread, paired Wilcoxon p < 0.05.
+- **PARTIALLY SUPPORTED:** specular beats no-correction (p < 0.05) but not grey-world.
+- **REFUTED:** specular fails to beat no-correction.
+
+- [x] Task 1: feasibility census — highlight detection rate, saturation distribution, area, by phone and lighting
+- [x] Apply the 30% feasibility gate and report the number before proceeding
+- [x] Task 2: dichromatic specular illuminant estimation (not a mean of bright pixels)
+- [x] Task 2: report the number of distinct chromatic clusters rather than forcing one estimate
+- [x] Task 3: evaluate on the identical MOBIUS protocol, held-out iris, circularity guard intact
+- [x] Task 3: paired statistics against grey-world specifically, plus per-subject win rates and variance decomposition
+- [x] Task 4: deployment-realism — how grey-world degrades as the field of view narrows to a tight crop
+- [x] Task 5: `reports/phase2_5_specular.md` with a verdict against the pre-declared thresholds
 
 ### Phase 3: Monte Carlo tissue simulator (N2)
+
+**TASK 0 GATE — interpretation thresholds declared BEFORE running (2026-09-11):**
+Propagate the residual colour error that grey-world actually leaves through the
+forward model and measure the resulting haemoglobin error.
+- **Under +/-1.0 g/dL** -> the approach is VIABLE; proceed.
+- **1.0 to 2.0 g/dL** -> MARGINAL; viable only for coarse screening bands, not point
+  estimates. Report which WHO severity boundaries remain distinguishable.
+- **Over +/-2.0 g/dL** -> the colour-to-haemoglobin inversion is NOT RECOVERABLE under
+  realistic calibration error. STOP and report as a major finding.
+Residual errors tested: **3.935** dE2000 (grey-world at 25% FOV, the recommended
+normalisation), **6.076** (grey-world full frame), and **1.0** (best case).
+The result is reported before any further work, whatever it shows.
+
+- [x] Task 0: minimal forward model plus error propagation; report the gate result first
+- [x] Task 0: report whether Hb error is uniform or worse at low Hb, where screening decisions are made
+- [ ] Task 1: layered conjunctival optical model with EVERY constant cited in one documented module *(PARTIAL: constants module built and cited; full layered MC NOT built — gate failed, see DECISION LOG 2026-09-11)*
+- [ ] Task 1: radiative transfer, validated against published benchmark cases before any output is trusted *(NOT BUILT — stopped at the Task 0 gate)*
+- [ ] Task 2: validate simulated spectra against published conjunctival/eyelid reflectance measurements *(NOT DONE — stopped at the gate; simulated colour WAS checked against 216 real Eyes-Defy subjects instead)*
+- [x] Task 2: compare simulated RGB against real Eyes-Defy images at matched Hb; report the gap honestly *(DONE in reduced form: empirical 0.70 vs simulated 0.452 dE2000 per g/dL)*
+- [x] Task 2: state plainly what the model does NOT capture
+- [ ] Task 3: generate the synthetic corpus, storing spectra AND RGB with full generating parameters *(NOT BUILT — stopped at the gate; the inversion the corpus would serve cannot survive realistic calibration error)*
+- [x] Task 4: quantify how much reflectance-prior error is tolerable (closes the question Phase 2 could not answer)
+- [x] Task 5: `reports/phase3_simulation.md` with the gate result first and an N2 verdict
+
 - [ ] Assemble chromophore absorption spectra (HbO2, Hb, melanin, water) and tissue scattering parameters with cited sources
 - [ ] Define the layered eyelid/conjunctiva optical model (layer count, thickness ranges, blood volume fraction, oxygenation)
 - [ ] Implement the Monte Carlo photon-transport forward model producing diffuse reflectance spectra
@@ -185,6 +429,38 @@ and its output exists on disk.
 - [ ] Collect or fit camera spectral sensitivity curves and illuminant SPDs; project spectra to synthetic RGB
 - [ ] Compare the synthetic RGB distribution against real conjunctiva pixels and document the sim-to-real gap
 - [ ] Log the severe-anemia coverage the simulator adds relative to the real data
+
+### Phase 3.5: Ratio reformulation — TIME-BOXED test of a possible rescue
+
+**Rationale.** Every method tested so far (sclera-referenced, specular, grey-world)
+tries to RECOVER THE ABSOLUTE ILLUMINANT, and that is the specific thing that failed.
+Under a von Kries diagonal model, observed = reflectance x illuminant, so a ratio of
+two regions in the SAME image cancels the illuminant algebraically, per channel:
+
+    conjunctiva_observed / sclera_observed  =  R_conj / R_sclera
+
+No estimation step, therefore no estimation error. This REFRAMES N1 rather than
+abandoning it: the premise that the eye carries its own reference was right; the error
+was demanding the reference yield the ABSOLUTE illuminant, which needs its reflectance
+known. A ratio needs only that the reference be STABLE PER SUBJECT, which Phase 2
+demonstrated it is. **This is a hypothesis to test, not to confirm.**
+
+**Thresholds declared BEFORE running (2026-09-11), in the equivalent-Hb units of the
+Phase 3 gate so the comparison is direct:**
+- **Equivalent residual < 1.0 g/dL** -> the illuminant cancels; proceed to Task 2.
+- **1.0 to 2.0 g/dL** -> partial cancellation; MARGINAL.
+- **> 2.0 g/dL** -> von Kries diagonality or region stability is failing; the
+  reformulation does NOT rescue the claim. STOP, do not proceed to Task 2.
+
+- [x] Task 0: replace transcribed constants with the downloaded sourced files; report disagreements
+- [x] Task 1: cancellation test on the unchanged MOBIUS protocol; report before proceeding
+- [x] Task 1: decompose the ratio residual by phone, lighting and interaction
+- [ ] Task 2: re-run the Phase 3 gate on ratio features *(NOT RUN — Task 1 failed at 10.04 g/dL equivalent, 5x the pre-declared threshold)*
+- [x] Task 2: report ratio sensitivity in dE2000-equivalent per g/dL — a ratio may attenuate signal as well as noise
+- [x] Task 3: within- versus between-subject sclera reference stability; state which regime the data is in
+- [x] Task 3: test whether a per-subject offset helps, and whether it is obtainable in deployment
+- [x] Task 4: record the PPG scope change — promoted to co-primary, not subject to the Phase 3 failure
+- [x] Task 5: `reports/phase3_5_ratio.md` with the Task 1 result first and a verdict
 
 ### Phase 4: Spectral reconstruction and Hb estimation (N3)
 - [ ] Implement RGB-to-reflectance-spectrum reconstruction trained on the synthetic library
@@ -297,6 +573,8 @@ because results computed under a wrong assumption tend to survive into write-ups
 the overlap check completes.
 
 ### 2026-09-10 — PyTorch installed CPU-only; no GPU available
+> ⚠️ **SUPERSEDED and FACTUALLY WRONG — see the correction dated 2026-09-11 below.**
+
 **Decision.** Installed the default `torch` wheel, which resolved to a CPU build
 (`torch 2.14.0+cpu`, `cuda.is_available() == False`).
 **Rationale.** No CUDA device was detected on this machine, so a CUDA wheel would have
@@ -306,6 +584,35 @@ added several GB for nothing.
 compute-heavy phases and will be slow. Revisit before Phase 3: either obtain GPU access
 and reinstall from the CUDA index, or design the simulator around vectorised NumPy and
 a reduced photon count, and log which path was taken.
+
+### 2026-09-11 — CORRECTION to the 2026-09-10 CPU-only entry: the machine has CUDA hardware
+**Correction.** The entry above is wrong in its cause and its conclusion. This machine
+has an **NVIDIA GeForce RTX 4060 Laptop GPU, 8188 MiB (8 GB) VRAM, driver 610.62,
+CUDA UMD 13.3**. `nvidia-smi` reports it.
+**What actually happened.** `pip install` resolved `torch` from the default PyPI index,
+which serves the CPU wheel on Windows. `torch.cuda.is_available() == False` was a
+consequence of installing a CPU-only build, **not** evidence that no CUDA device was
+present. The original entry inferred absent hardware from a package-resolution
+artefact, which was an unfounded leap: that flag cannot distinguish "no GPU" from
+"no CUDA runtime in this wheel", and nothing was run to tell the two apart.
+**Action taken.** Uninstalled `torch`, `torchvision` and `torchaudio`, then reinstalled
+from the CUDA index:
+`pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu126`
+Verified `cuda.is_available()`, device name, total memory, and a matmul on the device.
+**Consequences.**
+- **The Phase 3 compute revisit point is CLOSED.** The simulator and CNN baseline may
+  assume GPU availability. The fallback plan in the superseded entry (vectorised NumPy
+  with a reduced photon count) is no longer required on compute grounds, though it may
+  still be worth having for reproducibility on CPU-only machines.
+- **8 GB VRAM is now the binding constraint**, not compute availability. It caps batch
+  size and model choice in Phase 5 (CNN baseline) and Phase 8 (multimodal fusion),
+  where several modality encoders may need to be resident at once. Recorded in the
+  TECH STACK section.
+- **Standing rule:** never install `torch` from the default index in this project. See
+  the comment in `pyproject.toml`.
+**Lesson for future entries.** Do not record an inferred cause as a finding. State the
+observation ("`cuda.is_available()` returned False") separately from the explanation,
+and verify the explanation before logging it.
 
 ### 2026-09-10 — `data/` excluded from git in full, including its subdirectory markers
 **Decision.** `.gitignore` excludes `data/` entirely, so the `.gitkeep` files in
@@ -317,6 +624,605 @@ an unnecessary hole in a rule that should be absolute.
 **Consequences.** A fresh clone has no `data/` tree. Any script that writes to
 `data/interim`, `data/processed` or `data/synthetic` must create its directory with
 `mkdir(parents=True, exist_ok=True)` rather than assume it exists.
+
+### 2026-09-11 — `dataset anemia` CONFIRMED as Eyes-Defy-Anemia
+**Decision.** The provisional identification of 2026-09-10 is now confirmed and the
+inventory updated. The folder is **not** renamed; `data/raw/` stays read-only and
+`paths.EYES_DEFY` carries the mapping.
+**Evidence.** Italian-language spreadsheet internals (sheet `Foglio1`, annotator notes
+"da segmentare la forniceale", "Segmentato da Michele"), India and Italy site folders,
+per-subject `_palpebral`/`_forniceal` masks beside a source `.jpg`, and 95 + 123 = 218
+subjects with Hgb — matching the published dataset.
+**Consequences.** Eyes-Defy is the project's **only** source of full photographs paired
+with haemoglobin, and therefore the only end-to-end test bed for N1. Its Italy sheet
+needed two repairs: 15 of 123 Hb values use a European decimal comma (`15,1`) and would
+have been silently dropped to NaN by a naive parse; one row is `_` with the note "Hgb
+not available" and stays genuinely missing (217 of 218 have Hb).
+
+### 2026-09-11 — CP-AnemiC and Ghana conjunctiva are ONE site (overlap verdict)
+**Decision.** The two are permanently merged into a single site `ghana`, together with
+the Ghana fingernail set. No split, table or claim may treat them as independent.
+**Evidence.** Four independent signals agree: 419 distinct MD5 hashes shared; 620/710
+(87.3%) of CP-AnemiC files byte-identical to a Ghana conjunctiva file; 697/710 (98.2%)
+within pHash Hamming 10 and 646 at distance **0**; 701/710 above 0.92 embedding cosine.
+Only 14.2% of Ghana conjunctiva files are covered, so Ghana is the superset and
+**CP-AnemiC is a labelled subset of it**.
+**Alternatives considered.** Treating the non-matching ~2% of CP-AnemiC as an
+independent site; rejected as too small to support any claim and impossible to
+disentangle from the shared collection protocol.
+**Consequences.** Cross-site evaluation now rests entirely on Eyes-Defy's India/Italy
+pair. The metadata-correspondence signal could not be computed at all: the Ghana sets
+ship no Hb, age or sex. That signal is *unavailable*, not negative.
+
+### 2026-09-11 — CP-AnemiC haemoglobin labels are unreliable on duplicated images
+**Decision.** CP-AnemiC is **not** treated as a trustworthy per-image Hb regression
+target. Any use of it must first deduplicate by content hash and then either drop
+conflicted groups or treat them as unlabelled; whichever is chosen must be stated with
+the result.
+**Evidence.** 710 files contain only 498 unique images. Of 91 exact-duplicate groups,
+**90 carry more than one distinct Hb value**. The worst is one image appearing 10 times
+with Hb recorded as 4.6, 5.1, 8.0, 8.7, 8.8, 8.9, 9.5, 9.7, 10.5 and 10.93 g/dL across
+8 hospitals (`reports/figures/phase1_cp_anemic_label_conflict.png`). 303 of 710 files
+(42.7%) sit in a conflicted group.
+**Consequences.** This is independent of the overlap finding and worse for modelling.
+All 48 severe cases (<7 g/dL) live in this dataset, so **no calibrated claim about
+severe anemia is available from real data**. It strengthens the motivation for the N2
+simulator while removing the means to validate the simulator's severe range.
+
+### 2026-09-11 — N1 cannot be computed on the two largest conjunctiva datasets
+**Decision.** N1's end-to-end validation is scoped to Eyes-Defy (218 subjects). nus8
+validates illuminant accuracy; SBVPI/MOBIUS validate sclera segmentation. The Ghana
+pool is excluded from any N1 result.
+**Evidence.** CP-AnemiC and Ghana conjunctiva are pre-segmented cutouts: mean near-black
+pixel fraction 0.70 and 0.72, with **100% of sampled images over 30% black**. The eye
+surrounding the conjunctiva, including the sclera, has been removed. Eyes-Defy measures
+0.000.
+**Consequences.** The headline claim rests on 218 subjects, two sites, and two regional
+variants of one phone (`SM-G920F`, `SM-G920I`) — not on the ~9,000 images the collection
+appears to offer. This must be stated in the paper, not discovered by a reviewer.
+
+### 2026-09-11 — Ghana conjunctiva and fingernail share participants (N6 opportunity)
+**Decision.** Recorded as an **opportunity, not contamination**, and the paired subjects
+are grouped together for splitting.
+**Evidence.** Subject numbers parsed from filenames match across body sites: non-anemic
+204/204 (Jaccard **1.000**) over a contiguous 1–204 range; anemic 250 shared of 271
+(0.919). Image content does not overlap (0 shared MD5, minimum pHash 10), as expected
+for different body parts — so this is inferred from the numbering scheme, not proven by
+a participant ID column.
+**Consequences.** ~454 participants have paired conjunctiva + nail images, which is what
+N6 needs. But they carry **binary labels only, no Hb**, so fusion can be developed and
+its graceful degradation demonstrated on classification only. Hb_PPG shares no subjects
+with any image dataset, so image+PPG fusion is **simulation-only, permanently**.
+
+### 2026-09-11 — Splits grouped by (subject_id, content hash), not subject_id alone
+**Decision.** The grouping unit is the connected component of a graph joining subject
+ids and MD5 hashes, implemented in `src/hemosight/io/splits.py`.
+**Rationale.** Subject-level grouping is insufficient here: identical images appear
+under different subject ids, and CP-AnemiC images recur inside the Ghana set. In the
+Ghana pool, **1,708 nominal subject ids collapse to 1,067 leak-proof groups** — that gap
+is exactly the leakage a plain subject-level split would have permitted.
+**Consequences.** Every split carries an automated leak check that fails the script on
+violation. Splits are frozen under seed `20260911` in `configs/phase1_splits.yaml`.
+
+### 2026-09-11 — Split outputs written to `data/interim/splits/`, not `data/processed/`
+**Decision.** Phase 1 plan item amended: splits live in `data/interim/splits/`.
+**Rationale.** The Phase 1 instruction specified `data/interim/` for all outputs, and
+splits are regenerable intermediate artefacts rather than a finished processed dataset.
+**Consequences.** Logged rather than changed silently, per the WORKING PROTOCOL. If a
+frozen `data/processed/splits/` copy is wanted later for release, it should be a
+deliberate copy step with its own log entry.
+
+### 2026-09-11 — N2's premise narrowed; N5 materially weakened
+**Decision.** Two novelty claims need their wording changed before any write-up. The
+claims themselves are NOT edited in section 2 — that text stays verbatim as the
+original brief — but no paper text may repeat them as written.
+**N2** says the simulator "supplies severe-anemia cases that no public dataset
+contains". False as written: CP-AnemiC holds 48 images below 7 g/dL, minimum 3.1 g/dL.
+The defensible version is that severe cases are *rare, confined to one site, and carry
+unreliable labels*.
+**N5** assumes SCIN skin-tone labels can be attached to the anemia datasets. They
+cannot. `scin-main/` on disk holds **no data at all** (5 documentation files; the images
+live in a GCS bucket), and SCIN is dermatology imagery with no conjunctiva photographs,
+no Hb, and no participant correspondence to any dataset here. The only route is to train
+a skin-tone estimator on SCIN and apply it, making every fairness stratum an *estimate
+with its own error*. The mechanistic melanin-vs-illuminant decomposition is therefore
+testable only in simulation, where melanin is known by construction.
+**Consequences.** Both are recorded here so the gap between the original claim and what
+the data supports is visible for the rest of the project.
+
+## PHASE 1.5 DECISIONS (2026-09-11)
+
+### 2026-09-11 — N1 restructured into N1a / N1b / N1c
+**Decision.** N1 is now three sub-claims with separate datasets and metrics. See
+section 2.
+**Justification.** Phase 1 found CP-AnemiC and the Ghana conjunctiva set are
+pre-segmented cutouts (mean near-black fraction 0.71/0.72; **the least-cropped image of
+all 4,972 is still 49.7% black**), so the sclera N1 needs is absent. Treating N1 as one
+end-to-end claim would have made it look refuted by a data limitation that in fact only
+bounds its final stage. Splitting it lets N1a and N1b be validated at full strength on
+`nus8` and `MOBIUS`, where no Hb labels are needed and real device diversity exists.
+**Original wording, preserved.** *"N1. Calibration-free spectral super-resolution. Use
+the sclera as an endogenous white reference to estimate the scene illuminant, removing
+the per-camera spectral profiling and per-use radiometric calibration that currently
+blocks hyperspectral-reconstruction methods from field deployment. THIS IS THE HEADLINE
+CLAIM."*
+**Consequences.** The headline survives, but N1c — the only sub-claim that touches
+haemoglobin — is permanently bounded to 218 subjects, 2 sites, 2 variants of one phone,
+no severe cases. That limitation is now written into the claim itself.
+
+### 2026-09-11 — No uncropped originals exist anywhere on disk (CLOSED, do not re-litigate)
+**Decision.** The search is closed. N1c's data base cannot be widened from local data.
+**Evidence.** Exhaustive, not sampled (`scripts/phase1_5_search_originals.py`):
+- Every one of 710 CP-AnemiC and 4,262 Ghana conjunctiva images scanned. **Minimum
+  black fraction 0.497 and 0.496** — the least-cropped image in either set is still
+  half black. **Zero images below 5% black. Zero images above 1 MP** (max 0.14 MP).
+- `Fingernails.rar` (27 MB) listed via a pure-Python RAR5 header parse, no extraction:
+  **4,260 PNGs with names identical to the extracted folder** — a compressed copy, not
+  originals.
+- All 12 nus8 archives are sensor data, not conjunctiva.
+- `ghana_conj` has **no subdirectories and no non-image files**; CP-AnemiC has only
+  `Anemic/`, `Non-anemic/` and its spreadsheet.
+**Consequences.** The cutouts are the only form in which these data were ever
+distributed. Nothing further to check locally; re-obtaining originals would require
+contacting the original authors, which is outside this project's constraints.
+
+### 2026-09-11 — Ghana pool is BINARY-LABEL-ONLY; `hb_label_trusted` enforced
+**Decision.** All haemoglobin values from `cp_anemic`, `ghana_conj` and `ghana_nail` are
+**rejected for every regression task**. Enforced by `hb_label_trusted`, set inside
+`_finalise()` in `src/hemosight/io/manifests.py` so a manifest rebuild cannot silently
+restore them, plus a `trusted_hb()` helper that downstream code must use.
+**Evidence** (`scripts/phase1_5_label_arbitration.py`):
+- The briefed comparison could not be run as stated: **the Ghana conjunctiva set ships
+  no haemoglobin values at all** (0 of 4,262), only a class token in the filename. So
+  "adopt Ghana as authoritative" was never available.
+- CP-AnemiC Hb is **not** self-consistent: 90 of 91 exact-duplicate groups carry more
+  than one Hb value; worst spread **7.10 g/dL within one byte-identical image**.
+- Therefore neither collection is self-consistent on Hb, so the briefed fallback applies.
+**Additional finding — the binary label has its own noise floor.** Ghana's binary label
+*is* internally self-consistent (0 of 1,397 duplicate groups conflict). But on the 419
+unique images present in both collections the two **disagree on 7 (1.67%)**. CP-AnemiC's
+`anemia_label` is exactly `hb_g_dl < 11.0` and its severity bins are the exact WHO
+bands, so it carries no information beyond Hb — meaning each disagreement is a genuine
+mislabelling in one collection or the other. **No binary result on this pool may claim
+accuracy above ~98.3% and attribute the gap to the model.** The rate is measurable on
+419 images and unmeasurable on the remaining ~4,000.
+**Consequences.** The project's entire trustworthy haemoglobin base is **469 rows**:
+217 Eyes-Defy + 252 Hb_PPG. **It contains zero severe cases.**
+
+### 2026-09-11 — N2's justification corrected
+**Decision.** N2's justification is now the label-trustworthiness argument in section 2.
+**Original wording, preserved.** *"This supplies severe-anemia cases that no public
+dataset contains."*
+**Why it was wrong.** CP-AnemiC contains 48 images below 7 g/dL, minimum 3.1 g/dL. The
+statement was factually false and would not have survived review.
+**Why the replacement is stronger.** Those 48 cases are exactly the ones whose labels
+the arbitration rejected, so the simulator remains the only source of *reliably
+labelled* severe anemia. The argument shifts from quantity to trustworthiness, which the
+Phase 1 evidence supports directly.
+
+### 2026-09-11 — N5 rebuilt without SCIN; `data/raw/scin-main` deleted
+**Decision.** SCIN removed as a dependency and deleted from disk. N5 now estimates skin
+tone by Individual Typology Angle on N1-calibrated periocular skin.
+**Original wording, preserved.** *"N5. Mechanistic fairness audit. Report performance
+stratified by skin tone and source device, and DECOMPOSE any gap into melanin absorption
+versus illuminant estimation error."* (The claim stands; only its method changed.)
+**Justification.** `scin-main/` held **no data** — 5 documentation files, 212 KB, zero
+images or label tables; SCIN's data lives in a GCS bucket. Even downloaded it could not
+serve N5: SCIN is dermatology imagery with no conjunctiva, no Hb, and no participant
+correspondence to any dataset here, so attaching its labels would require an unvalidated
+cross-domain transfer.
+**Note on the READ-ONLY rule.** This is the only deliberate deletion inside `data/raw/`,
+made on explicit instruction. It removed documentation, not data, and is recoverable
+from `github.com/google-research-datasets/scin`. The READ-ONLY rule otherwise stands
+unchanged.
+**Why ITA is the better method.** It is computed in closed form from CIELAB, needs no
+external dataset, and — because it runs on N1-calibrated images — makes the melanin
+versus illuminant decomposition mechanistic rather than descriptive: the same illuminant
+estimate under test is what makes ITA comparable across captures.
+**Consequences.** N5 gains three stated limitations that must appear verbatim in the
+paper: no ground-truth tone labels, ITA is a proxy, and the tone axis is confounded with
+site.
+
+### 2026-09-11 — N6 scoped to what the data supports
+**Decision.** Two scope limits recorded in section 2 as permanent, not as open problems.
+**Justification.** The ~454 paired conjunctiva+nail participants sit in the
+BINARY-LABEL-ONLY pool, so fusion there cannot produce a validated g/dL estimate.
+`Hb_PPG_Dataset` shares no participants with any image dataset, and the "no new data
+ever" constraint means it never will.
+**Consequences.** N6 is demonstrated as (a) real classification fusion on paired body
+sites and (b) simulation-only fusion involving PPG. Any paper text implying a validated
+multimodal Hb regression would be false.
+
+### 2026-09-11 — `reports/figures/` removed from version control
+**Decision.** `reports/figures/` added to `.gitignore` and removed from the git index
+with `git rm -r --cached` (files kept on disk). `reports/README.md` documents exact
+regeneration commands per figure.
+**Justification.** Figures render dataset pixels, and 9 of 10 datasets ship no licence
+file, so their redistribution terms are unverified. Committing them would redistribute
+dataset imagery through the repository — the precise thing the "nothing committed" rule
+exists to prevent.
+**Verified.** `git ls-files reports/figures/` returns nothing; `git check-ignore`
+confirms the rule matches. All figures regenerate from `data/raw/` with no manual steps.
+
+## PHASE 2 DECISIONS (2026-09-11)
+
+### 2026-09-11 — N1b's primary evaluation region is the IRIS, not the sclera
+**Decision.** Self-consistency is measured on the iris, a surface never used to
+estimate the illuminant. A sclera figure using a left/right spatial holdout is
+reported as secondary and explicitly labelled partially circular.
+**Rationale.** Estimating from the sclera and evaluating on the sclera is degenerate:
+`corrected = measured / (measured / prior) = prior`, a constant, so the spread
+collapses to exactly zero for every subject regardless of the data. That would have
+looked like a spectacular confirmation of the headline claim and meant nothing.
+**Evidence that this was not hypothetical.** On the secondary sclera-holdout region the
+sclera methods appear to win comfortably (2.47 vs 3.33 dE2000 for shades-of-grey). On
+the non-circular iris they lose to grey-world. **Measuring only on the sclera would have
+produced a confident and wrong claim of success.**
+**Consequences.** `tests/test_phase2.py::test_selfconsistency_is_circular_on_the_
+reference_region` asserts the degeneracy exists, so any future "simplification" of the
+protocol fails a test rather than silently producing a fake result.
+
+### 2026-09-11 — Self-consistency cannot answer the reflectance-prior question
+**Decision.** The prior comparison (neutral / fixed-population / per-subject) is
+reported from N1b as instructed, together with a statement that the protocol is
+structurally incapable of answering it. The question is answered by N1a instead.
+**Rationale.** A prior is constant for a given subject, so it multiplies all of that
+subject's captures by the same factor: it *shifts* the subject's colour cluster without
+changing its *spread*. Within-subject spread is therefore blind to the prior by
+construction.
+**Evidence.** Predicted before running, then confirmed: neutral 7.31, fixed 7.43,
+per-subject 7.43 dE2000; fixed vs neutral paired p = 0.25 (not significant); fixed and
+per-subject are **bit-identical** (max per-subject difference 0.0).
+**Second finding.** Per-subject and fixed-population coincide because a per-subject
+prior can only be fitted from that subject's own ground truth, which a held-out subject
+by definition lacks, so the estimator falls back to the population value. **A
+per-subject prior is not evaluable in any deployable setting** — which answers whether
+one could be shipped: it could not.
+**Consequences.** N1a (nus8, ground-truth illuminants) carries the prior question:
+knowing the reference reflectance halves the error, 1.266 -> 0.666 deg. N1c will test
+it against haemoglobin.
+
+### 2026-09-11 — N1b runs on all 100 MOBIUS subjects, not the 35 annotated ones
+**Decision.** `index_mobius_all()` indexes all 16,717 frames; N1b uses the trained
+model's masks rather than ground-truth masks.
+**Rationale.** A first run selected only 35 subjects, because `index_mobius()` returns
+only the 3,559 annotated frames — and those come from exactly the subjects the
+segmentation model trained on. That would have evaluated the pipeline on its own
+training subjects while discarding two thirds of the population. The run was stopped
+and restarted.
+**Consequences.** 100 subjects, 1,796 frames, 40 held out for evaluation. 71 of the 100
+subjects were never seen in segmentation training; this is recorded in the results JSON
+so the unseen subset can be reported separately if the distinction ever matters.
+
+### 2026-09-11 — MOBIUS and SBVPI label spaces reconciled in the loss, not the labels
+**Decision.** `merged_bg_cross_entropy` merges the background and periocular logits
+for MOBIUS frames only.
+**Rationale.** MOBIUS marks periocular skin black, identical to true background, while
+SBVPI gives it its own class. Training naively on both teaches the model that skin is
+simultaneously class 0 and class 4, and the periocular class collapses. Remapping the
+labels instead would have thrown away either SBVPI's periocular supervision or
+MOBIUS's negative supervision.
+**Evidence it worked.** Epoch 1 shows background IoU 0.110 and periocular 0.357 while
+the conventions were still in conflict; by epoch 3 they reach 0.953 and 0.957, ending
+at 0.964 and 0.975.
+
+### 2026-09-11 — 16-bit NUS PNGs must be read with cv2, never PIL
+**Decision.** `load_linear_png` uses `cv2.IMREAD_UNCHANGED` and reverses BGR.
+**Rationale.** The NUS PNGs are 16-bit (bit depth 16, colour type 2). PIL returns them
+as 8-bit RGB **without raising**, collapsing ~1,848 distinct values to 11 on a typical
+frame. Every downstream number would have been noise, and nothing would have failed
+loudly.
+**Related.** Dark-level subtraction is equally load-bearing and equally silent: on
+Canon600D it moves mean angular error from 12.04 to 0.89 deg. Both are verified per
+camera before use.
+
+### 2026-09-11 — The MOBIUS sclera prior is contaminated by grey-world's bias
+**Decision.** The fitted population sclera reflectance prior is reported with an
+explicit warning that it is **not** interpretable as physical sclera reflectance.
+**Evidence.** The fitted value is `[0.858, 1.020, 1.122]` — more blue than red, the
+opposite of a yellowish sclera. MOBIUS ships no ground-truth illuminant, so the prior
+had to be fitted against grey-world under a stated assumption; MOBIUS frames are
+skin-dominated, grey-world therefore leans red, and the "reflectance" inherited the
+inverse of that bias.
+**Consequences.** This is why the fitted prior scores marginally *worse* than assuming
+neutrality on MOBIUS. A physically meaningful sclera prior requires a dataset with
+ground-truth illuminants or measured reflectance; neither exists in this project. Any
+future sclera prior must be fitted where ground truth exists, or derived from the N2
+simulator — not fitted against another estimator.
+
+## PHASE 2.5 DECISIONS (2026-09-11)
+
+### 2026-09-11 — N1 is REFUTED in its entirety; the contribution becomes the diagnosis
+**Decision.** N1 — "the sclera as an endogenous white reference enables calibration-free
+colour correction" — is recorded as a **negative result**. Two independent endogenous
+ocular references (sclera, corneal specular highlight) have now been tested on the same
+protocol and neither beats grey-world, a whole-image statistic requiring no
+segmentation, no reference surface and no anatomy.
+**Evidence** (held-out iris, within-subject dE2000, 40 subjects, paired Wilcoxon):
+grey-world 6.076; specular+sclera 7.047 (p=4.5e-04 worse); sclera 7.427 (p=3.1e-08
+worse); specular 7.821 (p=4.5e-06 worse); no correction 9.530.
+**The rescue did not rescue.** Specular vs sclera: +0.394 dE2000, **p = 0.29, not
+significant**. Removing the per-subject reflectance term — the exact quantity Phase 2
+identified as the bottleneck — did not improve the result.
+**The replacement contribution.** A quantified, mechanistic account of *why* endogenous
+ocular white references fail: the sclera's diffuse reflectance varies between
+individuals by more than the illuminant signal being estimated (10% yellowing = 4.40
+deg, larger than grey-world's entire error), while segmentation (31 px mask
+perturbation = 0.40 deg) and estimation mathematics (0.666 deg given a known
+reflectance, six sensors) are both exonerated. The corneal highlight removes the
+per-subject term and still fails, while adding its own failure modes.
+**Consequences.** No paper text may present N1 as a working method. **N1a survives
+intact** as a component result. The project's calibration recommendation downstream is
+grey-world on a tight periocular crop.
+
+### 2026-09-11 — Task 4 refuted its own hypothesis; reported as such
+**Decision.** The deployment-realism check was expected to show grey-world degrading as
+scene context vanished, favouring local references. It shows the opposite and is
+reported that way.
+**Evidence.** Grey-world mean dE2000 by field of view: 100% -> 6.076, 60% -> 5.790,
+40% -> 5.416, **25% -> 3.935**, 15% -> 4.889. Its best result anywhere in Phase 2 or
+2.5, and better than every endogenous method by ~3.1-3.9 dE2000.
+**Mechanism.** A wide MOBIUS frame is dominated by facial skin, which is strongly and
+consistently red, so the grey-world assumption is badly violated. A tight periocular
+crop contains sclera, iris, pupil, lashes and a little skin — a far more balanced set of
+reflectances, so the assumption is *better* satisfied on exactly the narrow crop a real
+capture produces. The tightest crop (15%) worsens again, consistent with losing that
+balance.
+**Consequences.** Grey-world's advantage does not merely survive the deployment-realistic
+regime, it **widens**. Caveat recorded against overstatement: these crops are centred on
+the eye using the segmentation and are therefore idealised; hand-framing noise was not
+simulated, though the effect size (-2.14 dE2000) makes it unlikely to be erased.
+
+### 2026-09-11 — Highlight detection must be physics-based, not percentile-based
+**Decision.** A specular pixel must exceed BOTH 3x the region's median luminance AND its
+99th percentile.
+**Rationale.** A percentile alone is not a detector. The top 1% of a 350,000-pixel
+iris+pupil region is ~3,500 pixels whether or not any highlight exists, so a
+percentile-only rule fires on every image by construction. The first census run reported
+97.3% usable — an artefact of the detector never returning empty. The dichromatic model
+supplies a real criterion: a specular pixel is much brighter than the same surface's
+body reflectance.
+**Consequences.** The honest rate is 71.7% on MOBIUS, not 97.3%.
+`tests/test_phase2_5.py::test_uniform_region_yields_no_highlight` asserts a flat
+synthetic iris yields zero detections.
+
+### 2026-09-11 — Degenerate colour clouds are the signal, not a fit failure
+**Decision.** `degenerate_direction()` was added as the PREFERRED decomposition route.
+**Rationale.** The verification test failed on first run: the dichromatic plane fit
+returned None for the pupil. Investigation showed why — with `D ~= 0` the pupil's pixels
+satisfy `I ~= m_s * L` and collapse to a single direction (s1/s0 = 0.019), so a plane fit
+correctly refuses them. But that refusal discards the cleanest reading available: the
+principal direction recovers the true illuminant to within 2 degrees.
+**Consequences.** The test caught a real defect rather than a test artefact. Both routes
+are now verified against synthetic surfaces built from the dichromatic model with a known
+illuminant.
+
+### 2026-09-11 — SBVPI excluded from the feasibility gate denominator
+**Decision.** SBVPI's 0% highlight rate is reported separately, not averaged into the
+gate.
+**Rationale.** The Phase 2 model outputs **zero** iris/pupil pixels on SBVPI, consistent
+with its measured iris IoU of 0.000 there. The 0% measures segmentation transfer, not
+highlight availability, and averaging it in would have dragged the headline number down
+for the wrong reason (58.6% all-frames versus 71.7% MOBIUS).
+
+## PHASE 3 DECISIONS (2026-09-11)
+
+### 2026-09-11 — Claim hierarchy restructured: N3+N4 become PRIMARY, N1 becomes a secondary negative result
+**Decision.** The claim hierarchy in section 2 now ranks N3+N4 as the primary
+contribution and N1 as a secondary one consisting of a negative result plus a practical
+recommendation. Substance of N2, N5 and N6 is unchanged. All original claim text is
+retained verbatim under its refuted banner.
+**Rationale.** N1 was the headline and Phase 2.5 refuted it on pre-declared criteria.
+Continuing to present it as the headline would misrepresent the evidence. What the
+project can still establish is the physical estimation pipeline: haemoglobin in g/dL
+with a calibrated interval and a principled abstention, which is N3+N4.
+**The negative result is stated positively.** Two independent endogenous references
+tested on 100 subjects, 3 devices, 3 lighting conditions; both lose to grey-world; and
+grey-world *improves* under tight crops (6.076 -> 3.935 dE2000 at 25% FOV), which is
+both a useful practical recommendation and a counter-intuitive finding worth reporting.
+**Consequences.** Grey-world on a tight periocular crop is the normalisation for all
+later phases. Phase 3's gate (Task 0) now carries unusual weight: it asks whether the
+colour-to-haemoglobin inversion survives the residual error that recommendation leaves.
+
+### 2026-09-11 — The Phase 2 diagnosis is recorded as INCOMPLETE
+**Decision.** A standing warning is attached to the claim hierarchy: the Phase 2
+explanation for why the sclera fails is not settled and may not be presented as such.
+**Evidence.** Phase 2 attributed the failure to inter-individual reflectance variance
+(10% scleral yellowing moves the estimate 4.40 deg). Phase 2.5 removed that term
+outright by using a corneal specular reference, which carries no per-subject
+reflectance component at all. The result did not improve: **specular vs sclera
++0.394 dE2000, p = 0.29**.
+**Interpretation.** If inter-individual reflectance variance were the sole limiting
+factor, eliminating it should have helped. It did not. Either another error source
+dominates both methods, or the specular route introduces compensating errors of its own
+(availability on 78% of frames, 41% multi-source frames, 39 pp device spread).
+**Consequences.** The diagnosis remains the project's contribution from N1, but it is a
+*partial* diagnosis. Honest framing: segmentation and estimation mathematics are
+exonerated with measured bounds; inter-individual reflectance variance is demonstrated
+to be large but is NOT sufficient to explain the whole gap. Identifying the remainder is
+open work, not a claimed result.
+
+### 2026-09-11 — TASK 0 GATE FAILED: work stopped before Tasks 1-3
+**Decision.** The full layered Monte Carlo simulator, its literature validation, and the
+synthetic corpus (Tasks 1-3) were **not built**. Work stopped at the gate, as the
+pre-declared protocol required.
+**Evidence.** Haemoglobin MAE at the residual colour error this project's own
+recommended normalisation leaves (3.935 dE2000, grey-world @25% FOV, measured in
+Phase 2.5) is **3.417 g/dL** — 1.7x the >2.0 g/dL "NOT RECOVERABLE" threshold declared
+in CLAUDE.md before running. At full-frame grey-world (6.076) it is 5.096 g/dL. Only at
+a residual of 1.0 dE2000 — better than any method measured anywhere in this project —
+does it become viable (0.864 g/dL).
+**Rationale for stopping.** The corpus exists to train an RGB-to-haemoglobin inversion.
+The gate shows that inversion cannot survive the available calibration error, so more
+or better training data does not address the limit. Building it anyway would be the
+exact waste the gate was designed to prevent.
+**Consequences.** N2's purpose changes from *data generator* to *analysis instrument*:
+the minimal forward model produced the gate result, the signal-to-noise framing, the
+low-Hb sensitivity finding and the melanin confounder without any photon transport.
+
+### 2026-09-11 — The failure is a signal-to-noise limit, not a modelling artefact
+**Decision.** The result is stated as a signal-versus-noise comparison, which needs no
+inversion machinery and is therefore harder to dismiss.
+**Evidence.** Haemoglobin changes conjunctival colour by **0.452 dE2000 per g/dL**
+(simulated) or **~0.70** (measured on 216 real Eyes-Defy subjects using the dataset's own
+palpebral masks). The best calibration available leaves **3.935 dE2000**. Noise exceeds
+signal by **5.6x (empirical) to 8.7x (simulated)** — equivalent to 5.6-8.7 g/dL of
+haemoglobin error against a clinically meaningful range only 14 g/dL wide.
+**Robustness.** Five tissue-assumption variants (BVF 0.02-0.15, StO2 0.60-1.00) all give
+7.5-12.2 g/dL equivalent error. The conclusion does not depend on one parameter choice.
+**The gate is OPTIMISTIC**, which strengthens it: oxygenation, blood volume fraction,
+melanin and layer thickness were all held fixed AND known. Real per-subject variation in
+those adds error on top.
+**Consequences.** The failure is specific to *ambient-light RGB photography*, not to
+non-invasive haemoglobin estimation in general. The PPG modality uses four narrow
+wavelengths with a controlled source and no ambient illuminant to estimate, and is not
+subject to this particular limit.
+
+### 2026-09-11 — Melanin is a catastrophic confounder (an N5 finding found in Phase 3)
+**Decision.** Recorded here and flagged forward to N5 rather than left to be
+rediscovered.
+**Evidence** (Task 4, illuminant held perfect, only the tissue prior perturbed):
+a melanin volume fraction of **0.005 — half of one percent — shifts recovered
+haemoglobin by +9.6 g/dL**. At 0.01 and above the estimate rails to the top of the
+search range, i.e. total failure. By contrast oxygenation is **benign across its entire
+physiological range** (0.60-1.00 all within +/-1.0 g/dL), blood volume fraction is
+tolerable to about +/-30%, and layer thickness to -20%/+100%.
+**Interpretation.** Conjunctival melanin is low but nonzero and conjunctival melanosis
+is more prevalent in darker-skinned populations. This is a direct, quantified mechanism
+by which a colour-based haemoglobin estimator would be **severely biased by skin tone** —
+exactly what N5 exists to audit.
+**Qualifications recorded against overstatement.** The epithelial melanin layer in this
+model is thin, so the sensitivity may be overstated by the layered approximation; and
+above 0.01 the estimate rails, so only the fact of failure is meaningful, not the
+magnitude. Neither changes the direction.
+
+### 2026-09-11 — Optical constants are TRANSCRIBED and require verification
+**Decision.** `constants.py` carries a prominent VERIFICATION REQUIRED banner and a
+`validate_constants()` self-check; every downstream number is provisional.
+**Rationale.** This environment has no network access and no installed package ships
+haemoglobin optical data, so the spectral tables were transcribed from the cited
+published compilations rather than read from primary files.
+**The self-check earned its place.** It FAILED on first run: the 500 nm isosbestic
+landed at 515 nm, and the 529/545 pair had collapsed because HbO2's 542 nm alpha peak
+was not rising above deoxy-Hb between them. Both were real transcription errors. After
+correction all six isosbestic points land within 0.5 nm, the HbO2 visible peak is at
+576 nm, and the deoxy/oxy red ratio is 8.4x.
+**Consequences.** Internal consistency is not verification. Before publication the
+primary sources must be re-read and `validate_constants()` re-run.
+
+### 2026-09-11 — The six nus8 camera spectral sensitivities are NOT available
+**Decision.** The CIE 1931 2-degree observer is used as a camera proxy; Task 3's
+"project through the six nus8 cameras" could not be done as specified.
+**Evidence.** NUS ships ground-truth illuminants and colorchecker coordinates, not
+spectral sensitivity functions. `colour-science` ships measured SSFs for exactly two
+cameras (Nikon 5100, Sigma SDMerill), neither of them a nus8 camera.
+**Consequences.** Any camera-specific claim in later phases needs SSFs this project does
+not have. Recorded as a data limitation, not worked around silently.
+
+## PHASE 3.5 DECISIONS (2026-09-11)
+
+### 2026-09-11 — The ratio reformulation is REFUTED; the imaging arm is definitively a negative result
+**Decision.** Phase 3.5 Task 1 failed against its pre-declared threshold and work
+stopped; Task 2 was not run. **Both formulations of the imaging claim — absolute
+illuminant recovery and the illuminant-free ratio — have now failed.** The project's
+imaging contribution is recorded as a negative result, not a method.
+**Evidence.** Best ratio feature `iris_over_sclera`: within-subject spread 6.399
+dE2000, ratio sensitivity 0.637 dE2000/g/dL, **equivalent residual 10.04 g/dL** against
+a >2.0 failing threshold — 5x over. Every ratio feature is **worse than the uncorrected
+sclera** (5.682): iris/sclera 6.399, pupil/iris 7.541, pupil/sclera 9.091. Grey-world
+remains best at 3.330.
+**The implementation was verified before the conclusion was accepted.** On a synthetic
+diagonal illuminant change the ratio cancels **exactly, 0.000000 dE2000** with a plain
+mean (0.046 with the percentile-trimmed summariser actually used). The observed spread
+on real captures is **139x larger** than the implementation's own residual. The algebra
+works; the data does not.
+**Consequences.** No third reformulation is proposed. The imaging arm's status is
+settled. Phases 4-8 must not be run as an imaging pipeline on the assumption that
+colour-to-haemoglobin works.
+
+### 2026-09-11 — Why the ratio fails: the reference is noisier within-subject than between
+**Finding.** The ratio method needs the sclera stable across captures **of one person**,
+not across people. Measured separately (Task 3):
+- MOBIUS (phone captures): within-subject **5.860** dE2000 vs between-subject **4.050**
+  — ratio **1.447**, the wrong side of 1.
+- SBVPI (studio): within **1.685** vs between **1.825** — ratio **0.924**.
+**Interpretation.** On phone captures the sclera varies MORE across captures of the same
+person than between different people. Dividing by a reference noisier than the
+population it normalises against adds variance rather than removing it, which is exactly
+what Task 1 measured. Controlled studio conditions cut within-subject variation **3.5x**,
+so the instability is dominated by capture conditions (geometry, gaze, specular
+contamination, focus), not by tissue change — but even in a studio the ratio is 0.92,
+still short of the << 1 regime required.
+**Second mechanism.** von Kries diagonality is breaking down: the ratio should cancel
+the camera's per-channel gains as well as the illuminant, yet the phone variance
+fraction stays at **0.177**, against 0.202 uncorrected. Real sensitivities overlap
+enough that an illuminant change is not a per-channel gain.
+**Third.** The ratio raises the signal 1.4x (0.452 -> 0.637 dE2000/g/dL) but raises the
+noise 1.9x. Reporting only the signal gain would have been the easy error.
+
+### 2026-09-11 — A per-subject offset would not help, and is not obtainable
+**Decision.** Per-subject calibration is recorded as unavailable and is not to be used
+in any reported figure.
+**Evidence.** An offset removes the BETWEEN-subject term and leaves the WITHIN-subject
+term. On MOBIUS that removes 4.050 dE2000 and leaves **5.860** — it removes the smaller
+term and leaves the larger one. It addresses the wrong problem.
+**And it cannot be obtained.** A per-subject offset needs one capture of that subject
+with a known answer: a reference haemoglobin measurement or a calibrated target in
+frame. A screening deployment has neither — the premise is a first, uncalibrated capture
+of a person whose haemoglobin is unknown. Any performance figure assuming an offset is
+reporting an oracle, not a method.
+
+### 2026-09-11 — Task 0: the downloaded constants disagree materially with the transcription
+**Decision.** All spectral constants now load from `data/raw/optical_constants/`;
+`constants_transcribed.py` is retained only for this comparison. The VERIFICATION
+REQUIRED banner is lifted for haemoglobin, water, scattering and camera sensitivities,
+and **remains** for layer thicknesses and blood volume fractions, which no downloaded
+file backs.
+**Evidence.** Median relative error 1.30%, but **18.8% of points differ by >10%**, max
+**252%**. Worst: deoxy-Hb at 470 nm (16,156 sourced vs 56,880 transcribed), 1000 nm
+(207 vs 726), 460 nm (23,389 vs 75,326). The transcription had deoxy-haemoglobin far
+too high across the blue and the far red.
+**Important caveat about the Phase 3 self-check.** The isosbestic check **PASSED on the
+bad data** — it verified where the two curves cross, which was correct, while the values
+between the crossings were wrong. A consistency check is not a verification, as was
+flagged at the time.
+**Effect on Phase 3.** Re-running the gate on sourced data gives **3.893 g/dL** (was
+3.417) at the measured residual: the verdict is unchanged and marginally stronger, and
+the 2.0 dE2000 case moves from MARGINAL to NOT RECOVERABLE.
+
+### 2026-09-11 — Melanin confirmed to be a fitted power law; flagged as sweep-never-fix
+**Evidence.** Fitting `mu_a = A*lambda^-k` to the spectralLIB melanin curve gives
+A = 6.6e11, k = 3.330, with a maximum log-residual of **0.000000** — it is *exactly* a
+power law with no measured structure in it.
+**Consequences.** Combined with the Phase 3 finding that a melanin volume fraction of
+0.005 shifts recovered Hb by **+9.6 g/dL**, this is the model's single most consequential
+assumption: extreme sensitivity, large inter-individual variation, known only through a
+smooth fit. `constants.py` now flags it to be SWEPT, never fixed, and
+`melanin_powerlaw_fit()` exposes the exponent so the sensitivity can be propagated. It
+is also the mechanism by which this method would be biased by skin tone (N5).
+
+### 2026-09-11 — PPG arm promoted to CO-PRIMARY (Task 4, scope change only)
+**Decision.** The claim hierarchy now carries two co-primary arms: imaging (contingent,
+now refuted) and PPG (promoted). **No PPG model has been built.**
+**Rationale.** `Hb_PPG_Dataset` is not subject to the Phase 3 failure for a structural
+reason: four narrow wavelengths rather than three broad overlapping RGB channels, and a
+**controlled source** — the LEDs are the illuminant, so there is no ambient illuminant to
+estimate and the entire error term that defeated Phases 2, 2.5, 3 and 3.5 does not
+exist. It is also the project's best-labelled data: 252 subjects with venous HemoCue
+reference, against 217 usable Eyes-Defy images, and one of only two trustworthy Hb
+sources left after the Phase 1.5 arbitration.
+**Consequences.** The Phase 3/3.5 failures are specific to ambient-light RGB
+photography, not to non-invasive haemoglobin estimation. That distinction is why the
+project still has a viable primary claim.
+
+### 2026-09-11 — Only 2 of 6 nus8 cameras have spectral sensitivities
+**Evidence.** 28 cameras parsed from the Jiang camspec database (400-720 nm at 10 nm;
+an initial parser assumed 400-700 and returned zero). Canon 600D matches exactly;
+Canon 1DMarkIII is a different body from the nus8 1Ds Mark III. **Fujifilm X-M1 and
+Samsung NX2000 are absent entirely.** An average mobile-phone SSF is also available and
+is more representative of this project's inputs than any DSLR.
+**Consequences.** Any camera-specific claim over all six nus8 sensors remains
+unsupported by measured SSFs.
 
 ---
 
@@ -330,7 +1236,472 @@ Format: `### YYYY-MM-DD — Experiment name`, then **Config** (script, config fi
 commit), **Data** (split, sites, n), **Metric(s)**, **Interpretation**, **Status**
 (provisional / confirmed / superseded).
 
-*No results yet. Phase 0 produces no metrics.*
+### 2026-09-11 — Phase 1 dataset inventory
+**Config.** `scripts/phase1_manifests.py`, `scripts/phase1_audit.py`.
+**Data.** All of `data/raw/`, read-only. **Metrics.** 28,275 manifest rows over 2,333
+subjects; integrity check PASS (no duplicate `image_id` or `file_path`, all Hb inside
+1–25 g/dL, 0 unparsed filenames of 8,522 Ghana files).
+
+| dataset | images | subjects | imgs/subj | with Hb | Hb range | severe <7 | devices |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| cp_anemic | 710 | 710* | 1.0 | 710 | 3.1–15.0 | 48 | 0 (EXIF stripped) |
+| ghana_conj | 4,262 | 523 | 8.1 | 0 | — | — | 0 (EXIF stripped) |
+| ghana_nail | 4,260 | 475 | 9.0 | 0 | — | — | 0 (EXIF stripped) |
+| eyes_defy | 218 | 218 | 1.0 | 217 | 7.0–17.4 | 0 | 2 |
+| hb_ppg | 252 | 252 | 1.0 | 252 | 8.5–17.3 | 0 | 1 |
+| sbvpi | 1,856 | 55 | 33.8 | 0 | — | — | 1 |
+| mobius | 16,717 | 100 | 167.2 | 0 | — | — | 3 |
+
+\* CP-AnemiC subject ids are a **fallback** (= image id); its sheet has no participant
+column. Every other dataset has a true subject id — 27,565 of 28,275 rows (97.5%).
+**Interpretation.** Only 3 of 7 datasets carry Hb, totalling 1,179 labelled
+measurements — of which 710 are the unreliable CP-AnemiC set. **Status: confirmed.**
+
+### 2026-09-11 — Phase 1 overlap check (N/A — this is a data result, not a model metric)
+**Config.** `scripts/phase1_overlap.py`; pHash/dHash threshold 10, embedding cosine
+0.92, ResNet18 ImageNet features on GPU.
+**Data.** cp_anemic (710), ghana_conj (4,262), ghana_nail (4,260).
+**Metrics.**
+- cp_anemic vs ghana_conj: 419 shared MD5; pHash ≤10 **697/710 (98.17%)**, 646 at
+  distance 0; dHash ≤10 708/710; embedding ≥0.92 **701/710**; max cosine 1.0000.
+- cp_anemic vs ghana_nail: 0 shared MD5; pHash min 10; embedding max 0.9344.
+- ghana_conj vs ghana_nail: 0 shared MD5; pHash min 10; embedding max 0.9394.
+- Cross-body-site subject numbering: non-anemic **Jaccard 1.000 (204/204)**, anemic
+  0.919 (250 shared of 271).
+- Intra-dataset duplication: cp_anemic 498 unique of 710 (29.9% redundant), ghana_conj
+  2,015 of 4,262 (52.7%), ghana_nail 2,097 of 4,260 (50.8%).
+- CP-AnemiC label conflicts: 90 of 91 exact-duplicate groups carry >1 distinct Hb.
+**Interpretation.** CP-AnemiC is contained inside ghana_conj → one site. Conjunctiva and
+nail share a participant roster → N6 opportunity. Headline file counts overstate the
+Ghana data by ~2x. **Status: confirmed.** Metadata-correspondence signal **not
+computable** (Ghana sets ship no Hb/age/sex) — recorded as unavailable, not negative.
+
+### 2026-09-11 — Phase 1 image-content check (NEGATIVE RESULT for N1)
+**Config.** `scripts/phase1_audit.py`, 60 images/dataset, seed 0, near-black =
+max channel < 12.
+**Metrics.** Mean near-black fraction: cp_anemic **0.705**, ghana_conj **0.723**,
+ghana_nail 0.205, eyes_defy **0.000**, sbvpi 0.000, mobius 0.019. Images over 30% black:
+cp_anemic **100%**, ghana_conj **100%**.
+**Interpretation.** **Negative result, recorded prominently.** The two largest
+conjunctiva datasets are pre-segmented cutouts with the sclera removed, so N1's white
+reference does not exist in them. N1's end-to-end validation set is Eyes-Defy alone:
+**218 subjects, 2 sites, 2 variants of one phone, no severe cases.** **Status:
+confirmed.**
+
+### 2026-09-11 — Phase 1 splits
+**Config.** `scripts/phase1_splits.py`, `configs/phase1_splits.yaml`, seed `20260911`.
+**Metrics.** Ghana pool 9,232 images; **1,708 nominal subject ids → 1,067 leak-proof
+groups**; train 5,508 img/640 grp, calibration 1,950/213, test 1,774/214. Eyes-Defy
+cross-site: italy_to_india 123 train / 95 test, reverse 95/123. Hb_PPG 151/51/50
+subjects. nus8 1,265 images, 6 cameras, per-camera 3-fold plus leave-one-camera-out.
+**Leak check: PASS** — no subject and no byte-identical image spans a boundary.
+**Interpretation.** The 1,708→1,067 collapse is the leakage a plain subject-level split
+would have permitted; it is the single most important guard in Phase 1.
+**Status: confirmed.**
+
+### 2026-09-11 — Phase 1 nus8 parse
+**Config.** `src/hemosight/io/nus8.py`.
+**Metrics.** 6 cameras, 1,265 images, **0 missing PNGs, 0 missing colorchecker masks**,
+all ground-truth illuminants unit-normalised (‖v‖ = 1.000). Black/saturation levels
+differ per camera (0–2048 / 4,043–15,892), confirming both 12-bit and 14-bit sensors.
+**Interpretation.** N1's illuminant-accuracy arm is fully supported over six sensors.
+Two of the benchmark's eight cameras are not extracted — report six.
+**Status: confirmed.**
+
+### 2026-09-11 — Phase 1.5 uncropped-original search (NEGATIVE RESULT, conclusive)
+**Config.** `scripts/phase1_5_search_originals.py`. Full scan, not sampled.
+**Data.** All 710 CP-AnemiC, 4,262 Ghana conjunctiva, 4,260 Ghana nail, 218 Eyes-Defy
+images; all 13 archives under `data/raw/`.
+**Metrics.**
+
+| dataset | n | black mean | **black MIN** | n < 5% black | max MP | n > 1 MP |
+| --- | --- | --- | --- | --- | --- | --- |
+| cp_anemic | 710 | 0.713 | **0.497** | 0 | 0.14 | 0 |
+| ghana_conj | 4,262 | 0.713 | **0.496** | 0 | 0.14 | 0 |
+| ghana_nail | 4,260 | 0.238 | 0.043 | 6 | 0.05 | 0 |
+| eyes_defy | 218 | 0.000 | 0.000 | 218 | 11.90 | 218 |
+
+`Fingernails.rar`: 4,261 entries, 4,260 `.png`, names identical to the extracted folder.
+**Interpretation.** **Negative result, conclusive.** Not one uncropped image exists in
+either conjunctiva dataset — the least-cropped is still 49.7% black and the largest is
+0.14 MP against Eyes-Defy's 11.9 MP. N1c's data base cannot be widened. Question closed.
+**Status: confirmed.**
+
+### 2026-09-11 — Phase 1.5 haemoglobin label arbitration
+**Config.** `scripts/phase1_5_label_arbitration.py`.
+**Data.** cp_anemic (710), ghana_conj (4,262), 419 shared unique images.
+**Metrics.**
+- Q1 CP-AnemiC Hb self-consistent: **False** — 90/91 duplicate groups conflict; worst
+  spread **7.10 g/dL** within one byte-identical image.
+- Q2 Ghana binary self-consistent: **True** — 0/1,397 duplicate groups conflict.
+  Ghana Hb values present: **0**.
+- Q3 cross-collection binary agreement: **412/419 (98.33%)**, 7 disagreements.
+- Q4 CP-AnemiC Hb vs its own binary label at WHO 11.0 g/dL: **0/710 mismatches** — the
+  label is exactly `hb < 11.0`, and severity bins are the exact WHO bands.
+- Resulting flags: trusted Hb rows **469 of 28,275** (eyes_defy 217, hb_ppg 252);
+  untrusted 27,806.
+**Interpretation.** Verdict **BINARY_LABEL_ONLY**. The Ghana pool leaves Hb regression
+entirely. Two numbers to carry forward: the project's trustworthy Hb base is **469 rows
+with zero severe cases**, and the retained binary label carries a **1.67% noise floor**
+measured where checkable — an accuracy ceiling of ~98.3% on that pool.
+**Status: confirmed.**
+
+### 2026-09-11 — Phase 1.5 repository hygiene
+**Config.** `git rm -r --cached reports/figures`, `.gitignore` updated.
+**Metrics.** `git ls-files reports/figures/` → 0 entries. `git check-ignore` matches at
+`.gitignore:26`. Tracked files: 22, of which 1 under `reports/`. 5 figures remain on
+disk and regenerate from `data/raw/` via 3 documented commands.
+`data/raw/scin-main/` deleted: 5 files, 212 KB, 0 data files.
+**Interpretation.** No dataset pixels can now enter version control.
+**Status: confirmed.**
+
+### 2026-09-11 — N1a: illuminant estimation on nus8 (SUPPORTED)
+**Config.** `scripts/phase2_nus8_n1a.py`, `src/hemosight/calibration/`. Per-camera
+3-fold CV and leave-one-camera-out from `configs/phase1_splits.yaml` (seed 20260911).
+**Data.** 1,265 images, 6 cameras, ground-truth illuminants. ColorChecker masked out of
+every classical baseline's input.
+**Metrics** (angular error in degrees, pooled over cameras):
+
+| method | mean | median | trimean | best25 | worst25 |
+| --- | --- | --- | --- | --- | --- |
+| reference-patch, fixed population prior | **0.666** | 0.376 | 0.414 | 0.131 | 1.734 |
+| reference-patch, assumed neutral | 1.266 | 1.125 | 1.134 | 0.610 | 2.192 |
+| max-RGB p99 | 3.076 | 2.276 | 2.500 | 0.694 | 6.762 |
+| shades-of-grey p6 | 3.401 | 2.548 | 2.699 | 0.861 | 7.425 |
+| grey-world | 4.020 | 3.100 | 3.279 | 0.878 | 8.749 |
+| grey-edge 2 / 1 | 6.325 / 6.486 | | | | |
+| max-RGB | 11.140 | 11.917 | | | |
+
+Leave-one-camera-out pooled: 0.735 deg (vs 0.666 in-camera), so the prior transfers
+across sensors. Classical baselines land in the published NUS range, an independent
+check that the harness is not flattering itself.
+**Prior ablation.** neutral 1.266 -> fixed 0.666 deg: **knowing the reference
+reflectance halves the error (47%)**. The oracle reaches exactly 0.000 by construction
+and is reported only to show the measurement model inverts exactly, i.e. all residual
+error is prior error, not model error.
+**Interpretation.** SUPPORTED against a criterion declared before the run. **Status:
+confirmed.**
+
+### 2026-09-11 — Sclera segmentation (SBVPI + MOBIUS)
+**Config.** `scripts/phase2_train_segmentation.py`, U-Net + ImageNet ResNet-18, 384px,
+batch 12, AMP, 8 epochs. Subject-level split: train 4,294 / val 1,088.
+**Metrics.** Held-out IoU: sclera **0.8749** (Dice 0.9333), iris 0.7949, pupil 0.6865,
+periocular 0.9750, background 0.9640. Peak GPU **1.5 GB** of 8 GB.
+Per dataset: MOBIUS sclera 0.8541, SBVPI sclera 0.9045.
+**By device:** iPhone 6s 0.8475, Sony Xperia Z5 0.8431, Xiaomi Pocophone F1 0.8784 —
+spread **0.0352**.
+**By lighting:** indoor 0.8944, natural 0.8702, **poor 0.7971** — spread **0.0973**.
+**Interpretation.** Device does NOT meaningfully confound segmentation; **lighting
+does**. The pipeline degrades ~10 IoU points exactly in the poor-light condition that
+field deployment would face. Any later result stratified by lighting inherits this.
+SBVPI iris/pupil IoU is 0.000 — those classes are annotated on only ~128 of 1,840 SBVPI
+images, so iris segmentation does not transfer to that domain. N1b is unaffected (it
+runs on MOBIUS, iris IoU 0.8148). **Status: confirmed.**
+
+### 2026-09-11 — N1b: sclera self-consistency (PARTIALLY SUPPORTED — negative on the headline)
+**Config.** `scripts/phase2_n1b_selfconsistency.py`. MOBIUS, 3 phones x 3 lighting,
+1,796 frames, 100 subjects; prior fitted on 60 subjects, evaluated on 40 held out.
+Primary region **iris** (non-circular); secondary sclera spatial holdout.
+**Metrics — within-subject dE2000 spread on the iris (lower is better):**
+
+| method | mean | median |
+| --- | --- | --- |
+| **grey-world** | **6.08** | 5.57 |
+| sclera, neutral prior | 7.31 | 6.82 |
+| sclera, fixed population prior | 7.43 | 7.16 |
+| sclera, per-subject prior | 7.43 | 7.16 |
+| shades-of-grey p6 | 7.55 | 6.99 |
+| max-RGB p99 | 8.26 | 7.14 |
+| no correction | 9.53 | 10.12 |
+
+**Paired Wilcoxon over the same 40 subjects** (sclera fixed prior vs):
+no correction -2.104, p=2.4e-08, better in 35/40; **grey-world +1.351, p=3.1e-08,
+better in only 6/40**; shades-of-grey -0.123, p=0.44 (tie); max-RGB -0.830, p=5.4e-06;
+neutral prior +0.115, p=0.25 (no significant difference).
+**Variance decomposition (iris, fraction of total):** phone 0.203 / lighting 0.246 for
+the sclera method, versus 0.220 / 0.262 uncorrected and 0.184 / 0.179 for grey-world.
+**The phone effect survives correction.**
+**Secondary (partially circular) sclera-holdout region:** sclera 2.47 vs shades-of-grey
+3.33 vs none 6.23 — the sclera methods *appear* to win there, which is exactly why the
+circular measure is not the headline.
+**Interpretation. NEGATIVE RESULT, recorded without softening.** Sclera-referencing
+removes real capture-condition variation (significantly better than no correction and
+than max-RGB) but is **significantly worse than plain grey-world** on a held-out region,
+and the device effect it is supposed to remove survives. Under the criterion declared
+before the run — beat no-correction AND every classical baseline — this is PARTIALLY
+SUPPORTED. The claim that the sclera is a *sufficient* endogenous white reference is
+**not supported**. **Status: confirmed. Not to be retried until it passes.**
+
+### 2026-09-11 — Sensitivity of the sclera estimate (diagnoses the N1b result)
+**Config.** `scripts/phase2_sensitivity.py`, 120 MOBIUS frames, angular shift in degrees.
+
+| perturbation | mean | median | p90 |
+| --- | --- | --- | --- |
+| scleral yellowing +20% | 8.445 | 8.487 | 9.419 |
+| scleral yellowing +10% | **4.399** | 4.443 | 4.842 |
+| scleral yellowing +5% | 2.243 | 2.272 | 2.451 |
+| vasculature left in | 1.569 | 1.421 | 2.134 |
+| specular: naive mean vs robust trim | 0.485 | 0.383 | 1.052 |
+| mask dilate 31 px | 0.404 | 0.355 | 0.695 |
+| mask erode 31 px | 0.315 | 0.275 | 0.536 |
+| mask erode/dilate 5 px | 0.055-0.060 | | |
+
+**Interpretation — this explains N1b.** Segmentation boundary error is negligible
+(0.06 deg at 5 px, 0.40 deg at 31 px) and the estimation mathematics is excellent
+(N1a, 0.67 deg). But a 10% scleral yellowing shift — well inside normal inter-subject
+and age variation — moves the estimate by **4.40 deg**, larger than grey-world's entire
+error. **The bottleneck is knowledge of the sclera's own reflectance, which varies
+between people by more than the illuminant signal being estimated and cannot be
+recovered per subject without ground truth a deployment will never have.** This is a
+mechanistic explanation of the negative result and it was predicted by the phase's
+stated premise. **Status: confirmed.**
+
+### 2026-09-11 — Segmentation quality score is too weak for N4 (negative)
+**Config.** `scripts/phase2_eval_segmentation.py`, validated against MOBIUS's 17
+deliberately-unusable `_bad` frames vs 120 normal frames.
+**Metrics.** AUROC 0.816; good mean 0.918 vs bad mean 0.889 (difference 0.029);
+**0 of 17 bad frames fall below the 0.3 threshold**.
+**Interpretation.** It ranks bad frames slightly lower but **rejects nothing**. As an
+abstention signal for N4 it is currently useless, and N4 must rely on the spectral
+reconstruction residual it already specifies rather than on this score. **Status:
+confirmed (negative).**
+
+### 2026-09-11 — Vasculature exclusion is crude (negative)
+**Metrics.** Removing 25.0% of sclera area recovers only **40.4%** of true vessel
+pixels at **10.9%** precision, against vessels occupying 6.9% of the sclera (SBVPI
+ground truth, n=60).
+**Interpretation.** The redness percentile is a blunt instrument: it discards a quarter
+of the reference to catch two fifths of a 6.9% target. It is still worth doing — leaving
+vessels in costs 1.57 deg — but SBVPI's 128 vessel masks would support a proper vessel
+segmenter if Phase 4 needs one. **Status: confirmed.**
+
+### 2026-09-11 — Task 4: the pipeline runs on Eyes-Defy-Anemia
+**Metrics.** n=218; mean quality 0.814, median 0.817; mean predicted sclera area
+fraction 0.2623; **failure rate (quality < 0.3) 0.0%**. India 0.811, Italy 0.816.
+**Interpretation.** Phase 4 has a working front end and the two sites behave alike.
+This is a confidence measure, not accuracy: Eyes-Defy ships no masks, so segmentation
+correctness there remains unverified. **Status: confirmed.**
+
+### 2026-09-11 — Phase 2.5 Task 1: corneal-highlight feasibility census (GATE PASSED)
+**Config.** `scripts/phase2_5_census.py`; detection requires >=3x region median luminance
+AND >99th percentile; saturation threshold 250/255.
+**Data.** 900 MOBIUS + 200 SBVPI frames.
+**Metrics.** MOBIUS detected 74.7%, **usable (unsaturated) 71.7%**, pupil highlight
+37.3%, median area 41 px. SBVPI 0.0% (segmentation yields zero iris/pupil pixels).
+Saturation among detected highlights: p50 = 0.000, p75 = 0.031, p90 = 0.315; only 4.0%
+of frames fully clipped; median 1,326 unsaturated pixels in the best highlight.
+**By device:** Xiaomi Pocophone F1 91.5%, iPhone 6s 69.8%, Sony Xperia Z5 **52.1%** —
+spread **39.3 percentage points**.
+**By lighting:** indoor 78.8% (most clipping, 0.204), poor 72.6% (least clipping,
+0.018), natural 65.1% — spread 13.7 pp.
+**Interpretation.** Gate of 30% declared in advance: **PASSED at 71.7%**. Saturation is
+not the blocker it was expected to be. Device dependence is larger than any device
+effect found in Phase 2, and runs opposite to lighting: poor light is *not* the worst
+case here, unlike segmentation. **Status: confirmed.**
+
+### 2026-09-11 — Phase 2.5 Task 2: dichromatic specular estimation
+**Config.** `scripts/phase2_5_evaluate.py`, `src/hemosight/calibration/specular.py`.
+**Metrics.** Specular estimate obtainable on **1,393/1,796 frames (77.6%)**.
+Decomposition routes: pupil_highlight_direct 862, iris_highlight_direct 273,
+dichromatic_plane_intersection 173, degenerate_dark_surface 85, none 403.
+Distinct chromatic clusters per frame: 1 in 817 frames, 2 in 356, 3 in 111, >=4 in 109 —
+**41.3% of frames carry more than one light source**.
+**Interpretation.** A genuine dichromatic decomposition, verified against synthetic
+surfaces with a known illuminant. Direct routes dominate (81% of successful estimates)
+because a clean pupil highlight usually exists and is the most direct reading. High
+cluster counts (up to 17) most likely reflect detection fragmentation rather than 17
+physical sources, but multi-source frames are common either way and are counted rather
+than averaged. **Status: confirmed.**
+
+### 2026-09-11 — Phase 2.5 Task 3: specular PARTIALLY SUPPORTED; the rescue failed
+**Config.** Identical MOBIUS protocol to Phase 2; held-out iris; 720 frames, 40 subjects.
+**Metrics** (within-subject dE2000 spread, lower is better):
+
+| method | mean | median |
+| --- | --- | --- |
+| grey-world | **6.076** | 5.572 |
+| specular + sclera | 7.047 | 6.722 |
+| sclera, neutral prior | 7.312 | 6.821 |
+| sclera, fitted prior | 7.427 | 7.157 |
+| shades-of-grey p6 | 7.550 | 6.990 |
+| **specular** | **7.821** | 7.255 |
+| max-RGB p99 | 8.257 | 7.143 |
+| no correction | 9.530 | 10.115 |
+
+**Paired Wilcoxon, 40 subjects:** specular vs no correction -1.709, p=2.3e-04, wins
+29/40. Specular vs grey-world **+1.745, p=4.5e-06, wins 5/40**. Specular vs sclera
+**+0.394, p=0.29, NOT SIGNIFICANT**. specular+sclera vs grey-world +0.971, p=4.5e-04,
+wins 10/40.
+**Variance decomposition (iris):** specular+sclera has the lowest phone fraction (0.178,
+below grey-world's 0.184) and the highest between-subject fraction (0.380). Noted but
+not over-read: a higher between-subject fraction can also mean the method spreads
+subjects apart, and its absolute within-subject spread is still worse than grey-world's.
+**Interpretation.** Against thresholds declared in advance: **PARTIALLY SUPPORTED** —
+beats no correction, does not beat grey-world. **The rescue did not rescue anything:
+specular is statistically indistinguishable from the sclera method it was designed to
+replace (p = 0.29).** Removing the per-subject reflectance term did not help.
+**Status: confirmed. NEGATIVE RESULT, not to be retried until it passes.**
+
+### 2026-09-11 — Phase 2.5 Task 4: grey-world IMPROVES under tight crops (hypothesis refuted)
+**Config.** Centre crops around the segmented eye, grey-world recomputed per crop.
+**Metrics.** Field of view 100% -> 6.076 dE2000; 60% -> 5.790; 40% -> 5.416;
+**25% -> 3.935**; 15% -> 4.889. Crop-invariant references for comparison: sclera 7.427,
+specular 7.821, none 9.530.
+**Interpretation.** The Task 4 hypothesis — that grey-world would degrade as scene
+context vanished, favouring local references — is **refuted**. Grey-world's best result
+anywhere in Phase 2 or 2.5 is on a tight periocular crop, beating every endogenous
+method by 3.1-3.9 dE2000. A wide frame is skin-dominated and strongly red, violating the
+grey-world assumption; a periocular crop is far more balanced, so the assumption is
+better satisfied on exactly the input a screening app would capture. **Grey-world's
+advantage widens in the deployment-realistic regime rather than evaporating.**
+Caveat: crops are eye-centred using the segmentation and therefore idealised; hand-framing
+noise was not simulated. **Status: confirmed.**
+
+### 2026-09-11 — N1 OVERALL: REFUTED (headline negative result)
+**Summary.** Sclera (Phase 2) and corneal specular highlight (Phase 2.5) both tested on
+the same held-out-iris protocol. Neither beats grey-world; the two are statistically
+indistinguishable from each other; and grey-world's margin grows under the tight crops
+that deployment implies.
+**The surviving contribution is the diagnosis**, with each component measured:
+inter-individual reflectance variance dominates (10% scleral yellowing = 4.40 deg),
+segmentation is exonerated (31 px mask perturbation = 0.40 deg), estimation mathematics
+is exonerated (0.666 deg given a known reference reflectance, six sensors,
+leave-one-camera-out stable).
+**What survives:** N1a intact; the segmentation pipeline intact (sclera IoU 0.875, 0%
+failure on Eyes-Defy); and grey-world on a tight periocular crop as the practical
+downstream recommendation. **Status: confirmed.**
+
+### 2026-09-11 — Phase 3 TASK 0 GATE: colour-to-Hb inversion NOT RECOVERABLE (major negative result)
+**Config.** `scripts/phase3_task0_gate.py`, `src/hemosight/simulation/`. Layered
+diffusion forward model, D65, CIE 1931 observer as camera proxy, 240 random illuminant
+perturbations per Hb level, Hb grid 4-18 g/dL.
+**Metrics.**
+
+| residual dE2000 | MAE g/dL | median | p90 | worst | band |
+| --- | --- | --- | --- | --- | --- |
+| 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | VIABLE |
+| 1.000 | 0.864 | 0.653 | 1.958 | 3.992 | VIABLE |
+| 2.000 | 1.801 | 1.341 | 4.069 | 8.000 | MARGINAL |
+| **3.935 (measured, grey-world @25% FOV)** | **3.417** | 2.699 | 7.541 | 13.000 | **NOT RECOVERABLE** |
+| 6.076 (measured, grey-world full frame) | 5.096 | 4.349 | 10.799 | 17.000 | NOT RECOVERABLE |
+
+Inversion self-consistency with no perturbation: max error 0.0001 g/dL, so the error is
+caused by colour error alone.
+**WHO boundaries at the measured residual:** severe/moderate (7.0) MAE 1.975 p90 3.581 —
+NOT distinguishable; moderate/mild (10.0) MAE 3.311 p90 8.156 — NOT distinguishable;
+mild/normal (11.0) MAE 4.160 p90 10.935 — NOT distinguishable. **No WHO severity
+boundary survives.**
+**Interpretation.** Against thresholds declared before running, **NOT RECOVERABLE** at
+1.7x the failing threshold. Work stopped; Tasks 1-3 not built.
+**Status: confirmed. MAJOR NEGATIVE RESULT.**
+
+### 2026-09-11 — Phase 3: signal-to-noise is the mechanism, checked against real tissue
+**Metrics.** Simulated signal **0.452 dE2000 per g/dL** (mean over Hb 4-18). Empirical
+signal from **216 real Eyes-Defy subjects** using the dataset's own palpebral masks,
+binned by Hb: **~0.70 dE2000 per g/dL** (excluding the n=3 lowest bin, which gave 5.26
+and is sampling noise). Model/empirical agree within ~1.5x.
+Noise: 3.935 (best measured) and 6.076 (full frame).
+**noise/signal = 5.6x empirical, 8.7x simulated.**
+Assumption robustness: BVF 0.02/0.06/0.15 and StO2 0.60/0.75/1.00 give equivalent errors
+of 7.46 / 8.71 / 12.24 / 9.73 / 7.51 g/dL respectively — no variant rescues it.
+**Interpretation.** The calibration residual alone is equivalent to 5.6-8.7 g/dL of Hb
+error against a 14 g/dL clinical range. The empirical figure is an *upper* bound on the
+true Hb signal (bin differences also contain inter-subject and capture variation), and
+using it rather than the model's own makes the gate easier to pass — it still fails.
+**Status: confirmed.**
+
+### 2026-09-11 — Phase 3: sensitivity is HIGHER at low Hb (the one favourable finding)
+**Metrics.** At the measured 3.935 residual: mean MAE at Hb <= 8 g/dL = **1.900 g/dL**;
+at Hb >= 14 = **4.645 g/dL**; ratio **0.41x**. Per-g/dL colour change: 1.013 dE2000 at
+Hb 4 versus 0.203 at Hb 16 — a 5x difference.
+**Interpretation.** The reflectance-vs-Hb curve saturates, so the measurement is most
+sensitive exactly where screening decisions are made. Not enough to rescue the method —
+even at its most sensitive it needs calibration ~4x better than the best measured — but
+it is a real and favourable asymmetry and the correct answer to "is low Hb worse?" is
+**no, it is better**. **Status: confirmed.**
+
+### 2026-09-11 — Phase 3 TASK 4: prior sensitivity (closes the Phase 2 question)
+**Config.** Illuminant held perfect; each tissue prior perturbed alone; Hb truth 12.0.
+**Metrics.**
+
+| prior | tolerable range for <1.0 g/dL error | verdict |
+| --- | --- | --- |
+| blood volume fraction (nom 0.06) | 0.045-0.10 (about +/-30%) | tolerable |
+| oxygenation StO2 (nom 0.75) | 0.60-1.00 (entire physiological range) | **benign** |
+| layer thickness scale (nom 1.0) | 0.8-2.0 | tolerable |
+| **melanin fraction (nom 0.0)** | **0.0 only** | **catastrophic** |
+
+Melanin detail: 0.005 -> **+9.60 g/dL**; 0.010 and above -> +12.00 (estimate rails to the
+top of the search range, i.e. total failure).
+**Interpretation.** Phase 2 could not answer the prior question because within-subject
+self-consistency is mathematically blind to a per-subject constant. Simulation answers
+it: oxygenation is a non-issue, BVF and thickness are tolerable, and **melanin is
+catastrophic**. This is a quantified mechanism for skin-tone bias and is flagged forward
+to N5. Qualifications: the epithelial melanin layer is thin so sensitivity may be
+overstated, and above 0.01 only the fact of failure is meaningful, not its magnitude.
+**Status: confirmed.**
+
+### 2026-09-11 — Phase 3: optical constants self-check FAILED then passed after correction
+**Metrics.** First run: 500 nm isosbestic found at 515 nm (15 nm error, FAIL); the
+529/545 pair collapsed. After correcting two transcription errors: all six isosbestic
+points within **0.5 nm** (500.0 -> 499.5, 529 -> 529.0, 545 -> 545.0, 570 -> 570.0,
+584 -> 584.0, 797 -> 797.5); HbO2 visible peak 576 nm; deoxy/oxy ratio 650-700 nm 8.36x.
+**Interpretation.** The self-check caught real errors in data that would otherwise have
+silently propagated into every downstream number. Internal consistency is **not**
+verification: the tables are transcribed, not read from primary sources, and must be
+re-verified before publication. **Status: confirmed (provisional data).**
+
+### 2026-09-11 — Phase 3.5 TASK 1: ratio reformulation REFUTED (major negative result)
+**Config.** `scripts/phase3_5_task1_cancellation.py`. Identical MOBIUS protocol to
+Phases 2/2.5: 1,796 frames, 100 subjects, 3 phones x 3 lighting.
+**Metrics** (within-subject spread across capture conditions):
+
+| feature | dE2000 | equivalent g/dL |
+| --- | --- | --- |
+| grey-world on sclera | 3.330 | 5.23 |
+| uncorrected sclera | 5.682 | 8.92 |
+| **iris / sclera (best ratio)** | **6.399** | **10.04** |
+| pupil / iris | 7.541 | 11.83 |
+| pupil / sclera | 9.091 | 14.27 |
+
+Ratio sensitivity 0.637 dE2000 per g/dL (absolute colour was 0.452).
+**Implementation verification:** synthetic diagonal illuminant change gives ratio spread
+**0.000000 dE2000** (plain mean) and 0.046 (trimmed summariser) — the observed 6.399 is
+**139x** the implementation residual, so the negative result is real.
+**Variance decomposition:** phone fraction 0.177 for the ratio vs 0.202 uncorrected —
+essentially unchanged, the signature of von Kries diagonality failing.
+**Interpretation.** Pre-declared threshold >2.0 g/dL = fails. At 10.04 g/dL this is 5x
+over. Every ratio feature is worse than no correction at all. **Status: confirmed.
+NEGATIVE RESULT. Task 2 not run.**
+
+### 2026-09-11 — Phase 3.5 TASK 3: sclera reference stability (diagnoses Task 1)
+**Metrics.**
+
+| dataset | within-subject dE2000 | between-subject dE2000 | within/between |
+| --- | --- | --- | --- |
+| MOBIUS (100 subj, 898 captures) | **5.860** | 4.050 | **1.447** |
+| SBVPI studio (54 subj, 699 captures) | 1.685 | 1.825 | 0.924 |
+
+**Interpretation.** On phone captures the sclera varies MORE within a subject than
+between subjects — the opposite of the regime the ratio method requires. Studio
+conditions cut within-subject variation 3.5x, so the instability is capture-driven
+(geometry, gaze, specular, focus), not tissue-driven; but even there the ratio is 0.92,
+short of << 1. A perfect per-subject offset removes the between term (4.050) and leaves
+the within term (5.860) — the wrong term — and is not obtainable in deployment anyway.
+**Status: confirmed.**
+
+### 2026-09-11 — Phase 3.5 TASK 0: sourced constants vs transcription
+**Metrics.** 112 points compared: median relative error 1.30%, **18.8% of points >10%
+off**, max **252%** (deoxy-Hb at 470 nm: 16,156 sourced vs 56,880 transcribed).
+Melanin power-law fit: A=6.6e11, k=3.330, max log-residual **0.000000** (exactly a power
+law, not measured data). 28 cameras parsed from camspec; only 2 of 6 nus8 cameras
+matched.
+**Effect on the Phase 3 gate:** MAE at the measured 3.935 residual moves from 3.417
+(transcribed) to **3.893** (sourced); 2.0 dE2000 moves MARGINAL -> NOT RECOVERABLE.
+**Verdict unchanged and marginally stronger.**
+**Interpretation.** The Phase 3 isosbestic self-check PASSED on the bad data — it
+verified crossing points, which were right, not the values between them. Internal
+consistency is not verification. **Status: confirmed.**
 
 ---
 
