@@ -128,6 +128,13 @@ STAGES = [
           note="from configs/external_audit_register.json and the run record"),
     Stage("Phase 8A content review", "phase8a_content_review.py", 1.0,
           note="plain and technical layers side by side; runs the harness on the shipped samples"),
+    Stage("Phase 8B contrast + tokens", "phase8b_contrast.py", 0.1,
+          note="writes app/frontend/src/tokens.css and measures every contrast pair"),
+    Stage("Phase 8B visual assets", "phase8b_assets.py", 0.2,
+          note="OMLC spectra, CIE band, and the project's own aggregate figures -> front-end JSON"),
+    # Lighthouse and the 48-state browser verification need node + Chrome and are run from
+    # app/frontend (tools/verify_8b.mjs); their outputs are read by the report stage.
+    Stage("Phase 8B design report", "phase8b_report.py", 0.1),
 ]
 
 

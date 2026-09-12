@@ -1,15 +1,19 @@
+@import "./tokens.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* An instrument, not a dashboard.
-   Warm paper, near-black ink, hairline rules, and numbers set in a monospace so
-   columns of them line up and can be read against each other. Colour is reserved
-   for verdicts - nothing else on the page is allowed to compete with them. */
+/* A precision instrument, not a document.
+   Deep near-black ground, surfaces stepped up by elevation, one cyan accent for the
+   live trace and for focus, and three verdict hues that always travel with a label and
+   a shape. Numbers are set in a monospace so columns can be read against each other.
+   Every colour comes from tokens.css; nothing is hard-coded below or in components. */
 
 @layer base {
   html {
     -webkit-font-smoothing: antialiased;
+    color-scheme: dark;
+    scroll-behavior: smooth;
   }
   body {
     @apply bg-paper text-ink font-sans;
@@ -18,14 +22,46 @@
   }
   h1, h2, h3 {
     @apply font-serif;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;
   }
   ::selection {
-    background: #e7e2d6;
+    background: var(--accent-dim);
+    color: var(--ink);
   }
-  /* A thin, slightly inset scrollbar so long tables do not shout. */
   ::-webkit-scrollbar { height: 9px; width: 9px; }
-  ::-webkit-scrollbar-thumb { background: #d6d1c7; border-radius: 6px; }
+  ::-webkit-scrollbar-thumb { background: var(--rule-strong); border-radius: 6px; }
+
+  /* Keyboard focus is always visible, in the accent, outside the element. The custom
+     cursor never covers it: the reticle is pointer-driven and hides on keyboard use. */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+  /* Native cursor is hidden ONLY while the custom reticle is active. */
+  html[data-cursor="custom"] { cursor: none; }
+  html[data-cursor="custom"] a,
+  html[data-cursor="custom"] button,
+  html[data-cursor="custom"] input,
+  html[data-cursor="custom"] select,
+  html[data-cursor="custom"] label { cursor: none; }
+
+  /* Motion off - by OS preference or by the in-app toggle - disables every CSS
+     animation and transition that decorates. Layout and content are unchanged. */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+  html[data-motion="off"] { scroll-behavior: auto; }
+  html[data-motion="off"] *, html[data-motion="off"] *::before, html[data-motion="off"] *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }
 
 @layer components {
@@ -35,19 +71,78 @@
     @apply font-mono text-[11px] uppercase tracking-[0.14em] text-faint;
   }
   .prose-measure { @apply max-w-measure text-[15px] leading-relaxed text-muted; }
+
   .btn {
-    @apply inline-flex items-center gap-2 border border-ink bg-ink px-4 py-2
-           text-[13px] font-medium text-paper transition-colors
-           hover:bg-transparent hover:text-ink disabled:cursor-not-allowed
-           disabled:border-rule disabled:bg-rule disabled:text-faint;
+    @apply inline-flex items-center gap-2 border border-accent bg-accent px-4 py-2
+           text-[13px] font-medium text-paper transition-[background-color,color,box-shadow,transform]
+           duration-200 hover:bg-transparent hover:text-accent hover:shadow-glow
+           disabled:cursor-not-allowed disabled:border-rule disabled:bg-rule disabled:text-faint
+           disabled:shadow-none;
   }
   .btn-ghost {
-    @apply inline-flex items-center gap-2 border border-rule px-3 py-1.5
-           text-[13px] text-muted transition-colors hover:border-ink hover:text-ink;
+    @apply inline-flex items-center gap-2 border border-ui-border px-3 py-1.5
+           text-[13px] text-muted transition-[border-color,color,box-shadow] duration-200
+           hover:border-accent hover:text-ink hover:shadow-glow;
   }
   .field {
-    @apply w-full border border-rule bg-white px-3 py-2 text-[14px] outline-none
-           transition-colors focus:border-ink;
+    @apply w-full border border-ui-border bg-panel px-3 py-2 text-[14px] text-ink outline-none
+           transition-colors focus:border-accent placeholder:text-faint;
   }
   .cell { @apply border-b border-rule px-3 py-2 align-top; }
+
+  /* Links underline with motion: the line draws in from the left. */
+  .link {
+    @apply relative text-ink;
+    background-image: linear-gradient(var(--accent), var(--accent));
+    background-repeat: no-repeat;
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    transition: background-size 220ms ease-out;
+  }
+  .link:hover, .link:focus-visible { background-size: 100% 1px; }
+
+  /* Glowing border: a thin conic sweep behind the card, revealed and rotated on hover.
+     Transform and opacity only - no layout property animates. */
+  .glow-card {
+    @apply relative bg-card;
+    isolation: isolate;
+  }
+  .glow-card::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    z-index: -1;
+    background: conic-gradient(from var(--glow-angle, 0deg),
+      var(--rule-strong) 0deg, var(--accent-dim) 90deg, var(--rule-strong) 180deg,
+      var(--rule-strong) 360deg);
+    opacity: 0.55;
+    transition: opacity 240ms ease-out;
+  }
+  .glow-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--bg-2);
+  }
+  .glow-card:hover::before, .glow-card:focus-within::before {
+    opacity: 1;
+    animation: glow-sweep 3.2s linear infinite;
+  }
+  .glow-card { transition: transform 240ms ease-out, box-shadow 240ms ease-out; }
+  .glow-card:hover { transform: translateY(-2px); box-shadow: 0 18px 50px -24px rgba(111, 227, 208, 0.35); }
+  html[data-motion="off"] .glow-card:hover { transform: none; }
+
+  /* Reveal-on-scroll: elements start hidden only when motion is on; GSAP animates them
+     in. With motion off the class does nothing, so content is never hidden. */
+  html[data-motion="on"] .reveal { opacity: 0; transform: translateY(14px); }
+}
+
+@property --glow-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes glow-sweep {
+  to { --glow-angle: 360deg; }
 }

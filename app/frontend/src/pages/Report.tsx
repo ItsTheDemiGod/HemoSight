@@ -129,7 +129,7 @@ export default function ReportPage() {
 
       <section className="mt-10">
         <h2 className="text-[17px]">Document preview</h2>
-        <pre className="mt-4 max-h-[560px] overflow-auto border border-rule bg-white p-5 text-[11.5px] leading-relaxed">
+        <pre className="mt-4 max-h-[560px] overflow-auto border border-rule bg-panel text-ink p-5 text-[11.5px] leading-relaxed">
           {md || "…"}
         </pre>
       </section>

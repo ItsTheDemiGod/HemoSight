@@ -17,12 +17,40 @@ const VERDICT_CLASS: Record<Verdict, string> = {
   PASS: "text-pass border-pass",
 };
 
+/* Never colour alone: each verdict carries a glyph with a distinct shape as well as its
+   label and hue. FAIL is a cross in a square; PASS a tick in a circle; INSUFFICIENT
+   DATA a dashed diamond with a dash inside - visibly "not measured", not a faded pass. */
+function Glyph({ v }: { v: Verdict }) {
+  const s = "h-[13px] w-[13px] shrink-0";
+  if (v === "FAIL")
+    return (
+      <svg className={s} viewBox="0 0 14 14" aria-hidden="true">
+        <rect x="1" y="1" width="12" height="12" fill="currentColor" opacity="0.18" stroke="currentColor" />
+        <path d="M4 4l6 6M10 4l-6 6" stroke="currentColor" strokeWidth="1.6" />
+      </svg>
+    );
+  if (v === "PASS")
+    return (
+      <svg className={s} viewBox="0 0 14 14" aria-hidden="true">
+        <circle cx="7" cy="7" r="6" fill="currentColor" opacity="0.18" stroke="currentColor" />
+        <path d="M3.8 7.2l2.2 2.2 4.2-4.6" fill="none" stroke="currentColor" strokeWidth="1.6" />
+      </svg>
+    );
+  return (
+    <svg className={s} viewBox="0 0 14 14" aria-hidden="true">
+      <path d="M7 1l6 6-6 6-6-6z" fill="none" stroke="currentColor" strokeDasharray="2 1.6" />
+      <path d="M4.5 7h5" stroke="currentColor" strokeWidth="1.6" />
+    </svg>
+  );
+}
+
 export function VerdictMark({ v, big = false }: { v: Verdict; big?: boolean }) {
   return (
     <span
-      className={`inline-flex items-center border-l-[3px] pl-2 font-mono uppercase
+      className={`inline-flex items-center gap-1.5 border-l-[3px] pl-2 font-mono uppercase
         tracking-[0.12em] ${VERDICT_CLASS[v]} ${big ? "text-[13px]" : "text-[11px]"}`}
     >
+      <Glyph v={v} />
       {VERDICT_LABEL[v]}
     </span>
   );
@@ -57,8 +85,8 @@ export function Figure({
 }) {
   const c = tone === "fail" ? "text-fail" : tone === "pass" ? "text-pass" : "text-ink";
   return (
-    <div className="border-t border-ink pt-3">
-      <div className={`num text-[26px] leading-none ${c}`}>{value}</div>
+    <div className="border-t border-rule-strong pt-3">
+      <div className={`num text-[30px] leading-none ${c}`}>{value}</div>
       <div className="prose-measure mt-2 text-[13px]">{caption}</div>
     </div>
   );
@@ -93,7 +121,7 @@ export function Notice({
   return (
     <div
       className={`border-l-2 py-2 pl-4 text-[13.5px] ${
-        tone === "warn" ? "border-insufficient text-insufficient" : "border-rule text-muted"
+        tone === "warn" ? "border-insufficient text-insufficient" : "border-rule-strong text-muted"
       }`}
     >
       {children}
@@ -132,7 +160,7 @@ export function Spinner({ label }: { label: string }) {
   return (
     <div className="flex items-center gap-3 text-[13px] text-muted">
       <motion.span
-        className="block h-2 w-2 rounded-full bg-ink"
+        className="block h-2 w-2 rounded-full bg-accent"
         animate={{ opacity: [1, 0.2, 1] }}
         transition={{ repeat: Infinity, duration: 1.2, ease: "easeInOut" }}
       />

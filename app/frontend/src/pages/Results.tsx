@@ -13,6 +13,7 @@ export default function ResultsPage() {
   const { runId } = useParams();
   const nav = useNavigate();
   const [run, setRun] = useState<Run | null>(null);
+  const [loading, setLoading] = useState<boolean>(() => Boolean(runId || readSession().runId));
   const [error, setError] = useState("");
   const [filter, setFilter] = useState<Set<Verdict>>(
     new Set(["FAIL", "INSUFFICIENT_DATA", "PASS"] as Verdict[])
@@ -26,7 +27,8 @@ export default function ResultsPage() {
     api
       .run(id)
       .then(setRun)
-      .catch((e) => setError(String(e)));
+      .catch((e) => setError(String(e)))
+      .finally(() => setLoading(false));
   }, [runId]);
 
   const results = useMemo(() => {
@@ -41,6 +43,12 @@ export default function ResultsPage() {
   }, [run, filter, sort]);
 
   if (error) return <Notice tone="warn">{error}</Notice>;
+  if (loading)
+    return (
+      <div className="min-h-[70vh]" aria-busy="true">
+        <SectionTitle index="04 — Results" title="Reading the run…" />
+      </div>
+    );
   if (!run)
     return (
       <div>
@@ -116,7 +124,7 @@ export default function ResultsPage() {
         <label className="flex items-center gap-2 text-[12.5px] text-muted">
           <span className="label">sort</span>
           <select
-            className="border border-rule bg-white px-2 py-1 text-[12.5px]"
+            className="border border-rule bg-panel text-ink px-2 py-1 text-[12.5px]"
             value={sort}
             onChange={(e) => setSort(e.target.value as SortKey)}
           >
@@ -232,13 +240,13 @@ export default function ResultsPage() {
                       <KeyValue rows={Object.entries(r.measured)} />
                       <div>
                         <div className="label">threshold applied</div>
-                        <pre className="mt-2 overflow-x-auto border border-rule bg-white p-3 text-[11.5px]">
+                        <pre className="mt-2 overflow-x-auto border border-rule bg-panel text-ink p-3 text-[11.5px]">
                           {JSON.stringify(r.threshold ?? {}, null, 2)}
                         </pre>
                         {"details" in r && (
                           <>
                             <div className="label mt-4">detail</div>
-                            <pre className="mt-2 max-h-[280px] overflow-auto border border-rule bg-white p-3 text-[11.5px]">
+                            <pre className="mt-2 max-h-[280px] overflow-auto border border-rule bg-panel text-ink p-3 text-[11.5px]">
                               {JSON.stringify(r.details, null, 2).slice(0, 4000)}
                             </pre>
                           </>

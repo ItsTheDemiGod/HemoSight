@@ -266,6 +266,13 @@ export default function UploadPage() {
       <section className="mt-16">
         <h2 className="text-[17px]">What each column does</h2>
         <table className="mt-4 w-full text-[13px]">
+          <thead>
+            <tr className="label">
+              <th scope="col" className="cell text-left font-normal">column</th>
+              <th scope="col" className="cell text-left font-normal">needed?</th>
+              <th scope="col" className="cell text-left font-normal">what it does</th>
+            </tr>
+          </thead>
           <tbody>
             {CONTRACT.map(([name, req, plain, what]) => (
               <tr key={name}>
