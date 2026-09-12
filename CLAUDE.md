@@ -55,10 +55,11 @@ These drive every design decision.
 > | --- | --- | --- | --- | --- | --- |
 > | 1 | Imaging | Sclera as absolute white reference | 2 | **REFUTED** | loses to grey-world, p~3e-8 |
 > | 2 | Imaging | Corneal specular highlight | 2.5 | **REFUTED** | no better than sclera, p=0.29 |
-> | 3 | Imaging | Absolute colorimetric Hb inversion | 3 | **NOT RECOVERABLE** | signal 0.45-0.70 vs 3.9 dE2000 noise |
+> | 3 | Imaging | Absolute colorimetric Hb inversion | 3 | **NOT RECOVERABLE** | signal 0.45 (sim) / **0.84** (measured, CI 0.57-1.17) vs 3.9 dE2000 noise = 4.7x *(corrected 2026-09-12; was "0.45-0.70")* |
 > | 4 | Imaging | Illuminant-free within-image ratio | 3.5 | **REFUTED** | reference within/between = 1.447 |
 > | 5 | PPG | AC/DC + ratio-of-ratios features | 4 | **NOT VIABLE** | R² **-0.025**; permutation **p=0.978** |
 > | 6 | PPG | Raw waveform, 3 deep architectures | 4.5 | **NOT VIABLE** | best MAE 1.113; **sex alone 0.831** |
+> | 7 | Imaging | **Conventional CNN baseline** (ResNet-18, Eyes-Defy, the §3 comparison arm) | 6.5 | **MARGINAL** | MAE 1.301; site+sex+age alone 1.273; image adds +0.08; cross-site italy_to_india 1.96, india_to_italy 1.99 |
 >
 > **The one positive claim survived Phase 5 hardening** (selection-aware permutation, **empirical p <= 0.0041 at n=240**, z=-4.96, 11.9x the seed SD) and remains clinically useless: ~0.05 g/dL better than a constant. The p is still the FLOOR 1/(n+1) - zero of 240 permutations reached the real value - so it is a bound, not a measurement.
 >
@@ -377,24 +378,22 @@ and its output exists on disk.
 > | 1.5 Remediation | ✅ COMPLETE | — | 0 |
 > | 2 Sclera / illuminant (N1) | ✅ COMPLETE — N1 **REFUTED** | — | 0 (one ⚠️ reduced artefact) |
 > | 2.5 Specular rescue | ✅ COMPLETE — **REFUTED** | — | 0 |
-> | 3 Simulator (N2) | 🔴 CLOSED AT GATE | Task 0: 3.893 g/dL vs >2.0 | **1** (make the empirical 0.70 dE2000/g/dL figure reproducible) |
+> | 3 Simulator (N2) | 🔴 CLOSED AT GATE | Task 0: 3.893 g/dL vs >2.0 | 0 (empirical signal now measured, Phase 6.5) |
 > | 3.5 Ratio reformulation | 🔴 CLOSED AT GATE | Task 1: 10.04 g/dL vs >2.0 | 0 |
 > | 4 Imaging (N3) | 🔴 SUPERSEDED | imaging arm CLOSED, FINAL | 0 |
 > | 4 PPG gates | ✅ COMPLETE — **NOT VIABLE** | — | 0 |
 > | 4.5 Deep PPG | ✅ COMPLETE — **NOT VIABLE** (one real, useless signal) | — | 0 |
 > | 5 Harden + consolidate | ✅ COMPLETE | — | 0 |
-> | 5 (orig) CNN baseline | 🔴 SUPERSEDED | no physical model to compare against; ⚠️ §3 constraint unmet for imaging | 0 (optional: cross-site CNN on Eyes-Defy) |
-> | 6 Audit harness | ✅ BUILT | — | **1** (deep-model end-to-end validation — UNBLOCKED, ~7 min GPU) + 1 ⛔ closed-not-applicable |
+> | 5 (orig) CNN baseline | ✅ BUILT in Phase 6.5 | — | 0 (MAE 1.301, MARGINAL; site+sex+age alone 1.273) |
+> | 6 Audit harness | ✅ COMPLETE | — | 0 (deep-model validation closed in Phase 6.5) + 1 ⛔ closed-not-applicable |
+> | 6.5 Closure | ✅ COMPLETE | — | 0 |
 > | 6 (orig) Conformal (N4) | 🔴 SUPERSEDED | no estimator | 0 |
 > | 7 Fairness (N5) | 🔴 SUPERSEDED | no estimator; mechanism measured in Phase 3 Task 4 | 0 |
 > | 8 Fusion (N6) | 🔴 SUPERSEDED | no g/dL estimate from any modality | 0 (2 items found done, ticked) |
 > | 9 Web app | 🔴 SUPERSEDED | replaced by Phase 6 audit app | 0 (2 scaffold items ticked, with caveat) |
 > | 10 Flutter | 🔴 SUPERSEDED | no estimator | 0 |
 >
-> **Open work in the whole plan: 2 items**, plus the hygiene list in
-> `reports/claude_md_audit.md` §5 (commit Phases 4–6; licences; constants banner; reportlab;
-> test pre-registration rows; three RESULTS LOG entries stranded after section 9). Then the
-> write-up.
+> **Open work in the whole plan: none (Phase 6.5, 2026-09-12).** What remains is the write-up.
 ### Phase 0: Scaffold
 - [x] Create the repository directory structure
 - [x] Write `pyproject.toml` pinning Python 3.12 and the core dependencies
@@ -432,7 +431,7 @@ and its output exists on disk.
 - [x] Validate illuminant estimation on `nus8` against ground-truth illuminants (angular error), per camera
 - [x] Compare against standard colour-constancy baselines (grey-world, max-RGB, grey-edge) on the same split
 - [x] Quantify sensitivity to mask error, specular highlights, scleral yellowing and vessel coverage
-- [x] Apply the estimator to the conjunctiva datasets and inspect stability within and across sites *(scope amended: the Ghana conjunctiva pool has no sclera (Phase 1.5), so this ran on Eyes-Defy-Anemia only — see DECISION LOG 2026-09-11)* *(⚠️ reduced artefact: only segmentation quality per site is on disk (`eyes_defy_segmentation_quality.csv`); no per-image illuminant estimate for Eyes-Defy was stored, so estimator stability across sites was not measured)*
+- [x] Apply the estimator to the conjunctiva datasets and inspect stability within and across sites *(scope amended: the Ghana conjunctiva pool has no sclera (Phase 1.5), so this ran on Eyes-Defy-Anemia only — see DECISION LOG 2026-09-11)* *(⚠️ reduced artefact RESOLVED 2026-09-12: per-image illuminant estimates now stored by `scripts/phase6_5_eyes_defy_illuminant.py`; within-subject stability recorded as not measurable, one image per subject)*
 - [x] Write up the calibration-free argument with its failure modes stated explicitly
 - [x] N1b self-consistency on MOBIUS (3 phones x 3 lighting x 100 subjects), evaluated on a held-out region
 - [x] Per-image segmentation quality score, validated against MOBIUS's deliberately-bad frames
@@ -481,7 +480,7 @@ The result is reported before any further work, whatever it shows.
 - [ ] 🔴 SUPERSEDED — Task 1: layered conjunctival optical model with EVERY constant cited in one documented module *(PARTIAL: constants module built and cited; full layered MC NOT built — gate failed, see DECISION LOG 2026-09-11)* *(gate: Phase 3 Task 0, 3.893 g/dL at the measured 3.935 dE2000 residual vs >2.0 NOT RECOVERABLE)*
 - [ ] 🔴 SUPERSEDED — Task 1: radiative transfer, validated against published benchmark cases before any output is trusted *(NOT BUILT — stopped at the Task 0 gate)* *(gate: Phase 3 Task 0, 3.893 g/dL at the measured 3.935 dE2000 residual vs >2.0 NOT RECOVERABLE)*
 - [ ] 🔴 SUPERSEDED — Task 2: validate simulated spectra against published conjunctival/eyelid reflectance measurements *(NOT DONE — stopped at the gate; simulated colour WAS checked against 216 real Eyes-Defy subjects instead)* *(gate: Phase 3 Task 0, 3.893 g/dL at the measured 3.935 dE2000 residual vs >2.0 NOT RECOVERABLE)*
-- [x] Task 2: compare simulated RGB against real Eyes-Defy images at matched Hb; report the gap honestly *(DONE in reduced form: empirical 0.70 vs simulated 0.452 dE2000 per g/dL)* *(⚠️ artefact gap: the 0.70 dE2000/g/dL figure is hard-coded in `scripts/phase3_report.py`; no script or output file computes it — OUTSTANDING item 1 in `reports/claude_md_audit.md`)*
+- [x] Task 2: compare simulated RGB against real Eyes-Defy images at matched Hb; report the gap honestly *(DONE in reduced form: empirical 0.70 vs simulated 0.452 dE2000 per g/dL)* *(⚠️ artefact gap RESOLVED 2026-09-12: the 0.70 constant is withdrawn; measured 0.84 (CI 0.57-1.17) by `phase3_empirical_signal.py`)*
 - [x] Task 2: state plainly what the model does NOT capture
 - [ ] 🔴 SUPERSEDED — Task 3: generate the synthetic corpus, storing spectra AND RGB with full generating parameters *(NOT BUILT — stopped at the gate; the inversion the corpus would serve cannot survive realistic calibration error)* *(gate: Phase 3 Task 0, 3.893 g/dL at the measured 3.935 dE2000 residual vs >2.0 NOT RECOVERABLE)*
 - [x] Task 4: quantify how much reflectance-prior error is tolerable (closes the question Phase 2 could not answer)
@@ -493,7 +492,7 @@ The result is reported before any further work, whatever it shows.
 - [ ] 🔴 SUPERSEDED — Validate the simulator against published reflectance spectra or an analytic limiting case *(gate: Phase 3 Task 0, 3.893 g/dL at the measured 3.935 dE2000 residual vs >2.0 NOT RECOVERABLE; only inversion self-consistency (0.0001 g/dL) was checked, which is not validation)*
 - [ ] 🔴 SUPERSEDED — Sample the parameter space across Hb 4-18 g/dL and export a synthetic spectral library to `data/synthetic/` *(gate: Phase 3 Task 0, 3.893 g/dL at the measured 3.935 dE2000 residual vs >2.0 NOT RECOVERABLE; `data/synthetic/` is empty)*
 - [x] Collect or fit camera spectral sensitivity curves and illuminant SPDs; project spectra to synthetic RGB *(ticked 2026-09-12 audit: REDUCED — camspec (28 cameras, 400-720 nm) on disk and parsed; projection in `forward.py` is via D65 + CIE 1931 observer as camera proxy; only 2 of 6 nus8 cameras have measured SSFs (DECISION LOG 2026-09-11))*
-- [ ] 🟡 OUTSTANDING — Compare the synthetic RGB distribution against real conjunctiva pixels and document the sim-to-real gap *(the comparison WAS made — 0.70 empirical vs 0.452 simulated dE2000/g/dL on 216 Eyes-Defy subjects — but its computation is not on disk; what remains is a script + output file + `reproduce_all.py` stage so the number is reproducible)*
+- [x] Compare the synthetic RGB distribution against real conjunctiva pixels and document the sim-to-real gap *(ticked 2026-09-12, Phase 6.5 Task 1: `scripts/phase3_empirical_signal.py` -> `empirical_signal.json`; measured 0.84 dE2000/g/dL (CI 0.57-1.17) vs simulated 0.452, gap 1.9x; the earlier 0.70 constant is withdrawn)*
 - [ ] 🔴 SUPERSEDED — Log the severe-anemia coverage the simulator adds relative to the real data *(gate: Phase 3 Task 0, 3.893 g/dL at the measured 3.935 dE2000 residual vs >2.0 NOT RECOVERABLE; no corpus exists)*
 
 ### Phase 3.5: Ratio reformulation — TIME-BOXED test of a possible rescue
@@ -622,22 +621,18 @@ Two objectives, no new modelling directions.
 
 ### Phase 5 (original plan): CNN baseline comparison arm
 
-> 🔴 **SUPERSEDED (audit 2026-09-12).** Every item is a comparison arm *for the physical
-> model*, which was never built because the Phase 3 gate failed. For the one surviving
-> claim (PPG waveform) the conventional arm exists: Phase 4.5 ran three deep architectures
-> under identical subject-disjoint folds and Phase 4 Task 3 ran the demographic baseline.
->
-> ⚠️ **Section 3's hard constraint — a CNN baseline for every claim — is UNMET for the
-> imaging arm: no image CNN was ever trained.** The write-up must say so. A cross-site
-> CNN on Eyes-Defy (217 subjects, sex and age available for all 218) is cheap and optional;
-> it is not required by any surviving claim. Author's call, recorded so it is a decision
-> rather than a default.
-- [ ] 🔴 SUPERSEDED — Define the baseline: standard backbone, conjunctiva crop input, Hb regression head
-- [ ] 🔴 SUPERSEDED — Train the baseline under identical splits, preprocessing and augmentation budget
-- [ ] 🔴 SUPERSEDED — Evaluate with the identical metric suite, including leave-one-site-out
-- [ ] 🔴 SUPERSEDED — Add a colour-feature baseline (mean/percentile RGB or HSV statistics plus a shallow regressor)
-- [ ] 🔴 SUPERSEDED — Build a single comparison table that every subsequent claim must cite
-- [ ] 🔴 SUPERSEDED — Establish the protocol for keeping the baseline current whenever the physical model changes
+> ✅ **BUILT 2026-09-12 (Phase 6.5 Task 2).** The audit found section 3's hard constraint unmet for the
+> imaging arm. `scripts/phase6_5_image_cnn.py` closes it: ResNet-18 on Eyes-Defy, subject-disjoint
+> folds, the Phase 4 baselines and bands, three seeds, sex probe, cross-site both ways. **MAE 1.301
+> (MARGINAL) vs site + sex + age 1.273**; beats it: False. Pilot arm: 217
+> subjects, one phone model, no severe cases. The comparison arm agrees with the refutation.
+
+- [x] Define the baseline: standard backbone, conjunctiva crop input, Hb regression head *(ticked 2026-09-12, Phase 6.5 Task 2: `scripts/phase6_5_image_cnn.py`, `image_cnn.json`)*
+- [x] Train the baseline under identical splits, preprocessing and augmentation budget *(ticked 2026-09-12, Phase 6.5 Task 2: `scripts/phase6_5_image_cnn.py`, `image_cnn.json`)*
+- [x] Evaluate with the identical metric suite, including leave-one-site-out *(ticked 2026-09-12, Phase 6.5 Task 2: `scripts/phase6_5_image_cnn.py`, `image_cnn.json`)*
+- [x] Add a colour-feature baseline (mean/percentile RGB or HSV statistics plus a shallow regressor) *(ticked 2026-09-12, Phase 6.5 Task 2: `scripts/phase6_5_image_cnn.py`, `image_cnn.json`)*
+- [x] Build a single comparison table that every subsequent claim must cite *(ticked 2026-09-12, Phase 6.5 Task 2: `scripts/phase6_5_image_cnn.py`, `image_cnn.json`)*
+- [ ] 🔴 SUPERSEDED — Establish the protocol for keeping the baseline current whenever the physical model changes *(there is no physical model left to change; re-running `phase6_5_image_cnn.py` is the protocol if one ever appears)*
 
 ### Phase 6: HemoSight Audit - the software deliverable (web application)
 
@@ -653,7 +648,7 @@ purposes only; the original is retained verbatim below.** See the DECISION LOG,
 - [x] Task 1: eight checks, each returning PASS / FAIL / INSUFFICIENT DATA with the measured quantity and a plain-language explanation
 - [x] Task 1: INSUFFICIENT DATA is a first-class outcome; no verdict is ever inferred from what could not be measured
 - [x] Task 1: existing tests continue to pass (121 passing, was 102)
-- [x] Task 2: FastAPI backend - upload, run, retrieve, export, with long checks as background jobs reporting progress *(⚠️ export is half-delivered: Markdown works, PDF returns HTTP 501 because reportlab is absent. The stated blocker (no network) has lapsed — `pip download reportlab` succeeded on 2026-09-12)*
+- [x] Task 2: FastAPI backend - upload, run, retrieve, export, with long checks as background jobs reporting progress *(⚠️ RESOLVED 2026-09-12: reportlab installed and declared; PDF export verified end to end)*
 - [x] Task 2: pre-registration endpoint recording thresholds and whether they predate the results
 - [x] Task 2: SQLite for development, PostgreSQL-ready; no authentication in this phase
 - [x] Task 3: React + TypeScript + Vite + Tailwind + Framer Motion front end, seven pages
@@ -661,8 +656,21 @@ purposes only; the original is retained verbatim below.** See the DECISION LOG,
 - [x] Task 4: validate the harness against this project's own data, where every verdict is already on the record
 - [x] Task 4: validate against synthetic inputs carrying one known injected fault each
 - [x] Task 4: validate against clean inputs and report the false-positive rate whatever it is
-- [ ] 🟡 OUTSTANDING — Task 4: end-to-end validation of the three Phase 5 checks against the Phase 4.5 DEEP model *(DEFERRED - needs the GPU, which is held by the extended permutation run; validated at statistic level instead)* *(UNBLOCKED 2026-09-12: the permutation run finished 240/240 and the GPU is free. Needs per-subject predictions written by ~16 `fit_predict` calls (~7 min GPU) into the audit contract format, then the three checks run and added as a 16th known-truth case — see `reports/claude_md_audit.md` §4.1)*
+- [x] Task 4: end-to-end validation of the three Phase 5 checks against the Phase 4.5 DEEP model *(ticked 2026-09-12, Phase 6.5 Task 3: predictions regenerated by `phase6_5_deep_predictions.py`, harness A8 19/19 known-truth cases; the harness p is a different null from 0.0041)*
 - [x] Task 5: `reports/phase6_audit_harness.md` - architecture, catalogue with provenance, validation, limitations
+
+### Phase 6.5: Closure of every outstanding audit item (2026-09-12)
+
+Ordered by the brief: Task 1 first, its verdict checked before anything else was started.
+
+- [x] Task 1: measure the empirical colour-per-g/dL signal; store it; reproduce stage; reports read it *(withdrew the 0.70 constant; measured 0.84, CI 0.57-1.17; noise/signal 4.7x; no verdict changed)*
+- [x] Task 2: image CNN baseline on Eyes-Defy with the Phase 4 baselines, bands and scrutiny *(MAE 1.301, MARGINAL; site+sex+age alone 1.273; beats it: False; cross-site italy_to_india 1.96, india_to_italy 1.99; first run omitted site - corrected)*
+- [x] Task 3: per-subject deep-model predictions written; the three Phase 5 checks run end to end *(19/19 known-truth cases)*
+- [x] Task 4: Phase 2 estimator applied to Eyes-Defy and stored; PDF export working with reportlab declared
+- [x] Task 5: 8 licences verified from source; constants banner narrowed (epithelium lifted, rest retained); test pre-registration rows deleted and title validated; stray log entries moved
+- [x] Task 6: everything committed; no data, figures or binaries tracked (test-enforced)
+- [x] Task 7: `reports/phase6_5_closure.md`; CLAUDE.md updated; every decision and correction logged
+
 
 ### Phase 6 (original plan): Conformal prediction and abstention (N4)
 
@@ -1274,6 +1282,7 @@ the minimal forward model produced the gate result, the signal-to-noise framing,
 low-Hb sensitivity finding and the melanin confounder without any photon transport.
 
 ### 2026-09-11 — The failure is a signal-to-noise limit, not a modelling artefact
+> ⚠️ **CORRECTED 2026-09-12 (Phase 6.5 Task 1).** The "~0.70 (measured on 216 subjects)" figure below is WITHDRAWN: it had no producing script, and the binned method it was attributed to has a null of ~2.1 dE2000/g/dL. Measured value: **0.84 dE2000/g/dL (CI 0.57-1.17)**, noise/signal **4.7x**, not 5.6x. Verdict unchanged. See the 2026-09-12 entry "The empirical signal was a constant".
 **Decision.** The result is stated as a signal-versus-noise comparison, which needs no
 inversion machinery and is therefore harder to dismiss.
 **Evidence.** Haemoglobin changes conjunctival colour by **0.452 dE2000 per g/dL**
@@ -1965,6 +1974,93 @@ and reportlab items are closeable. (6) Three smoke-test pre-registration rows (`
 **Consequences.** The plan can be read at a glance. Nothing about any result, verdict or
 claim changes. The two outstanding items and the hygiene list are prioritised in the
 audit report's section 5; the answer to "what remains" is the write-up and those.
+## PHASE 6.5 DECISIONS (2026-09-12)
+
+### 2026-09-12 — CORRECTION: the empirical signal was a constant; it is withdrawn and replaced by a measurement
+**What was wrong.** The Phase 3 report's "~0.70 dE2000 per g/dL, measured on 216 Eyes-Defy subjects, binned
+by haemoglobin" was a string in `scripts/phase3_report.py` with no script and no output behind it (audit
+2026-09-12). It was the numerator of the 5.6x noise/signal ratio that closed the imaging arm.
+**What the measurement found.** The binned method returns **2.29** on the real labels and
+**2.13 +/- 0.46 with haemoglobin shuffled** (p = 0.33):
+it cannot resolve the signal, so the figure is **withdrawn as a measurement, not corrected**. A regression
+estimator (Lab ~ Hb + site + sex + age, CIEDE2000 per +1 g/dL, bootstrap CI, permutation null) gives
+**0.84 dE2000/g/dL (CI 0.57-1.17; null 0.13, p = 0.002)**. That it brackets 0.70 is coincidence.
+**Downstream, recomputed rather than adjusted.** noise/signal **4.7x** (was 5.6x); equivalent error at the
+measured residual **4.7 g/dL** (CI 3.4-6.9; 2.9 with the unadjusted signal);
+sim-to-real gap 1.9x (was "within 1.5x"). **No verdict changes**: the gate figure (3.893) was computed on the
+simulated inversion, and the empirical cross-check remains above 2.0 g/dL at every bound. Phases 2, 2.5 and 3.5
+never used the constant. The margin is smaller than was written and is now stated correctly everywhere.
+**Two findings the constant hid.** Sex confounds colour-vs-Hb in Eyes-Defy (r = 0.55; site-only slope
+1.37 -> adjusted 0.84), the same confound Phase 4 found in PPG. And between-subject colour at fixed
+Hb, sex, age and site is 4.55 dE2000 (5.4 g/dL equivalent) under a fixed white LED with ambient
+light excluded - a noise floor intrinsic to tissue and capture, several times the signal, before calibration.
+**Prevention.** Stage in `reproduce_all.py`; the three reports read the JSON and refuse to run without it;
+`tests/test_phase3.py` fails if a copy reappears, if the binned method is presented as a measurement, or if
+the equivalent error falls below 2.0 (a verdict change, to be reported not absorbed).
+**Lesson.** A number typed into a report generator is indistinguishable from a measured one until someone
+tries to regenerate it. The project's own audit harness exists to catch this class of defect in other
+work; it was caught here by the same discipline applied to itself.
+
+### 2026-09-12 — The image CNN baseline is built; the §3 constraint is met for the imaging arm
+**Decision.** `src/hemosight/baseline/image_cnn.py` and `scripts/phase6_5_image_cnn.py` provide the
+conventional comparison arm on Eyes-Defy: ResNet-18, subject-disjoint folds, target standardised, the Phase 4
+baselines and bands, three seeds, train-test gap, sex probe, permutation, cross-site both ways.
+**Result.** MAE **1.301** (MARGINAL) against sex alone 1.631, demographics without site
+1.607, **site + sex + age 1.273**, population mean 2.003; cross-site
+italy_to_india 1.958 (MARGINAL, bias +1.59), india_to_italy 1.995 (MARGINAL, bias -1.52).
+Beats the site-inclusive demographic baseline: **False**. Image increment over it: +0.078 g/dL.
+**Consequences.** The imaging verdict stands. The comparison arm agrees with the ambient-light refutation and adds a caveat the write-up must carry: under a controlled illuminant conjunctival colour carries real haemoglobin information (within-site r 0.5-0.65; three Lab numbers nearly match the CNN) worth ~0.1 g/dL over demographics - real and clinically useless.
+The Phase 5 (original) CNN items are ticked with this evidence. Limitation carried verbatim: 217 subjects, one
+Galaxy S6 in two variants, two sites, no severe cases - a pilot arm, not a validation.
+
+### 2026-09-12 — CORRECTION: the CNN baseline script omitted SITE from the demographic baseline
+**What was wrong.** The first run of `phase6_5_image_cnn.py` (19:28) used age and sex as "demographics",
+as Phase 4 had (the PPG data has one site). Eyes-Defy has two sites that are also two device variants, with a
+2.4 g/dL gap in mean Hb (Italy 13.83, India 11.47). The CNN (1.309) appeared to beat demographics
+(1.607) and sex alone (1.631); with site in the baseline, demographics alone reach 1.273 and the CNN
+does not beat them. It had learned the site. The ±1.5 g/dL cross-site bias is the same fact seen from the other
+direction: without the site label the model transfers the wrong intercept.
+**Fix.** Site added wherever demographics are a baseline (site alone; site + sex + age; colour + site + sex + age;
+CNN + site + sex + age); `beats_demographics` now means the site-inclusive baseline; the whole analysis was
+re-run end to end, not patched. The first run's JSON was overwritten by the re-run.
+**Checked elsewhere.** The PPG dataset has no site, cohort or session column. Its unused covariates were tested on
+the Phase 4 folds: r(Hb, signal length) = -0.01, SBP +0.18, DBP +0.21, glucose +0.04; demographics 0.831 ->
+0.825 with BP -> 0.822 with BP + signal length + glucose; signal length alone 1.180 (= population mean). Nothing
+to recompute. The Phase 6 audit harness's demographic-baseline check takes `site` as an optional column and
+uses it when present; the Eyes-Defy submission in the case study must supply it.
+**Lesson.** "Demographics" means every non-signal variable the data carries that the model could learn. Site
+is one whenever sites differ in the outcome, and the sites here differ by more than sex does.
+
+### 2026-09-12 — The deferred deep-model validation is closed
+**Decision.** Per-subject predictions for the Phase 4.5/5 deep model (10 seeds + 6 candidates) are regenerated
+by `scripts/phase6_5_deep_predictions.py` with the Phase 5 driver and driven through the harness
+(`phase6_validate_harness.py` A8). All four verdicts match the record (19/19 known-truth cases).
+**Caveat retained.** The harness's permutation null (labels against fixed predictions) is not Phase 5's
+refitting null; its p is not a reproduction of 0.0041 and is never presented as one.
+
+### 2026-09-12 — Two over-claiming ticks resolved by producing the artefact
+**Phase 2 Task 4.** The illuminant estimator is now applied to every Eyes-Defy image and the estimates
+stored (`scripts/phase6_5_eyes_defy_illuminant.py`). Within-subject stability is recorded as not measurable
+(one image per subject) rather than approximated.
+**Phase 6 Task 2.** `reportlab` installed (network available) and declared in `pyproject.toml`; PDF export
+verified through the API. The "no network" comment in `main.py` is corrected.
+
+### 2026-09-12 — Licences verified, constants banner narrowed, database cleaned
+**Licences.** All 8 previously UNVERIFIED sources checked from their landing pages or access forms: 4 are
+CC BY 4.0 (Ghana conjunctiva, Ghana fingernails, CP-AnemiC with the authors' "academic purpose only"
+statement, Hb-PPG via the figshare API); SBVPI and MOBIUS are custom non-commercial research agreements
+forbidding redistribution (MOBIUS alone permits scaled-down or watermarked figures); NUS-8 and Eyes-Defy
+state no licence at all. `test_dataset_manifest_states_every_licence` now asserts each state is written.
+Nothing permits committing images or derived measurements; the rule stands.
+**Constants.** Efron 2009 and Zhivov 2006 fetched: neither abstract carries a thickness and both full texts
+are paywalled, so stromal and tarsal thicknesses and all BVFs stay flagged. The 32 um epithelium is
+corroborated independently (Li et al. 2015 OCT, 34.0 +/- 5.8 um, n=62) and its flag is lifted. Zhivov 2006
+is in *The Ocular Surface*, not *Cornea*; corrected. Phase 3 Task 4's tolerances mean no correction moves a verdict.
+**Database.** Three smoke-test pre-registrations (`t`, `t`, `e2e`) and two near-duplicate real ones deleted;
+the two smoke-test runs that cited deleted rows carry `prereg_id = NULL`, not a substituted record.
+`PreRegIn.title` requires >= 8 characters after stripping; test added.
+**Logs.** The three RESULTS LOG entries stranded after section 9 moved into section 8.
+
 ## 8. RESULTS LOG
 
 Dated entries recording **every** metric produced, including failures and negative
@@ -2335,6 +2431,7 @@ boundary survives.**
 **Status: confirmed. MAJOR NEGATIVE RESULT.**
 
 ### 2026-09-11 — Phase 3: signal-to-noise is the mechanism, checked against real tissue
+> ⚠️ **SUPERSEDED 2026-09-12** by "Phase 6.5 Task 1: the empirical signal, measured" below. The ~0.70 figure and the 5.6x ratio are withdrawn; the binned method cannot measure the signal.
 **Metrics.** Simulated signal **0.452 dE2000 per g/dL** (mean over Hb 4-18). Empirical
 signal from **216 real Eyes-Defy subjects** using the dataset's own palpebral masks,
 binned by Hb: **~0.70 dE2000 per g/dL** (excluding the n=3 lowest bin, which gave 5.26
@@ -2584,30 +2681,6 @@ test-enforced. **Status: confirmed.**
 
 ---
 
-## 9. WORKING PROTOCOL
-
-After completing any task:
-
-1. **Tick its checkbox in CLAUDE.md.** A task is complete when its output exists on
-   disk, not when the code is written.
-2. **Record any deviation in the DECISION LOG**, dated, with the rationale.
-3. **Record any metric in the RESULTS LOG**, dated, including failures and negative
-   results.
-4. **Never delete a log entry.** Supersede it with a newer entry instead.
-5. **Never silently change a phase plan item.** Editing or removing a task requires a
-   DECISION LOG entry saying what changed and why.
-
-Additional standing rules:
-
-- Never write to `data/raw/`.
-- Never split at image level; splits are patient-level and site-aware.
-- Never report a single-site number as a headline result.
-- Never describe any output as diagnostic, validated, or clinically approved.
-- Keep the CNN baseline current: if the physical model changes, the comparison arm is
-  re-run before the new number is reported.
-- When a result is worse than the baseline, log it and say so plainly. That is the
-  point of having a baseline.
-
 ### 2026-09-12 - Phase 6: the audit harness, validated against known ground truth
 **Config.** `scripts/phase6_validate_harness.py` (58 s, CPU only),
 `src/hemosight/audit/`, 8 checks. Verdicts compared against CLAUDE.md's own DECISION and
@@ -2700,3 +2773,120 @@ statistically distinguishable from chance, and clinically useless.
 evidence block, the Phase 5 RESULTS LOG table, `reports/final_results.md`, the audit
 package's own provenance docstrings, and the case-study endpoint - which reads the figure
 from `harden.json` rather than holding a copy. **Status: confirmed.**
+
+
+### 2026-09-12 — Phase 6.5 Task 1: the empirical signal, MEASURED (supersedes the 0.70 figure)
+**Config.** `scripts/phase3_empirical_signal.py` -> `data/interim/phase3/empirical_signal.json`;
+`reproduce_all.py` stage "Phase 3 empirical signal"; seed 20260911; 500 permutations, 2,000 bootstrap.
+**Data.** Eyes-Defy-Anemia, 215 subjects with a palpebral mask (2 lack one),
+the dataset's own masks in all three encodings found on disk (alpha cutout 184,
+white-background 31, 3-channel 0),
+cutout-vs-JPEG alignment max 11938.9/255.
+**Metrics** (dE2000 per g/dL; null = Hb shuffled across subjects):
+
+| estimator | value | null | p |
+| --- | --- | --- | --- |
+| binned by Hb, the method on record | 2.29 | **2.13 +/- 0.46** | 0.33 |
+| regression Hb + site (upper bound) | 1.37 (CI 1.06-1.71) | 0.17 | 0.002 |
+| **regression Hb + site + sex + age** | **0.84 (CI 0.57-1.17)** | 0.13 | 0.002 |
+
+Per site (adjusted): India 0.68, Italy 0.92.
+Grey-world tight crop: 0.78. r(Hb, male) = 0.55. Between-subject colour at fixed
+Hb/sex/age/site: **4.55 dE2000 = 5.4 g/dL equivalent**.
+**Downstream.** noise/signal at 3.935: **4.7x** (CI 3.4-6.9), was 5.6x;
+at 6.076: 7.3x. Equivalent Hb error at the measured residual **4.7 g/dL**
+(2.9 even with the unadjusted signal) - above 2.0 at every bound.
+Model/empirical: the model underestimates by 1.9x (was "within 1.5x").
+**Interpretation.** The binned method returns ~2.1 with NO Hb signal - CIEDE2000 between noisy bin means
+measures the noise in the means - so the figure on record was never a measurement and is WITHDRAWN, not
+corrected. The regression figure brackets 0.70 by coincidence. **No verdict changes**: the Phase 3 gate
+(3.893 g/dL) was computed on the simulated inversion; the empirical cross-check still puts the equivalent
+error above the 2.0 g/dL line at the central estimate and both CI bounds. **Status: confirmed.**
+
+### 2026-09-12 — Phase 6.5 Task 2: image CNN baseline on Eyes-Defy (MARGINAL; the §3 comparison arm)
+**Config.** `scripts/phase6_5_image_cnn.py`, `src/hemosight/baseline/image_cnn.py`. ResNet-18 ImageNet init,
+palpebral bbox crop 224 px, 30 epochs, 10-fold subject-disjoint CV, target standardised on train
+folds, geometric augmentation only, 3 seeds. Bands <1.0 viable, 1.0-2.0 marginal, >2.0 not viable.
+**Data.** 216 Eyes-Defy subjects (India 95, Italy 121), one image each,
+one Galaxy S6 in two variants, Hb 7.0-17.4, no severe cases. **Pilot comparison arm, not a validation.**
+**Metrics** (identical folds):
+
+| model | MAE g/dL | r | R² | band |
+| --- | --- | --- | --- | --- |
+| population mean | 2.003 | — | — | NOT VIABLE |
+| sex alone | 1.631 | +0.544 | +0.295 | MARGINAL |
+| demographics without site (age, sex) | 1.607 | +0.548 | +0.301 | MARGINAL |
+| site alone | 1.641 | +0.490 | +0.240 | MARGINAL |
+| **demographics WITH site (site, sex, age)** | **1.273** | +0.697 | +0.485 | MARGINAL |
+| colour features (mean Lab + ridge) | 1.343 | +0.703 | +0.494 | MARGINAL |
+| colour features + demographics | 1.243 | +0.746 | +0.557 | MARGINAL |
+| **CNN, seed-averaged** | **1.301** | +0.709 | +0.499 | **MARGINAL** |
+| CNN + age + sex (stacked) | 1.225 | +0.738 | +0.544 | MARGINAL |
+| CNN + site + sex + age (stacked) | 1.195 | +0.744 | +0.553 | MARGINAL |
+| colour features + site + sex + age | 1.161 | +0.758 | +0.574 | MARGINAL |
+
+Site Hb: India 11.47 +/- 2.06; Italy 13.83 +/- 2.04 - a 2.4 g/dL gap between two device
+variants. Image increment over site+sex+age: **+0.078 g/dL**. WHO-band AUROC: CNN
+0.875, colour 0.874, site+sex+age 0.816.
+Per site (pooled CNN vs site+sex+age): India 1.386 vs 1.290; Italy 1.234 vs 1.260.
+
+Seeds: 1.344, 1.436, 1.328 (SD 0.0476); train MAE 0.476,
+**train-test gap +0.893**. Sex probe on features 0.713 vs base 0.602;
+r(CNN pred, male) +0.502 vs r(Hb, male) +0.558. Permutation (n=30): real 1.3435, null 2.2018 +/- 0.0814, empirical p 0.0323 (floor 0.0323), z -10.54.
+
+**Cross-site (the only cross-site axis):**
+
+| direction | train/test | train-site mean | sex | demographics | colour | **CNN** | r | bias | band |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| italy to india | 121/95 | 2.625 | 2.246 | 2.739 | 2.035 | **1.958** | +0.60 | +1.59 | MARGINAL |
+| india to italy | 95/121 | 2.819 | 2.405 | 2.486 | 1.995 | **1.995** | +0.53 | -1.52 | MARGINAL |
+
+**Interpretation.** Beats population mean: True; beats sex alone: True;
+beats demographics without site: True; **beats demographics WITH site: False**.
+The CNN beat sex alone by reading the site; against the site-inclusive baseline it does not win. Under Eyes-Defy's controlled illuminant the image carries real haemoglobin information (within-site r 0.5-0.65, permutation far from chance, three Lab numbers nearly match the CNN) worth ~0.1 g/dL over demographics - real and clinically useless, the PPG-waveform shape again. The imaging verdict stands; the write-up carries the controlled-illuminant caveat.
+**Status: confirmed.**
+
+### 2026-09-12 — Phase 6.5 Task 3: the three Phase 5 checks driven END TO END on the deep model
+**Config.** `scripts/phase6_5_deep_predictions.py` (Phase 5 driver, same seeds and folds; 10 seeds + 6
+candidates in 9.7 min) -> `data/interim/phase6/known_truth/phase5_deep_model.csv` (untracked);
+`scripts/phase6_validate_harness.py` section A8.
+**Metrics.** Regenerated seed-averaged MAE 1.1126 vs recorded 1.1124;
+max |per-seed - recorded| 0.0041. Harness verdicts: demographic_baseline FAIL (expected FAIL); permutation PASS (expected PASS); seed_stability PASS (expected PASS); subgroup_robustness PASS (expected PASS).
+Known-truth cases **19/19**, faults 13/13, false positives
+6/160 (3.75%).
+**Interpretation.** The deferred Phase 6 item is closed. The harness's permutation p is a different null
+(labels permuted against fixed predictions) and is NOT a reproduction of 0.0041; the verdict agrees. **Status: confirmed.**
+
+### 2026-09-12 — Phase 6.5 Task 4a: the Phase 2 estimator applied to Eyes-Defy and STORED
+**Config.** `scripts/phase6_5_eyes_defy_illuminant.py` -> `data/interim/phase6_5/eyes_defy_illuminant.{csv,json}`.
+**Metrics** (angular spread about the site mean, degrees; n=218, sclera estimate on 218):
+sclera_neutral: all 3.48, India 2.69, Italy 2.65, between-site 4.82; grey_world_full: all 4.09, India 1.87, Italy 2.56, between-site 7.37; grey_world_25pct: all 4.40, India 4.24, Italy 4.04, between-site 2.93.
+Sclera vs grey-world(25%) per image 3.56 deg.
+**Interpretation.** Eyes-Defy is captured under a fixed white LED with ambient light excluded, so the true
+illuminant is nearly constant and the spread is mostly estimator error - consistent with Phase 2's MOBIUS
+finding that the sclera reference varies per subject. Within-subject stability is NOT measurable (one image
+per subject). The Phase 2 tick is now backed by the artefact its wording implies. **Status: confirmed.**
+
+## 9. WORKING PROTOCOL
+
+After completing any task:
+
+1. **Tick its checkbox in CLAUDE.md.** A task is complete when its output exists on
+   disk, not when the code is written.
+2. **Record any deviation in the DECISION LOG**, dated, with the rationale.
+3. **Record any metric in the RESULTS LOG**, dated, including failures and negative
+   results.
+4. **Never delete a log entry.** Supersede it with a newer entry instead.
+5. **Never silently change a phase plan item.** Editing or removing a task requires a
+   DECISION LOG entry saying what changed and why.
+
+Additional standing rules:
+
+- Never write to `data/raw/`.
+- Never split at image level; splits are patient-level and site-aware.
+- Never report a single-site number as a headline result.
+- Never describe any output as diagnostic, validated, or clinically approved.
+- Keep the CNN baseline current: if the physical model changes, the comparison arm is
+  re-run before the new number is reported.
+- When a result is worse than the baseline, log it and say so plainly. That is the
+  point of having a baseline.

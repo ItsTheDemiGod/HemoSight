@@ -132,16 +132,42 @@ def main() -> int:
     A(row(["model", "MAE g/dL", "r", "R2", "band"]))
     A(row(["---"] * 5))
     for k, lab in (("population_mean", "population mean"), ("sex_only", "sex alone"),
-                   ("demographics_age_sex", "demographics (age, sex)"),
+                   ("demographics_age_sex", "demographics WITHOUT site (age, sex)"),
+                   ("site_only", "site alone (India / Italy)"),
+                   ("demographics_site_sex_age", "**demographics WITH site (site, sex, age) - the baseline that counts**"),
                    ("colour_features_lab", "colour features (mean palpebral Lab + ridge)"),
-                   ("colour_features_lab_plus_demographics", "colour features + demographics")):
+                   ("colour_features_lab_plus_demographics", "colour features + age + sex"),
+                   ("colour_features_lab_plus_site_sex_age", "colour features + site + sex + age")):
         v = B[k]
         A(row([lab, f"{v['mae_g_dl']:.3f}", f"{v['pearson_r']:+.3f}", f"{v['r2']:+.3f}", v["band"]]))
     A(row([f"**CNN, seed-averaged ({cnn['seeds']} seeds)**", f"**{C['mae_g_dl']:.3f}**",
            f"{C['pearson_r']:+.3f}", f"{C['r2']:+.3f}", f"**{C['band']}**"]))
     cd = cnn["cnn_plus_demographics"]
-    A(row(["CNN + demographics (stacked ridge)", f"{cd['mae_g_dl']:.3f}", f"{cd['pearson_r']:+.3f}",
+    A(row(["CNN + age + sex (stacked ridge)", f"{cd['mae_g_dl']:.3f}", f"{cd['pearson_r']:+.3f}",
            f"{cd['r2']:+.3f}", cd["band"]]))
+    cs3 = cnn["cnn_plus_site_sex_age"]
+    A(row(["CNN + site + sex + age (stacked ridge)", f"{cs3['mae_g_dl']:.3f}", f"{cs3['pearson_r']:+.3f}",
+           f"{cs3['r2']:+.3f}", cs3["band"]]))
+    sh = cnn["site_hb"]
+    A(f"\nSite Hb: {'; '.join(f'{k.split(chr(58))[1]} mean {v['mean']:.2f} SD {v['sd']:.2f} (n={v['n']})' for k, v in sh.items())} - "
+      f"a {abs(list(sh.values())[0]['mean'] - list(sh.values())[1]['mean']):.1f} g/dL gap between two device variants, "
+      "which any model that recognises the site inherits for free.\n")
+    A("\n> ⚠️ **CORRECTION.** The first run of this script (2026-09-12 19:28) omitted site from the "
+      "demographic baseline and reported the CNN as beating demographics (1.309 vs 1.607). "
+      "With site included the demographic baseline is "
+      f"{B['demographics_site_sex_age']['mae_g_dl']:.3f}: the CNN {'does not beat it' if not cnn['verdict']['cnn_beats_demographics_site_sex_age'] else 'beats it'}. "
+      "It had beaten sex alone by reading the site - the Phase 4 pattern with site as the "
+      "covariate. The script was fixed and the whole analysis re-run; the DECISION LOG "
+      "carries the correction.\n\n")
+    A(f"**Does the image add anything over site + sex + age?** CNN + site + sex + age "
+      f"{cs3['mae_g_dl']:.3f} vs {B['demographics_site_sex_age']['mae_g_dl']:.3f}: the image is worth "
+      f"**{cnn['image_increment_over_site_sex_age_g_dl']:+.3f} g/dL** of MAE. WHO-band anaemia AUROC "
+      f"(12 g/dL F / 13 M): CNN {cnn['who_anaemia_auroc']['cnn']:.3f}, colour features "
+      f"{cnn['who_anaemia_auroc']['colour_features_lab']:.3f}, site + sex + age "
+      f"{cnn['who_anaemia_auroc']['site_sex_age']:.3f}, CNN + site + sex + age "
+      f"{cnn['who_anaemia_auroc']['cnn_plus_site_sex_age']:.3f}. Per site, the pooled CNN: "
+      + "; ".join(f"{k.split(':')[1]} CNN {v['mae_g_dl']:.3f} (r {v['pearson_r']:+.2f}) vs site+sex+age {v['site_sex_age_mae_g_dl']:.3f}"
+                  for k, v in cnn["cnn_pooled_by_site"].items()) + ".\n\n")
     A(f"\nPer seed: {', '.join(f'{m['mae_g_dl']:.3f}' for m in C['per_seed'])} (SD "
       f"{C['seed_mae_sd']:.4f}). Train MAE {C['train_mae_mean']:.3f}, **train-test gap "
       f"{C['train_test_gap_mean']:+.3f}**. Sex probe on the 512-d penultimate features: "
@@ -167,17 +193,26 @@ def main() -> int:
     A("\n### Verdict\n\n")
     beats_sex = V["cnn_beats_sex_alone"]
     A(f"* Pooled band: **{V['cnn_pooled_band']}**. Beats population mean: "
-      f"{V['cnn_beats_population_mean']}. Beats sex alone: **{beats_sex}**. Beats "
-      f"demographics: **{V['cnn_beats_demographics']}**.\n")
+      f"{V['cnn_beats_population_mean']}. Beats sex alone: {beats_sex}. Beats demographics "
+      f"without site: {V['cnn_beats_demographics_age_sex']}. **Beats demographics WITH site: "
+      f"{V['cnn_beats_demographics_site_sex_age']}.**\n")
     A(f"* Cross-site bands: {V['cross_site_bands']}; beats the train-site mean: "
       f"{V['cross_site_cnn_beats_train_site_mean']}.\n")
     if not V["cnn_beats_demographics"]:
-        A("* **The expected outcome: failure.** A conventional CNN on the only cross-site "
-          "haemoglobin photographs in the project does not beat a single binary "
-          "demographic variable, on the same folds, under the same bands, with the same "
-          "scrutiny the PPG deep models received. The imaging refutation now has the "
-          "standard-approach comparison section 3 required, and the comparison agrees "
-          "with it. The imaging verdict is not revisited.\n")
+        A("* **The expected outcome, with a refinement.** A conventional CNN on the only "
+          "cross-site haemoglobin photographs in the project does not beat the demographic "
+          "baseline once site is in it, on the same folds, under the same bands, with the "
+          "same scrutiny the PPG deep models received; cross-site it sits at the top of the "
+          "MARGINAL band with a bias the size of the site gap. The refinement the write-up "
+          "must carry: under Eyes-Defy's CONTROLLED illuminant (own white LED, ambient "
+          "excluded) conjunctival colour does carry haemoglobin - within-site r 0.5-0.65, "
+          "permutation z far from chance, three Lab numbers nearly match the CNN - and it is "
+          f"worth about {cnn['image_increment_over_site_sex_age_g_dl']:.1f} g/dL of MAE over "
+          "demographics. Real, and clinically useless: the same shape as the PPG waveform "
+          "finding. The imaging refutation now has the standard-approach comparison section "
+          "3 required; the comparison agrees with it for the ambient-light claim the "
+          "refutation makes and adds a controlled-illuminant caveat. The imaging verdict is "
+          "not revisited.\n")
     else:
         A("* **UNEXPECTED: the CNN beats the demographic baseline.** This is reported "
           "prominently and the imaging verdict must be revisited before the write-up.\n")
@@ -262,6 +297,12 @@ def main() -> int:
       "moved into section 8.\n\n")
 
     # ------------------------------------------------------------------ Task 6
+    A("### Did the same omission affect other baselines?\n\n")
+    A("Checked. The PPG dataset has no site, cohort or session column. Its unused covariates "
+      "were tested on the identical Phase 4 folds: r(Hb, signal length) = -0.01, r(Hb, SBP) = "
+      "+0.18, r(Hb, DBP) = +0.21, r(Hb, glucose) = +0.04; demographics 0.831 -> demographics + "
+      "BP 0.825 -> + BP + signal length + glucose 0.822; signal length alone 1.180 (= the "
+      "population mean). Nothing to recompute; the Phase 4 baseline stands.\n\n")
     A("## 6. TASK 6 - commit\n\nSee the git log; the commit message carries the summary. "
       "`tests/test_phase5.py::test_no_dataset_files_are_tracked_by_git` guards the tree.\n\n")
 

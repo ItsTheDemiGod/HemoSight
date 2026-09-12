@@ -103,6 +103,18 @@ STAGES = [
           note="MEASURED 58 s: hashes 9,232 images, injects 7 known faults, runs 20 "
                "clean replicates; CPU and disk only"),
     Stage("Phase 6  audit harness report", "phase6_report.py", 0.2),
+    # Phase 6.5 - closure. The deep-prediction dump must precede the harness validation
+    # for its A8 section to run; it is listed here after it so a --fast run stays CPU-only,
+    # and the validation script skips A8 cleanly when the file is absent.
+    Stage("Phase 6.5 deep-model predictions", "phase6_5_deep_predictions.py", 10, slow=True,
+          note="GPU; 10 seeds + 6 candidates with the Phase 5 driver; re-run the harness "
+               "validation afterwards for section A8 (19/19 known-truth cases)"),
+    Stage("Phase 6.5 image CNN baseline", "phase6_5_image_cnn.py", 76, slow=True,
+          note="GPU, MEASURED 4,578 s: ResNet-18 on Eyes-Defy, 3 seeds, 30 permutations, "
+               "cross-site; NON-DETERMINISTIC (cuDNN), seed SD 0.048"),
+    Stage("Phase 6.5 Eyes-Defy illuminant", "phase6_5_eyes_defy_illuminant.py", 1.5,
+          note="GPU inference only; Phase 2 estimator applied to all 218 images"),
+    Stage("Phase 6.5 closure report", "phase6_5_report.py", 0.1),
 ]
 
 
