@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* An instrument, not a dashboard.
+   Warm paper, near-black ink, hairline rules, and numbers set in a monospace so
+   columns of them line up and can be read against each other. Colour is reserved
+   for verdicts - nothing else on the page is allowed to compete with them. */
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    @apply bg-paper text-ink font-sans;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  h1, h2, h3 {
+    @apply font-serif;
+    letter-spacing: -0.01em;
+  }
+  ::selection {
+    background: #e7e2d6;
+  }
+  /* A thin, slightly inset scrollbar so long tables do not shout. */
+  ::-webkit-scrollbar { height: 9px; width: 9px; }
+  ::-webkit-scrollbar-thumb { background: #d6d1c7; border-radius: 6px; }
+}
+
+@layer components {
+  .rule { @apply border-t border-rule; }
+  .num { @apply font-mono tabular-nums; }
+  .label {
+    @apply font-mono text-[11px] uppercase tracking-[0.14em] text-faint;
+  }
+  .prose-measure { @apply max-w-measure text-[15px] leading-relaxed text-muted; }
+  .btn {
+    @apply inline-flex items-center gap-2 border border-ink bg-ink px-4 py-2
+           text-[13px] font-medium text-paper transition-colors
+           hover:bg-transparent hover:text-ink disabled:cursor-not-allowed
+           disabled:border-rule disabled:bg-rule disabled:text-faint;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 border border-rule px-3 py-1.5
+           text-[13px] text-muted transition-colors hover:border-ink hover:text-ink;
+  }
+  .field {
+    @apply w-full border border-rule bg-white px-3 py-2 text-[14px] outline-none
+           transition-colors focus:border-ink;
+  }
+  .cell { @apply border-b border-rule px-3 py-2 align-top; }
+}

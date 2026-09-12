@@ -1,0 +1,215 @@
+{
+  "generated_by": "scripts/phase6_make_sample_data.py",
+  "n_subjects": 240,
+  "image_dir": "C:\\Users\\demia\\Desktop\\HemoSight\\data\\interim\\phase6\\sample_images",
+  "image_zip": "C:\\Users\\demia\\Desktop\\HemoSight\\data\\interim\\phase6\\sample_images.zip",
+  "files": [
+    {
+      "file": "01_mixed_start_here.csv",
+      "kind": "mixed",
+      "rows": 248,
+      "description": "Several faults at once, and everything the optional checks need. The one to upload first.",
+      "verdicts": {
+        "duplicates": "FAIL",
+        "split_integrity": "FAIL",
+        "demographic_baseline": "PASS",
+        "proxy_probe": "PASS",
+        "permutation": "PASS",
+        "seed_stability": "PASS",
+        "subgroup_robustness": "PASS",
+        "ceiling": "PASS"
+      },
+      "counts": {
+        "FAIL": 2,
+        "INSUFFICIENT_DATA": 0,
+        "PASS": 6
+      }
+    },
+    {
+      "file": "02_clean_no_injected_fault.csv",
+      "kind": "clean",
+      "rows": 240,
+      "description": "No fault. Every check should pass or decline; any FAIL here is a false positive.",
+      "verdicts": {
+        "duplicates": "PASS",
+        "split_integrity": "PASS",
+        "demographic_baseline": "PASS",
+        "proxy_probe": "PASS",
+        "permutation": "PASS",
+        "seed_stability": "PASS",
+        "subgroup_robustness": "PASS",
+        "ceiling": "PASS"
+      },
+      "counts": {
+        "FAIL": 0,
+        "INSUFFICIENT_DATA": 0,
+        "PASS": 8
+      }
+    },
+    {
+      "file": "03_fault_duplicates_across_split.csv",
+      "kind": "duplicates_across_split",
+      "rows": 243,
+      "description": "byte-identical images on both sides of the split",
+      "verdicts": {
+        "duplicates": "FAIL",
+        "split_integrity": "FAIL",
+        "demographic_baseline": "PASS",
+        "proxy_probe": "PASS",
+        "permutation": "PASS",
+        "seed_stability": "PASS",
+        "subgroup_robustness": "PASS",
+        "ceiling": "PASS"
+      },
+      "counts": {
+        "FAIL": 2,
+        "INSUFFICIENT_DATA": 0,
+        "PASS": 6
+      }
+    },
+    {
+      "file": "04_fault_subject_in_train_and_test.csv",
+      "kind": "subject_across_split",
+      "rows": 245,
+      "description": "the same subject_id in train and test",
+      "verdicts": {
+        "duplicates": "FAIL",
+        "split_integrity": "FAIL",
+        "demographic_baseline": "PASS",
+        "proxy_probe": "PASS",
+        "permutation": "PASS",
+        "seed_stability": "PASS",
+        "subgroup_robustness": "PASS",
+        "ceiling": "PASS"
+      },
+      "counts": {
+        "FAIL": 2,
+        "INSUFFICIENT_DATA": 0,
+        "PASS": 6
+      }
+    },
+    {
+      "file": "05_fault_model_is_a_sex_classifier.csv",
+      "kind": "demographic_proxy",
+      "rows": 240,
+      "description": "a model that is a sex classifier with a decoration",
+      "verdicts": {
+        "demographic_baseline": "FAIL",
+        "proxy_probe": "FAIL",
+        "duplicates": "PASS",
+        "split_integrity": "PASS",
+        "permutation": "PASS",
+        "seed_stability": "PASS",
+        "subgroup_robustness": "PASS",
+        "ceiling": "PASS"
+      },
+      "counts": {
+        "FAIL": 2,
+        "INSUFFICIENT_DATA": 0,
+        "PASS": 6
+      }
+    },
+    {
+      "file": "06_fault_model_has_no_signal.csv",
+      "kind": "no_signal",
+      "rows": 240,
+      "description": "a model with no association to the target",
+      "verdicts": {
+        "demographic_baseline": "FAIL",
+        "permutation": "FAIL",
+        "seed_stability": "FAIL",
+        "subgroup_robustness": "FAIL",
+        "proxy_probe": "INSUFFICIENT_DATA",
+        "duplicates": "PASS",
+        "split_integrity": "PASS",
+        "ceiling": "PASS"
+      },
+      "counts": {
+        "FAIL": 4,
+        "INSUFFICIENT_DATA": 1,
+        "PASS": 3
+      }
+    },
+    {
+      "file": "07_fault_score_moves_with_the_seed.csv",
+      "kind": "seed_unstable",
+      "rows": 240,
+      "description": "a model whose score moves with the seed by more than its effect",
+      "verdicts": {
+        "seed_stability": "FAIL",
+        "duplicates": "PASS",
+        "split_integrity": "PASS",
+        "demographic_baseline": "PASS",
+        "proxy_probe": "PASS",
+        "permutation": "PASS",
+        "subgroup_robustness": "PASS",
+        "ceiling": "PASS"
+      },
+      "counts": {
+        "FAIL": 1,
+        "INSUFFICIENT_DATA": 0,
+        "PASS": 7
+      }
+    },
+    {
+      "file": "08_fault_effect_carried_by_8pct_of_subjects.csv",
+      "kind": "few_subjects",
+      "rows": 240,
+      "description": "an advantage carried by 8% of subjects",
+      "verdicts": {
+        "demographic_baseline": "FAIL",
+        "subgroup_robustness": "FAIL",
+        "duplicates": "PASS",
+        "split_integrity": "PASS",
+        "proxy_probe": "PASS",
+        "permutation": "PASS",
+        "seed_stability": "PASS",
+        "ceiling": "PASS"
+      },
+      "counts": {
+        "FAIL": 2,
+        "INSUFFICIENT_DATA": 0,
+        "PASS": 6
+      }
+    },
+    {
+      "file": "09_control_genuine_signal.csv",
+      "kind": "genuine_signal",
+      "rows": 240,
+      "description": "A real effect. The permutation test must NOT call this out.",
+      "verdicts": {
+        "demographic_baseline": "FAIL",
+        "duplicates": "PASS",
+        "split_integrity": "PASS",
+        "proxy_probe": "PASS",
+        "permutation": "PASS",
+        "seed_stability": "PASS",
+        "subgroup_robustness": "PASS",
+        "ceiling": "PASS"
+      },
+      "counts": {
+        "FAIL": 1,
+        "INSUFFICIENT_DATA": 0,
+        "PASS": 7
+      }
+    },
+    {
+      "file": "data/interim/phase6/known_truth/phase1_ghana_pool_overlap.csv",
+      "kind": "known-truth (real data, NOT tracked in git)",
+      "rows": 9232,
+      "description": "Phase 1: 419 shared MD5 hashes, 1,708 ids -> 1,067 leak-proof groups. image_path points into data/raw, which is READ-ONLY; upload with no image directory and the paths resolve as absolute."
+    },
+    {
+      "file": "data/interim/phase6/known_truth/phase4_ppg_features_only.csv",
+      "kind": "known-truth (real data, NOT tracked in git)",
+      "rows": 252,
+      "description": "Phase 4 Gate B: MAE 1.190 g/dL against sex alone at 0.831."
+    },
+    {
+      "file": "data/interim/phase6/known_truth/phase4_ppg_plus_demographics.csv",
+      "kind": "known-truth (real data, NOT tracked in git)",
+      "rows": 252,
+      "description": "Phase 4 Task 3: MAE 0.824 g/dL, inside the pre-declared VIABLE band, and a sex classifier. The proxy probe is the check that says so."
+    }
+  ]
+}
