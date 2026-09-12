@@ -34,9 +34,14 @@ from hemosight.audit.ingest import IngestSpec, NotAuditable, ingest_file  # noqa
 from hemosight.audit.report import to_external_markdown                  # noqa: E402
 
 REGISTER = ROOT / "configs" / "external_audit_register.json"
-REGISTER_FIELDS = ["slug", "date", "paper", "links", "predictions_released", "subject_ids",
-                   "splits", "demographics", "images", "auditable", "checks_possible",
-                   "notes"]
+REGISTER_FIELDS = ["slug", "date", "paper", "links", "kind", "code_released", "weights_released",
+                   "predictions_released", "subject_ids", "splits", "demographics", "images",
+                   "data_availability_statement", "code_availability_statement", "auditable",
+                   "checks_possible", "notes"]
+# "upon_request" is its own category: neither released nor unavailable. It is widely
+# documented that this phrasing rarely results in an actual transfer; nothing is claimed
+# here about any specific authors that was not tested.
+AVAIL = ["released", "partial", "upon_request", "none", "not_stated"]
 
 
 def cmd_ingest(a) -> int:
@@ -87,8 +92,11 @@ def cmd_register(a) -> int:
     reg = json.loads(REGISTER.read_text(encoding="utf-8")) if REGISTER.exists() else \
         {"schema": REGISTER_FIELDS, "entries": []}
     entry = {"slug": a.slug, "date": str(date.today()), "paper": a.paper, "links": a.links,
+             "kind": a.kind, "code_released": a.code, "weights_released": a.weights,
              "predictions_released": a.predictions, "subject_ids": a.subject_ids,
              "splits": a.splits, "demographics": a.demographics, "images": a.images,
+             "data_availability_statement": a.data_statement,
+             "code_availability_statement": a.code_statement,
              "auditable": a.auditable, "checks_possible": a.checks_possible, "notes": a.notes}
     reg["entries"] = [e for e in reg["entries"] if e["slug"] != a.slug] + [entry]
     REGISTER.write_text(json.dumps(reg, indent=2), encoding="utf-8")
@@ -101,13 +109,20 @@ def cmd_register(a) -> int:
     if not reg["entries"]:
         L.append("_No attempts recorded yet._\n")
     else:
-        L.append("| slug | date | paper | predictions | subject ids | splits | demographics | images | auditable | checks possible | notes |\n")
-        L.append("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n")
+        L.append("| slug | kind | code | weights | predictions | subject ids | splits | demographics | auditable | checks possible |\n")
+        L.append("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n")
         for e in reg["entries"]:
             L.append("| " + " | ".join(str(e.get(k, "")) for k in
-                                      ("slug", "date", "paper", "predictions_released", "subject_ids",
-                                       "splits", "demographics", "images", "auditable",
-                                       "checks_possible", "notes")) + " |\n")
+                                      ("slug", "kind", "code_released", "weights_released",
+                                       "predictions_released", "subject_ids", "splits", "demographics",
+                                       "auditable", "checks_possible")) + " |\n")
+        L.append("\n### Availability statements, verbatim\n\n")
+        for e in reg["entries"]:
+            L.append(f"* **{e['slug']}** - {e['paper']} ({e['links']})\n")
+            L.append(f"  - data: {e.get('data_availability_statement') or 'not stated'}\n")
+            L.append(f"  - code: {e.get('code_availability_statement') or 'not stated'}\n")
+            if e.get("notes"):
+                L.append(f"  - notes: {e['notes']}\n")
         n = len(reg["entries"]); na = sum(1 for e in reg["entries"] if e["auditable"] == "none")
         L.append(f"\n**{na} of {n} candidates released nothing auditable.**\n")
     (ROOT / "reports" / "external_audit_register.md").write_text("".join(L), encoding="utf-8")
@@ -125,11 +140,16 @@ def main() -> int:
     s = sub.add_parser("register")
     for f in ("slug", "paper", "links"):
         s.add_argument(f"--{f}", required=True)
-    s.add_argument("--predictions", choices=["released", "partial", "none"], required=True)
-    s.add_argument("--subject-ids", dest="subject_ids", choices=["yes", "no", "derivable"], required=True)
-    s.add_argument("--splits", choices=["yes", "no"], required=True)
-    s.add_argument("--demographics", choices=["yes", "partial", "no"], required=True)
-    s.add_argument("--images", choices=["yes", "no"], required=True)
+    s.add_argument("--kind", choices=["published_paper", "preprint", "code_repository", "unlocated"], required=True)
+    s.add_argument("--code", choices=AVAIL, required=True)
+    s.add_argument("--weights", choices=AVAIL, required=True)
+    s.add_argument("--predictions", choices=AVAIL, required=True)
+    s.add_argument("--data-statement", dest="data_statement", default="")
+    s.add_argument("--code-statement", dest="code_statement", default="")
+    s.add_argument("--subject-ids", dest="subject_ids", choices=["yes", "no", "derivable", "n/a"], required=True)
+    s.add_argument("--splits", choices=["yes", "partial", "no", "n/a"], required=True)
+    s.add_argument("--demographics", choices=["yes", "partial", "no", "n/a"], required=True)
+    s.add_argument("--images", choices=["yes", "no", "n/a"], required=True)
     s.add_argument("--auditable", choices=["full", "partial", "none"], required=True)
     s.add_argument("--checks-possible", dest="checks_possible", default="")
     s.add_argument("--notes", default="")

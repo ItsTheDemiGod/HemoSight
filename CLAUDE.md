@@ -388,7 +388,7 @@ and its output exists on disk.
 > | 5 (orig) CNN baseline | ✅ BUILT in Phase 6.5 | — | 0 (MAE 1.301, MARGINAL; site+sex+age alone 1.273) |
 > | 6 Audit harness | ✅ COMPLETE | — | 0 (deep-model validation closed in Phase 6.5) + 1 ⛔ closed-not-applicable |
 > | 6.5 Closure | ✅ COMPLETE | — | 0 |
-> | 7 Additions | ✅ COMPLETE | Task 1 outcome B | 0 (external audit path built, not run) |
+> | 7 Additions | ✅ COMPLETE | Task 1 outcome B; external audit: 0 of 3 candidates auditable | 0 |
 > | 6 (orig) Conformal (N4) | 🔴 SUPERSEDED | no estimator | 0 |
 > | 7 Fairness (N5) | 🔴 SUPERSEDED | no estimator; mechanism measured in Phase 3 Task 4 | 0 |
 > | 8 Fusion (N6) | 🔴 SUPERSEDED | no g/dL estimate from any modality | 0 (2 items found done, ticked) |
@@ -707,6 +707,10 @@ measurement it does support. Reported whichever way it falls.
 - [x] Task 1: restate the imaging refutation as the outcome dictates; log it *(ticked 2026-09-12: outcome B - partial - controlled capture reaches MARGINAL only; see the DECISION LOG)*
 - [x] Task 2: `reports/statistical_vs_clinical.md` - the statistically-real / clinically-useless pattern, quantified on comparable axes in both modalities, with a reporting standard and a retrospective check *(ticked 2026-09-12: `scripts/phase7_statistical_vs_clinical.py` -> `statistical_vs_clinical.json` -> report; nine results placed in the 2x2)*
 - [x] Task 3: external-audit ingestion path (`hemosight.audit.ingest`), documented conversion procedure, INSUFFICIENT DATA prominent, external report template, attempted-audit register - built, NOT run *(ticked 2026-09-12: `hemosight.audit.ingest`, `run_audit(unsupported=)`, `to_external_markdown`, `scripts/external_audit.py`, empty register, `reports/external_audit_procedure.md`; 6 tests; smoke-tested on a synthetic table only - NOT run on any external work)*
+- [x] Task 3B: availability record for every external candidate examined - `reports/external_audit_availability.md`, register with "upon request" as its own category *(ticked 2026-09-13: 3 examined, **0 auditable**)*
+- [x] Task 3B: run the one released codebase in an isolated environment, paths repointed only, stop at the first error *(ticked 2026-09-13: 0 of 7 notebooks ran; 0 predictions; the harness produced no verdict on any external model)*
+- [x] Task 3B: methodology from paper text for the paper that cannot be run - `reports/literature_gap.md` extended with NOT REPORTED as a value distinct from UNKNOWN and from NO *(ticked 2026-09-13: BPANet; Hemo-ConViT unlocated and excluded)*
+- [x] Task 3B: `reports/external_audit.md`, leading with the availability result *(ticked 2026-09-13)*
 - [x] `reports/phase7.md`; CLAUDE.md updated; decisions and results logged *(ticked 2026-09-12)*
 
 ### Phase 6 (original plan): Conformal prediction and abstention (N4)
@@ -2142,6 +2146,30 @@ otherwise PASS split integrity; `to_external_markdown` gives "could not be check
 audited and no outcome is simulated. Candidates arrive separately; `auditable: none` will be recorded
 with the same weight as an audit that ran.
 
+### 2026-09-13 — External audit run: the availability finding is the result; the harness returned no verdict
+**Decision.** Three external candidates were examined and entered in the register with their availability
+statements verbatim; **0 of 3 released artefacts sufficient for an independent audit**, so the harness ran on
+none. "Available upon request" is recorded as its own category - neither released nor unavailable - and was
+not tested: nothing is claimed about the specific authors.
+**The one released codebase** (mbedmutha/anemia-detection: a three-person student repository, 18 commits, zero
+stars, "initial experiments" - NOT a paper, NOT evidence about the literature, used only to exercise the
+harness's external path) was executed in an isolated environment with data paths repointed and Colab mount
+cells skipped as the only allowances: **0 of 7 notebooks ran.** Five stopped at their first
+unreleased intermediate (`y_forniceal_*.npy`, `y_base_italy.npy`, an augmented-image folder), one at parsing
+the dataset's own `Italy.xlsx` (the authors used an unreleased cleaned copy), two at Keras-2 imports under
+unpinned dependencies. `requirements.txt` does not install as written (`glob`, `pathlib`). No weights, no
+saved outputs, no predictions. Code-text observations (splits without a seed; a loader that ignores its own
+split slice; an XGBoost cell evaluated on training rows) are recorded as observations, **not** harness verdicts.
+**BPANet** (Lin et al. 2025): data "available from the corresponding authors upon reasonable request"; no code
+statement. From the full text: 5-fold CV on Eyes-Defy with the fold unit not stated; an ablation removing
+age/gender (1.460 vs 1.212) but no demographics-only baseline; India+Italy pooled; NTUH evaluated separately
+after retraining; no duplicate check mentioned. Entered in `literature_gap.md` as **NOT REPORTED** - a value
+added for full-text-read papers, distinct from UNKNOWN (not read) and NO (measured by this project).
+**"Hemo-ConViT"**: no primary source found (Europe PMC, Crossref, arXiv: 0 hits); not cited, not audited.
+**Standing rule.** "Not auditable" and "audited and failed" are different findings. No external model is
+recorded as failing any check, because no check ran. Three candidates support no statement about the
+field; the register is how one would be earned.
+
 ## 8. RESULTS LOG
 
 Dated entries recording **every** metric produced, including failures and negative
@@ -2985,6 +3013,17 @@ two in "real but worse than the cheap baseline". **Status: confirmed.**
 no subject id PASSES split integrity without the ingestion record and returns INSUFFICIENT DATA with
 it. Synthetic smoke test of the CLI: 150 per-image rows -> 75 subjects, 4 of 8 checks INSUFFICIENT.
 Register: 0 entries. **Status: built; no external audit run.**
+
+### 2026-09-13 — Phase 7 Task 3B: external audit (availability is the result)
+**Config.** `scripts/phase7_external_run.py` (isolated env `anemia-detection-env`, CPU torch, TF 2.21 /
+Keras 3, nbclient, 900 s cell timeout); `scripts/external_audit.py register`; `scripts/phase7_external_report.py`.
+**Metrics.** Candidates examined **3**; auditable **0**. anemia-detection: notebooks 7, ran to completion
+**0**, predictions produced **0**; `requirements.txt` installable as written: False. BPANet: predictions
+upon_request, code not_stated. Hemo-ConViT: unlocated (0/0/0 hits). Literature table: 11 sources, with one
+full-text-read paper recorded as NOT REPORTED on all four attributes.
+**Interpretation.** The harness's external path was exercised to the point of ingestion and never reached it,
+because nothing ingestible was released. That is the finding. **Status: confirmed; sample of three, no
+field-level claim.**
 
 ## 9. WORKING PROTOCOL
 

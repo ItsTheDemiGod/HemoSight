@@ -113,3 +113,42 @@ def test_register_starts_empty_and_no_external_result_is_fabricated():
     assert "entries" in d and "schema" in d
     for e in d["entries"]:
         assert e["auditable"] in ("full", "partial", "none")
+
+
+# ------------------------------------------------ Task 3B: the availability record
+def test_register_entries_and_availability_report_agree():
+    """The availability count in the report must be computed from the register, and
+    'not auditable' must never have been turned into a failed check anywhere."""
+    root = Path(__file__).resolve().parents[1]
+    reg = json.loads((root / "configs" / "external_audit_register.json").read_text(encoding="utf-8"))
+    entries = reg["entries"]
+    assert len(entries) >= 3
+    for e in entries:
+        assert e["auditable"] in ("full", "partial", "none")
+        for f in ("code_released", "weights_released", "predictions_released"):
+            assert e[f] in ("released", "partial", "upon_request", "none", "not_stated"), (e["slug"], f)
+    k = sum(1 for e in entries if e["auditable"] in ("full", "partial"))
+    rep = (root / "reports" / "external_audit_availability.md").read_text(encoding="utf-8")
+    assert f"of the {len(entries)} external candidates examined, {k} released artefacts" in rep
+    assert "upon request" in rep.lower() and "own category" in rep
+    assert "NOT harness verdicts" in rep
+    lit = (root / "reports" / "literature_gap.md").read_text(encoding="utf-8")
+    assert "NOT REPORTED from a full-text read is not 'audited and failed'" in lit
+    assert "UNKNOWN is not evidence of absence" in lit
+
+
+def test_external_run_record_produced_no_predictions_and_touched_no_repo_code():
+    root = Path(__file__).resolve().parents[1]
+    p = root / "data" / "interim" / "phase7" / "external" / "anemia-detection" / "run_results.json"
+    if not p.exists():
+        pytest.skip("external run not present on this machine")
+    run = json.loads(p.read_text(encoding="utf-8"))
+    assert run["summary"]["ran_to_completion"] == 0
+    assert run["summary"]["produced_per_subject_predictions"] == 0
+    for nb in run["notebooks"]:
+        assert not nb["completed"] and nb["failed_cell"] is not None
+        # only path substitutions and Colab-mount skips are allowed changes
+        for s in nb["substitutions"]:
+            assert "xlsx" in s["from"] or "dataset_anemia" in s["from"] or "anemia_detection" in s["from"] or "Augmented" in s["from"]
+        for c in nb["skipped_cells"]:
+            assert "Colab" in c["reason"]

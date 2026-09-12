@@ -121,6 +121,11 @@ STAGES = [
     Stage("Phase 7  statistical vs clinical", "phase7_statistical_vs_clinical.py", 0.5,
           note="needs the Phase 6.5 deep-model and CNN prediction tables"),
     Stage("Phase 7  reports", "phase7_report.py", 0.1),
+    # The external RUN (phase7_external_run.py) needs a third-party clone and its own
+    # environment outside this repository and is not a stage; its record is committed to
+    # the register and the report regenerates from it.
+    Stage("Phase 7  external audit reports", "phase7_external_report.py", 0.1,
+          note="from configs/external_audit_register.json and the run record"),
 ]
 
 

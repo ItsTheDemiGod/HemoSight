@@ -4,15 +4,93 @@
     "date",
     "paper",
     "links",
+    "kind",
+    "code_released",
+    "weights_released",
     "predictions_released",
     "subject_ids",
     "splits",
     "demographics",
     "images",
+    "data_availability_statement",
+    "code_availability_statement",
     "auditable",
     "checks_possible",
     "notes"
   ],
-  "entries": [],
-  "note": "One entry per attempted external audit. auditable=none is a measured outcome. No entry is written without an actual attempt."
+  "entries": [
+    {
+      "slug": "anemia-detection-mbedmutha",
+      "date": "2026-09-13",
+      "paper": "mbedmutha/anemia-detection - 'Hemoglobin Prediction using Conjunctiva Images' (Bedmutha, Saoji, Chauhan); student project, 18 commits, 0 stars, self-described 'initial experiments'. NOT a published paper.",
+      "links": "github.com\\mbedmutha\\anemia-detection (cloned to C;C:\\Program Files\\Git\\Users\\demia\\Desktop\\anemia-detection-main)",
+      "kind": "code_repository",
+      "code_released": "released",
+      "weights_released": "none",
+      "predictions_released": "none",
+      "subject_ids": "n/a",
+      "splits": "partial",
+      "demographics": "no",
+      "images": "n/a",
+      "data_availability_statement": "README: 'uses the Eyes-defy-Anemia dataset ... Simply changing path to the local folder containing the images and excel files will help run the files.' The notebooks in fact load preprocessed .npy arrays (X_forniceal_*, y_forniceal_*, X_proc_*, y_base_*, X_new_RGB, y_india), an augmented-image folder and a cleaned Italy_new.xlsx/Italy_copy.xlsx, none of which are in the repository.",
+      "code_availability_statement": "seven Jupyter notebooks, no saved outputs; requirements.txt unpinned and not installable as written (lists 'glob' and 'pathlib'); no weights (model.save/torch.save to local paths only)",
+      "auditable": "none",
+      "checks_possible": "none: 0 of 7 notebooks ran to completion, so no per-subject predictions exist to ingest",
+      "notes": "run attempted 2026-09-13 in an isolated env with data paths repointed only; every notebook stopped at its first unreleased intermediate (5), at parsing the dataset's own Italy.xlsx which the authors' unreleased cleaned copy avoided (1), or at Keras-2 imports under unpinned dependencies (2 transfer-learning notebooks, which also need PH2/HAM10000 archives). Splits in code: train_test_split without random_state (2 notebooks), positional slices, one loader that ignores its own split slice - code observations, NOT harness verdicts."
+    },
+    {
+      "slug": "bpanet-lin-2025",
+      "date": "2026-09-13",
+      "paper": "Lin ET, Lu SC, Liu AS, Ko CH, Huang CH, Tsai CL, Fu LC. 'Deep Learning-Based Model for Non-invasive Hemoglobin Estimation via Body Parts Images: A Retrospective Analysis and a Prospective Emergency Department Study.' J Imaging Inform Med 2025; DOI 10.1007/s10278-024-01209-4; PMC11950610",
+      "links": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11950610/",
+      "kind": "published_paper",
+      "code_released": "not_stated",
+      "weights_released": "not_stated",
+      "predictions_released": "upon_request",
+      "subject_ids": "n/a",
+      "splits": "partial",
+      "demographics": "partial",
+      "images": "n/a",
+      "data_availability_statement": "verbatim: 'The data that support the findings of this study are available from the corresponding authors upon reasonable request.'",
+      "code_availability_statement": "no code availability statement, repository link or model release found in the full text",
+      "auditable": "none",
+      "checks_possible": "none without released predictions; from the text alone: 5-fold CV on Eyes-Defy (unit not stated), 4-fold on NTUH; ablation removing age/gender reported (1.460 vs 1.212), no demographics-only baseline; India+Italy pooled, no per-country result; NTUH evaluated separately after retraining; no duplicate/leakage check mentioned",
+      "notes": "not requested from the authors; 'upon request' recorded as its own category and not tested"
+    },
+    {
+      "slug": "hemo-convit-unlocated",
+      "date": "2026-09-13",
+      "paper": "'Hemo-ConViT' - a primary source could not be located",
+      "links": "0 hits: Europe PMC, Crossref (query.bibliographic), arXiv API, 2026-09-13; web search returns an unattributed abstract-like description with no DOI or venue",
+      "kind": "unlocated",
+      "code_released": "not_stated",
+      "weights_released": "not_stated",
+      "predictions_released": "not_stated",
+      "subject_ids": "n/a",
+      "splits": "n/a",
+      "demographics": "n/a",
+      "images": "n/a",
+      "data_availability_statement": "",
+      "code_availability_statement": "",
+      "auditable": "none",
+      "checks_possible": "none: no primary text",
+      "notes": "treated as unconfirmed; not cited, not characterised, not audited on the strength of a secondary description"
+    }
+  ],
+  "note": "One entry per attempted external audit. auditable=none is a measured outcome. No entry is written without an actual attempt.",
+  "categories": {
+    "availability": [
+      "released",
+      "partial",
+      "upon_request",
+      "none",
+      "not_stated"
+    ],
+    "auditable": [
+      "full",
+      "partial",
+      "none"
+    ],
+    "note": "upon_request is its own category: neither released nor unavailable."
+  }
 }
