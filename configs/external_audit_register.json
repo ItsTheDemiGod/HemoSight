@@ -1,0 +1,18 @@
+{
+  "schema": [
+    "slug",
+    "date",
+    "paper",
+    "links",
+    "predictions_released",
+    "subject_ids",
+    "splits",
+    "demographics",
+    "images",
+    "auditable",
+    "checks_possible",
+    "notes"
+  ],
+  "entries": [],
+  "note": "One entry per attempted external audit. auditable=none is a measured outcome. No entry is written without an actual attempt."
+}

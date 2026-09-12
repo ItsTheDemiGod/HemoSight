@@ -115,16 +115,23 @@ class AuditReport:
 
 def run_audit(inp: AuditInput, checks: list[str] | None = None,
               prereg: PreRegistration | None = None, progress=None,
-              options: dict | None = None) -> AuditReport:
+              options: dict | None = None,
+              unsupported: dict[str, str] | None = None) -> AuditReport:
     """Run the selected checks and collect their verdicts.
 
     A check that raises is reported as INSUFFICIENT_DATA with the exception attached,
     never silently dropped: an audit that quietly omits a check it could not run is
     worse than one that says so.
+
+    `unsupported` maps check ids to a reason they MUST return INSUFFICIENT DATA without
+    running - used by the external-ingestion path when a column was assumed rather than
+    supplied (e.g. subject_id := image id). A check run on an assumed column can return
+    a PASS the data does not support; forcing it here is what keeps that from happening.
     """
     prereg = prereg or EMPTY
     ids = checks or ALL_IDS
     options = options or {}
+    unsupported = unsupported or {}
     cache: dict = {}
     results: list[CheckResult] = []
 
@@ -135,6 +142,16 @@ def run_audit(inp: AuditInput, checks: list[str] | None = None,
         th, declared = prereg.for_check(cid)
         if progress:
             progress(n / max(1, len(ids)), f"{spec.title}")
+        if cid in unsupported:
+            results.append(CheckResult(
+                check_id=cid, title=spec.title, verdict=INSUFFICIENT,
+                headline="not run: the input carries an assumption this check cannot survive",
+                explanation=("The ingestion record marks this check as unsupported: "
+                             f"{unsupported[cid]}. Running it would have produced a verdict "
+                             "about a column that was assumed, not supplied, so it was not run."),
+                provenance=spec.provenance, missing=[unsupported[cid]],
+                details={"forced_by_ingest": True}))
+            continue
         try:
             r = spec.run(inp, thresholds=th, preregistered=declared,
                          cache=cache,

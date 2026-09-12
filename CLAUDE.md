@@ -672,6 +672,41 @@ Ordered by the brief: Task 1 first, its verdict checked before anything else was
 - [x] Task 7: `reports/phase6_5_closure.md`; CLAUDE.md updated; every decision and correction logged
 
 
+### Phase 7: Three additions before the write-up (2026-09-12)
+
+**Task 1 - the controlled-capture hypothesis.** Two results point the same way: Phase 3.5
+Task 3 (studio captures cut within-subject sclera variation 3.5x; within/between 1.447 on
+phones, 0.924 in studio) and Phase 6.5 (under Eyes-Defy's controlled illuminant,
+conjunctival colour correlates with Hb within site, r 0.54-0.63). The untested question is
+whether the refutation is about PHOTOGRAPHS or about UNCONTROLLED photographs.
+
+**Thresholds declared BEFORE running (2026-09-12).** The Phase 3 gate is re-run at
+MEASURED residuals, never assumed ones: the within-subject sclera colour spread (dE2000)
+under each capture condition, with the best of {no correction, grey-world full frame,
+grey-world 25% crop} applied per condition. Conditions, from least to most controlled:
+MOBIUS across 3 phones x 3 lighting (the Phase 3.5 figure); MOBIUS same phone, same
+lighting, gaze varying (geometry only); SBVPI studio. Bands as Phase 3: **< 1.0 g/dL
+VIABLE, 1.0-2.0 MARGINAL, > 2.0 NOT RECOVERABLE.** Outcomes:
+- **A - closes the gap:** gate MAE at the studio residual < 1.0 AND the Eyes-Defy empirical
+  colour model (Phase 6.5, measured under a fixed LED) < 1.0 -> the refutation is about
+  uncontrolled capture specifically and is restated narrowly.
+- **B - partial:** either lands in 1.0-2.0 -> controlled capture moves the inversion from
+  NOT RECOVERABLE to MARGINAL only; the refutation is restated as two-part (not recoverable
+  uncontrolled; screening bands at best controlled).
+- **C - generalises:** both stay > 2.0 -> the refutation is stronger, not narrower.
+The residual needed to reach VIABLE is read off the gate model and compared with every
+measured condition. Eyes-Defy has one image per subject, so its within-subject residual
+is NOT measurable and is reported as such; its empirical MAE is the controlled-capture
+measurement it does support. Reported whichever way it falls.
+
+- [ ] Task 1: measure within-subject residuals per capture condition (MOBIUS across conditions, MOBIUS within condition, SBVPI studio), with and without grey-world
+- [ ] Task 1: re-run the Phase 3 gate at each measured residual; report MAE against the bands
+- [ ] Task 1: state the residual required for VIABLE and whether any measured condition achieves it
+- [ ] Task 1: restate the imaging refutation as the outcome dictates; log it
+- [ ] Task 2: `reports/statistical_vs_clinical.md` - the statistically-real / clinically-useless pattern, quantified on comparable axes in both modalities, with a reporting standard and a retrospective check
+- [ ] Task 3: external-audit ingestion path (`hemosight.audit.ingest`), documented conversion procedure, INSUFFICIENT DATA prominent, external report template, attempted-audit register - built, NOT run
+- [ ] `reports/phase7.md`; CLAUDE.md updated; decisions and results logged
+
 ### Phase 6 (original plan): Conformal prediction and abstention (N4)
 
 > WARNING: **NOT APPLICABLE as written, and not started.** N4 wraps a haemoglobin

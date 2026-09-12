@@ -206,3 +206,100 @@ def to_pdf(report: AuditReport, path: str | Path,
                            small))
     SimpleDocTemplate(str(p), pagesize=A4, title=title).build(story)
     return p
+
+
+def to_external_markdown(report: AuditReport, record: dict | None,
+                         all_check_ids: list[str] | None = None,
+                         title: str = "HemoSight external audit") -> str:
+    """The external-audit report: what was checked and what could not be, at equal
+    prominence, with the ingestion record's assumptions printed before any verdict.
+
+    `record` is the IngestRecord (as a dict) that produced the submission; None means
+    the submission arrived already in the contract's shape. `all_check_ids` lets the
+    report list checks that were not selected at all, so coverage is never overstated.
+    """
+    d = report.to_dict()
+    res = d["results"]
+    checked = [r for r in res if r["verdict"] in (PASS, FAIL)]
+    unchecked = [r for r in res if r["verdict"] == INSUFFICIENT]
+    ran = {r["check_id"] for r in res}
+    not_run = [i for i in (all_check_ids or []) if i not in ran]
+    out: list[str] = []
+    out.append(f"# {title}")
+    out.append("")
+    out.append(f"Generated {d['created_at']} by HemoSight Audit {d['harness_version']}.")
+    out.append("")
+    out.append(f"**Checked: {len(checked)} of {len(res)} selected checks returned a verdict. "
+               f"Could not be checked: {len(unchecked)}"
+               + (f"; not selected: {len(not_run)}" if not_run else "") + ".** "
+               "The two halves of this report carry equal weight: a check that could not "
+               "be run is a statement about what the released artefacts allow, not about "
+               "the model.")
+    out.append("")
+    if record:
+        out.append("## How the submission was brought into the contract")
+        out.append("")
+        out.append(f"- Source: {record.get('source_description') or '(not described)'}")
+        out.append(f"- Rows in / out: {record.get('n_rows_in')} / {record.get('n_rows_out')}; "
+                   f"subjects: {record.get('n_subjects')}")
+        out.append(f"- Columns supplied: {', '.join(record.get('columns_supplied', []))}")
+        if record.get("columns_derived"):
+            out.append(f"- Columns DERIVED by the auditor: {', '.join(record['columns_derived'])}")
+        if record.get("assumptions"):
+            out.append("- **Assumptions made:**")
+            for a in record["assumptions"]:
+                out.append(f"  - {a}")
+        if record.get("warnings"):
+            out.append("- Ingestion warnings:")
+            for w in record["warnings"]:
+                out.append(f"  - {w}")
+        out.append("")
+    out.append("## Part 1 - what was checked")
+    out.append("")
+    if checked:
+        out.append("| check | verdict | measured |")
+        out.append("| --- | --- | --- |")
+        for r in sorted(checked, key=lambda r: ORDER[r["verdict"]]):
+            out.append(f"| {r['title']} | **{BADGE[r['verdict']]}** | {r['headline']} |")
+    else:
+        out.append("**No check returned a verdict.** Nothing in this report is a finding "
+                   "about the model.")
+    out.append("")
+    out.append("## Part 2 - what could NOT be checked, and why")
+    out.append("")
+    if unchecked or not_run:
+        out.append("| check | why not | what would be needed |")
+        out.append("| --- | --- | --- |")
+        for r in unchecked:
+            out.append(f"| {r['title']} | {r['headline']} | "
+                       f"{', '.join(r.get('missing') or ['-'])} |")
+        for i in not_run:
+            out.append(f"| {i} | not selected for this run | - |")
+    else:
+        out.append("Every check ran and returned a verdict.")
+    out.append("")
+    out.append("## Findings in detail")
+    out.append("")
+    for r in sorted(res, key=lambda r: ORDER[r["verdict"]]):
+        out.append(f"### {r['title']} - {BADGE[r['verdict']]}")
+        out.append("")
+        out.append(f"**{r['headline']}**")
+        out.append("")
+        out.append(r["explanation"])
+        out.append("")
+        if r.get("missing"):
+            out.append("*Not measurable without:* " + ", ".join(r["missing"]))
+            out.append("")
+        if r.get("measured"):
+            out.append(_fmt_measured(r["measured"]))
+            out.append("")
+    out.append("## Scope")
+    out.append("")
+    out.append("- The checks operate on released predictions; nothing upstream of them is "
+               "tested.")
+    out.append("- INSUFFICIENT DATA is a statement about the release, not the model: a model "
+               "whose artefacts do not allow a check is unaudited on that axis, not cleared.")
+    out.append("- No output of this tool is a clinical validation.")
+    out.append("")
+    md = "\n".join(out)
+    return md + f"\n---\n\nReport fingerprint (SHA-256): `{fingerprint(report)}`\n"
