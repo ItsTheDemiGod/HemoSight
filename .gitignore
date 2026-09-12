@@ -33,6 +33,7 @@ dist-ssr/
 # Experiment outputs (file-based tracking; keep the logs in CLAUDE.md instead)
 runs/
 mlruns/
+logs/
 *.db
 
 # OS / editor
@@ -40,3 +41,6 @@ mlruns/
 Thumbs.db
 .vscode/
 .idea/
+
+# Frontend build artefacts (Phase 6)
+*.tsbuildinfo
