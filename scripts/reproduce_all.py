@@ -115,6 +115,12 @@ STAGES = [
     Stage("Phase 6.5 Eyes-Defy illuminant", "phase6_5_eyes_defy_illuminant.py", 1.5,
           note="GPU inference only; Phase 2 estimator applied to all 218 images"),
     Stage("Phase 6.5 closure report", "phase6_5_report.py", 0.1),
+    Stage("Phase 7  controlled capture", "phase7_controlled_capture.py", 44, slow=True,
+          note="GPU, MEASURED 2,614 s: segments 5,186 MOBIUS/SBVPI frames; gate re-run at "
+               "measured residuals; thresholds declared in CLAUDE.md before running"),
+    Stage("Phase 7  statistical vs clinical", "phase7_statistical_vs_clinical.py", 0.5,
+          note="needs the Phase 6.5 deep-model and CNN prediction tables"),
+    Stage("Phase 7  reports", "phase7_report.py", 0.1),
 ]
 
 

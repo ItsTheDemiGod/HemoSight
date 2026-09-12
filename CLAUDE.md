@@ -60,6 +60,7 @@ These drive every design decision.
 > | 5 | PPG | AC/DC + ratio-of-ratios features | 4 | **NOT VIABLE** | R² **-0.025**; permutation **p=0.978** |
 > | 6 | PPG | Raw waveform, 3 deep architectures | 4.5 | **NOT VIABLE** | best MAE 1.113; **sex alone 0.831** |
 > | 7 | Imaging | **Conventional CNN baseline** (ResNet-18, Eyes-Defy, the §3 comparison arm) | 6.5 | **MARGINAL** | MAE 1.301; site+sex+age alone 1.273; image adds +0.08; cross-site italy_to_india 1.96, india_to_italy 1.99 |
+> | 8 | Imaging | **Controlled capture** (studio residual 1.06 dE2000 vs 3.94 uncontrolled) | 7 | **MARGINAL** | gate MAE 1.04 g/dL at the measured studio residual; VIABLE needs < 0.99; Eyes-Defy (fixed LED) colour model 1.34 - refutation restated in two parts |
 >
 > **The one positive claim survived Phase 5 hardening** (selection-aware permutation, **empirical p <= 0.0041 at n=240**, z=-4.96, 11.9x the seed SD) and remains clinically useless: ~0.05 g/dL better than a constant. The p is still the FLOOR 1/(n+1) - zero of 240 permutations reached the real value - so it is a bound, not a measurement.
 >
@@ -387,6 +388,7 @@ and its output exists on disk.
 > | 5 (orig) CNN baseline | ✅ BUILT in Phase 6.5 | — | 0 (MAE 1.301, MARGINAL; site+sex+age alone 1.273) |
 > | 6 Audit harness | ✅ COMPLETE | — | 0 (deep-model validation closed in Phase 6.5) + 1 ⛔ closed-not-applicable |
 > | 6.5 Closure | ✅ COMPLETE | — | 0 |
+> | 7 Additions | ✅ COMPLETE | Task 1 outcome B | 0 (external audit path built, not run) |
 > | 6 (orig) Conformal (N4) | 🔴 SUPERSEDED | no estimator | 0 |
 > | 7 Fairness (N5) | 🔴 SUPERSEDED | no estimator; mechanism measured in Phase 3 Task 4 | 0 |
 > | 8 Fusion (N6) | 🔴 SUPERSEDED | no g/dL estimate from any modality | 0 (2 items found done, ticked) |
@@ -699,13 +701,13 @@ measured condition. Eyes-Defy has one image per subject, so its within-subject r
 is NOT measurable and is reported as such; its empirical MAE is the controlled-capture
 measurement it does support. Reported whichever way it falls.
 
-- [ ] Task 1: measure within-subject residuals per capture condition (MOBIUS across conditions, MOBIUS within condition, SBVPI studio), with and without grey-world
-- [ ] Task 1: re-run the Phase 3 gate at each measured residual; report MAE against the bands
-- [ ] Task 1: state the residual required for VIABLE and whether any measured condition achieves it
-- [ ] Task 1: restate the imaging refutation as the outcome dictates; log it
-- [ ] Task 2: `reports/statistical_vs_clinical.md` - the statistically-real / clinically-useless pattern, quantified on comparable axes in both modalities, with a reporting standard and a retrospective check
-- [ ] Task 3: external-audit ingestion path (`hemosight.audit.ingest`), documented conversion procedure, INSUFFICIENT DATA prominent, external report template, attempted-audit register - built, NOT run
-- [ ] `reports/phase7.md`; CLAUDE.md updated; decisions and results logged
+- [x] Task 1: measure within-subject residuals per capture condition (MOBIUS across conditions, MOBIUS within condition, SBVPI studio), with and without grey-world *(ticked 2026-09-12: `scripts/phase7_controlled_capture.py`; best residuals MOBIUS across phones x lighting 3.46, MOBIUS same phone + lighting 1.98, SBVPI studio 1.06 dE2000)*
+- [x] Task 1: re-run the Phase 3 gate at each measured residual; report MAE against the bands *(ticked 2026-09-12: studio residual -> MAE 1.04 g/dL, MARGINAL; across-phone 3.47, NOT RECOVERABLE)*
+- [x] Task 1: state the residual required for VIABLE and whether any measured condition achieves it *(ticked 2026-09-12: VIABLE needs < 0.99 dE2000; achieved by NO measured condition)*
+- [x] Task 1: restate the imaging refutation as the outcome dictates; log it *(ticked 2026-09-12: outcome B - partial - controlled capture reaches MARGINAL only; see the DECISION LOG)*
+- [x] Task 2: `reports/statistical_vs_clinical.md` - the statistically-real / clinically-useless pattern, quantified on comparable axes in both modalities, with a reporting standard and a retrospective check *(ticked 2026-09-12: `scripts/phase7_statistical_vs_clinical.py` -> `statistical_vs_clinical.json` -> report; nine results placed in the 2x2)*
+- [x] Task 3: external-audit ingestion path (`hemosight.audit.ingest`), documented conversion procedure, INSUFFICIENT DATA prominent, external report template, attempted-audit register - built, NOT run *(ticked 2026-09-12: `hemosight.audit.ingest`, `run_audit(unsupported=)`, `to_external_markdown`, `scripts/external_audit.py`, empty register, `reports/external_audit_procedure.md`; 6 tests; smoke-tested on a synthetic table only - NOT run on any external work)*
+- [x] `reports/phase7.md`; CLAUDE.md updated; decisions and results logged *(ticked 2026-09-12)*
 
 ### Phase 6 (original plan): Conformal prediction and abstention (N4)
 
@@ -2096,6 +2098,50 @@ the two smoke-test runs that cited deleted rows carry `prereg_id = NULL`, not a 
 `PreRegIn.title` requires >= 8 characters after stripping; test added.
 **Logs.** The three RESULTS LOG entries stranded after section 9 moved into section 8.
 
+## PHASE 7 DECISIONS (2026-09-12)
+
+### 2026-09-12 — The controlled-capture hypothesis was tested; outcome B
+**Decision.** Thresholds and three outcomes were declared in the Phase 7 plan before running.
+The Phase 3 gate was re-run at MEASURED residuals - the within-subject sclera colour spread
+under each capture condition, best of {none, grey-world full, grey-world 25% crop} - not at
+an assumed one. At the studio residual the gate returns 1.04 g/dL - +0.04 from the VIABLE line: studio-grade control brings the CALIBRATION term to the edge of viable, and what keeps the empirical Eyes-Defy result in MARGINAL is the between-subject tissue term the gate never modelled. In the controlled regime the limiting factor shifts from calibration to tissue. The refutation is restated in TWO PARTS: (1) from uncontrolled photographs the colour-to-Hb inversion is NOT RECOVERABLE (unchanged); (2) from controlled capture it reaches the MARGINAL band only - screening bands at best - does not beat site + sex + age, and moves no clinical threshold. The distinction a reviewer would raise is real, is now measured, and does not rescue the claim.
+**Evidence.** Residuals (dE2000): MOBIUS across phones x lighting 3.456 (grey_world_full); MOBIUS same phone + lighting 1.981 (grey_world_full); SBVPI studio 1.062 (grey_world_full).
+Gate: MOBIUS across phones x lighting -> 3.47 g/dL NOT RECOVERABLE; MOBIUS same phone + lighting -> 2.03 g/dL NOT RECOVERABLE; SBVPI studio -> 1.04 g/dL MARGINAL;
+reference 3.935 -> 3.98. VIABLE needs a residual < 0.99 dE2000 on this model;
+the studio residual is 1.1x that. Eyes-Defy (fixed LED, one image per subject, so no
+within-subject residual is measurable): mean-Lab colour model 1.343 g/dL, CNN 1.301,
+cross-site italy_to_india 1.96, india_to_italy 1.99, site + sex + age alone 1.273 -
+MARGINAL; between-subject colour at fixed Hb/sex/age/site 4.55 dE2000, a second
+noise term the gate never modelled.
+**Consequences.** Section 2's imaging verdict is not reversed; its scope is now stated precisely.
+"Nothing further should be built" stands: the controlled-capture regime is the one Eyes-Defy
+already occupies, and it was measured in Phase 6.5 at MARGINAL.
+
+### 2026-09-12 — The statistically-real / clinically-useless pattern is formalised
+**Decision.** `reports/statistical_vs_clinical.md` states the pattern and quantifies both instances on
+the same axes: detectability (z, empirical p and its floor) and utility (gain over a constant; gain
+over the cheapest baseline on identical folds; increment when added to it; fraction of the baseline's
+advantage; WHO-band AUROC and sensitivity/specificity vs the baseline). PPG: +0.066 over a constant,
+-0.009 added to sex, 0.00 sensitivity at the WHO threshold (no anaemic subject flagged).
+Conjunctiva: +0.702 over a constant, +0.078 added to site + sex + age, AUROC
+0.875 vs 0.816.
+**Reporting standard proposed** (four items): cheap-baseline comparison on identical folds with every
+non-signal variable the model could learn; permutation p beside z with the floor stated and the
+selection re-run inside; an explicit decision-threshold statement (sens/spec of model AND baseline);
+cross-site numbers with bias. **Retrospective:** nine project results placed in the 2x2; the headline
+cell has exactly two members; detectability and utility separated in seven of nine. Recorded rather
+than overclaimed.
+
+### 2026-09-12 — External audit path built; NOT run
+**Decision.** `hemosight.audit.ingest` converts released tables (per-image rows with present,
+derivable or absent subject ids; missing splits; missing demographics; g/L; word-coded sex) into the
+contract and records every assumption; `run_audit(unsupported=...)` forces checks that rest on an
+ASSUMED column to INSUFFICIENT DATA - a test shows that a table with one "subject" per image would
+otherwise PASS split integrity; `to_external_markdown` gives "could not be checked" equal prominence;
+`scripts/external_audit.py` and an empty register complete the path. No external work has been
+audited and no outcome is simulated. Candidates arrive separately; `auditable: none` will be recorded
+with the same weight as an audit that ran.
+
 ## 8. RESULTS LOG
 
 Dated entries recording **every** metric produced, including failures and negative
@@ -2901,6 +2947,44 @@ Sclera vs grey-world(25%) per image 3.56 deg.
 illuminant is nearly constant and the spread is mostly estimator error - consistent with Phase 2's MOBIUS
 finding that the sclera reference varies per subject. Within-subject stability is NOT measurable (one image
 per subject). The Phase 2 tick is now backed by the artefact its wording implies. **Status: confirmed.**
+
+### 2026-09-12 — Phase 7 Task 1: residuals by capture condition and the gate re-run (outcome B)
+**Config.** `scripts/phase7_controlled_capture.py`; Phase 2 U-Net; sclera colour, vessel-excluded,
+robust RGB; within-subject mean pairwise CIEDE2000; gate machinery imported from `phase3_task0_gate.py`
+(240 trials per Hb level, seed 20260911).
+**Data.** MOBIUS: 898 across-condition captures (100 subjects, 1 per phone x lighting cell) and
+3588 within-cell captures (898 cells, left eye, four gazes); SBVPI: 700 studio captures, 54 subjects.
+**Metrics** (within-subject dE2000; none / grey-world full / grey-world 25% crop):
+
+| condition | none | gw full | gw crop | best | gate MAE g/dL | band |
+| --- | --- | --- | --- | --- | --- | --- |
+| MOBIUS across phones x lighting | 5.860 | 3.456 | 5.070 | **3.456** | **3.471** | **NOT RECOVERABLE** |
+| MOBIUS same phone + lighting | 3.045 | 1.981 | 3.357 | **1.981** | **2.027** | **NOT RECOVERABLE** |
+| SBVPI studio | 1.685 | 1.062 | 2.591 | **1.062** | **1.040** | **MARGINAL** |
+
+Breakeven on the gate model: VIABLE needs residual < 0.99 dE2000, MARGINAL < 2.07.
+Reference 3.935 -> 3.977 (Phase 3 recorded 3.893; same model, different RNG stream).
+Eyes-Defy: within-subject residual NOT MEASURABLE; colour model 1.343, CNN 1.301, MARGINAL.
+**Interpretation.** At the studio residual the gate returns 1.04 g/dL - +0.04 from the VIABLE line: studio-grade control brings the CALIBRATION term to the edge of viable, and what keeps the empirical Eyes-Defy result in MARGINAL is the between-subject tissue term the gate never modelled. In the controlled regime the limiting factor shifts from calibration to tissue. The refutation is restated in TWO PARTS: (1) from uncontrolled photographs the colour-to-Hb inversion is NOT RECOVERABLE (unchanged); (2) from controlled capture it reaches the MARGINAL band only - screening bands at best - does not beat site + sex + age, and moves no clinical threshold. The distinction a reviewer would raise is real, is now measured, and does not rescue the claim. **Status: confirmed.**
+
+### 2026-09-12 — Phase 7 Task 2: both modalities on comparable axes
+**Config.** `scripts/phase7_statistical_vs_clinical.py`; identical 10-fold subject-disjoint folds; WHO
+thresholds 12 (F) / 13 (M) g/dL.
+**Metrics.** PPG waveform: z -4.96, p <= 0.0041 (floor); gain over constant +0.066;
+vs sex alone -0.282; added to sex -0.009; 19% of the baseline's advantage;
+WHO AUROC 0.566 vs 0.432; sensitivity 0.00 (prevalence 7%).
+Conjunctival colour: CNN z -10.5; gain over constant +0.702; vs site+sex+age
+-0.028; added +0.078; 96%; AUROC 0.875 vs 0.816;
+sens/spec 0.76/0.80 vs 0.86/0.74.
+**Interpretation.** Real in both; useless in PPG on every axis; marginal-and-within-site-only in the
+conjunctiva. Retrospective 2x2 over nine results: two in the headline cell, three in "apparent utility",
+two in "real but worse than the cheap baseline". **Status: confirmed.**
+
+### 2026-09-12 — Phase 7 Task 3: external audit path (no external result)
+**Metrics.** `tests/test_phase7.py`: 6 tests, including the demonstration that a per-image table with
+no subject id PASSES split integrity without the ingestion record and returns INSUFFICIENT DATA with
+it. Synthetic smoke test of the CLI: 150 per-image rows -> 75 subjects, 4 of 8 checks INSUFFICIENT.
+Register: 0 entries. **Status: built; no external audit run.**
 
 ## 9. WORKING PROTOCOL
 
