@@ -1,5 +1,8 @@
 # Datasets are never committed. data/raw is READ-ONLY source material.
-data/
+# The project's data tree only (anchored): datasets, interim artefacts, synthetic corpora.
+# app/frontend/src/data/ holds small generated JSON (public physics, aggregate results) and
+# is deliberately tracked - a clone cannot build the front end without it.
+/data/
 
 # Python
 __pycache__/
