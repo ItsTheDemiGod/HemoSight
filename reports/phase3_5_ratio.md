@@ -148,7 +148,7 @@ Both formulations of the imaging claim have now been tested and both have failed
 | --- | --- | --- | --- |
 | Absolute illuminant recovery from the sclera | 2 | REFUTED | loses to grey-world; p ~ 3e-8 |
 | Absolute illuminant recovery from corneal specular | 2.5 | REFUTED | no better than sclera, p = 0.29 |
-| Absolute colorimetric Hb inversion | 3 | NOT RECOVERABLE | signal 0.45-0.70 dE2000/g/dL vs 3.9 noise |
+| Absolute colorimetric Hb inversion | 3 | NOT RECOVERABLE | signal 0.45 (sim) / 0.84 (measured) dE2000/g/dL vs 3.9 noise |
 | Illuminant-free within-image ratio | 3.5 | **REFUTED** | reference noisier within-subject than between; diagonality fails |
 
 The negative result is now comprehensive rather than partial. The project has tested the two available reference surfaces, both available formulations (absolute and ratio), and the inversion itself, on 100 subjects across 3 devices and 3 lighting conditions, with pre-declared thresholds in every case.

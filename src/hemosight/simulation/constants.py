@@ -12,9 +12,19 @@
 
 ⚠️  **STILL TRANSCRIBED - banner REMAINS** for these, which no downloaded file
    backs:
-     - layer thicknesses and blood volume fractions (Efron 2009, Zhivov 2006,
-       Jacques 2013). These are read from the literature by hand and must be
-       re-verified before publication.
+     - stromal and tarsal-plate thicknesses and ALL blood volume fractions
+       (Efron 2009, Zhivov 2006, Jacques 2013). Re-checked 2026-09-12 (Phase 6.5,
+       network available): the abstracts of [5] and [6] contain NO numeric
+       thicknesses and both full texts are subscription-only, so the values
+       attributed to them could not be verified against the source. [6] is a
+       review in The Ocular Surface 4(2):81-93, not Cornea as previously cited.
+       Phase 3 Task 4 measured the model's tolerance - thickness scale 0.8-2.0
+       and BVF +/-30% both stay under 1.0 g/dL of error - so no plausible
+       correction to these numbers moves a recorded verdict.
+   ✅ LIFTED for the epithelial thickness alone: 32 um is corroborated by an
+       independent OCT measurement, Li et al. 2015 [8]: 34.0 +/- 5.8 um (males),
+       33.7 +/- 4.5 um (females), n = 62 healthy adults, superior palpebral
+       conjunctiva.
 
 ⚠️  **MELANIN IS A POWER-LAW APPROXIMATION, NOT MEASURED DATA.** It is sourced
    from spectralLIB.mat, but that curve is a fitted power law
@@ -47,8 +57,14 @@ SOURCES
 [5] Efron N., Al-Dossari M., Pritchard N. "In vivo confocal microscopy of the
     palpebral conjunctiva and tarsal plate." Optom. Vis. Sci. 86(11):E1303-8,
     2009. Palpebral conjunctival epithelium thickness.
-[6] Zhivov A. et al. "In vivo confocal microscopic evaluation of the ocular
-    surface." Cornea, 2006. Conjunctival epithelial/stromal architecture.
+[6] Zhivov A., Stachs O., Kraak R., Stave J., Guthoff R.F. "In vivo confocal
+    microscopy of the ocular surface." The Ocular Surface 4(2):81-93, 2006
+    (PMID 16681079). Review; conjunctival epithelial/stromal architecture.
+    (Journal corrected 2026-09-12; previously cited as Cornea.)
+[8] Li Y., Zhao Z., Zhang Y., et al. "The palpebral conjunctival epithelium
+    thickness in young adults measured by optical coherence tomography." Contact
+    Lens & Anterior Eye, 2015 (PMID 25770918). 34.0 +/- 5.8 um (M), 33.7 +/- 4.5 um
+    (F), n = 62. Independent corroboration of the 32 um epithelial thickness.
 [7] Bosschaart N. et al. "A literature review and novel theoretical approach on
     the optical properties of whole blood." Lasers Med Sci 29:453-479, 2014.
     Whole-blood absorption and scattering; haematocrit relations.
@@ -144,7 +160,7 @@ class Layer:
 # fractions in the ranges reported by [2] for well-perfused mucosa.
 DEFAULT_LAYERS: tuple[Layer, ...] = (
     Layer("epithelium", 0.0032, 0.002, 0.0005, 0.70, 1.0,
-          "[5] palpebral conjunctival epithelium ~32 um"),
+          "[5] palpebral conjunctival epithelium ~32 um; corroborated by [8] OCT 34 um"),
     Layer("stroma_vascular", 0.0200, 0.060, 0.0000, 0.75, 1.0,
           "[6] substantia propria; [2] mucosal blood volume fraction"),
     Layer("tarsal_plate", 0.0800, 0.010, 0.0000, 0.60, 1.2,

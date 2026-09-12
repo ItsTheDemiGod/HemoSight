@@ -28,6 +28,13 @@ def row(cells):
 def main() -> int:
     gate = load("task0_gate.json")
     prior = load("task4_prior_sensitivity.json")
+    emp = load("empirical_signal.json")      # scripts/phase3_empirical_signal.py
+    if emp is None:
+        raise SystemExit("empirical_signal.json missing - run "
+                         "scripts/phase3_empirical_signal.py first; the empirical "
+                         "signal is never hard-coded here (Phase 6.5 Task 1)")
+    H = emp["headline"]; NS = emp["noise_over_signal"]; PN = emp["permutation_null"]
+    sig = H["de_per_g_dl"]; lo, hi = H["ci95"]
     consts = validate_constants()
 
     L: list[str] = []
@@ -78,28 +85,67 @@ def main() -> int:
     A(row(["quantity", "value"]))
     A(row(["---", "---"]))
     A(row(["**signal** - simulated, mean over Hb 4-18", "**0.452 dE2000 per g/dL**"]))
-    A(row(["**signal** - empirical, real Eyes-Defy conjunctiva", "**~0.70 dE2000 per g/dL**"]))
+    A(row(["**signal** - empirical, real Eyes-Defy conjunctiva, adjusted for site, sex, age",
+           f"**{sig:.2f} dE2000 per g/dL** (95% CI {lo:.2f}-{hi:.2f}; n={emp['n_subjects']})"]))
+    A(row(["signal - empirical, site-adjusted only (UPPER bound; includes sex-linked colour)",
+           f"{H['upper_bound_site_only']:.2f} (CI {H['upper_bound_site_only_ci95'][0]:.2f}-"
+           f"{H['upper_bound_site_only_ci95'][1]:.2f})"]))
     A(row(["**noise** - grey-world @25% FOV (best measured)", "**3.935 dE2000**"]))
     A(row(["**noise** - grey-world full frame", "6.076 dE2000"]))
-    A(row(["noise / signal (empirical)", "**~5.6x**"]))
+    A(row(["noise / signal (empirical)",
+           f"**{NS['grey_world_25pct_fov_3.935']:.1f}x** (CI "
+           f"{NS['grey_world_25pct_fov_3.935_ci95'][0]:.1f}-{NS['grey_world_25pct_fov_3.935_ci95'][1]:.1f})"]))
     A(row(["noise / signal (simulated)", "8.7x"]))
-    A("\n**The calibration residual alone is equivalent to roughly 5.6-8.7 g/dL of "
-      "haemoglobin error. The entire clinically meaningful range is 14 g/dL wide.**\n")
+    A(f"\n**The calibration residual alone is equivalent to roughly "
+      f"{NS['equivalent_hb_error_g_dl_at_3.935']:.1f}-8.7 g/dL of haemoglobin error "
+      f"(empirical CI {NS['grey_world_25pct_fov_3.935_ci95'][0]:.1f}-"
+      f"{NS['grey_world_25pct_fov_3.935_ci95'][1]:.1f} g/dL). The entire clinically "
+      "meaningful range is 14 g/dL wide.**\n")
 
-    A("\n### The model was checked against real tissue\n\n")
-    A("The signal figure is the load-bearing number, so it was not left to the model. "
-      "Conjunctival colour was measured directly on **216 Eyes-Defy subjects** using "
-      "the dataset's own palpebral masks, binned by haemoglobin, and the bin-to-bin "
-      "CIEDE2000 change computed. That gives **~0.70 dE2000 per g/dL** against the "
-      "model's 0.452 - the same order, with the model slightly conservative.\n\n")
-    A("Two caveats, both of which make the empirical figure an *upper* bound on the "
-      "true haemoglobin signal:\n\n")
-    A("* bin-to-bin colour differences in real data also contain inter-subject, "
-      "capture-condition and device variation, not only haemoglobin;\n")
-    A("* the lowest bin (n=3 subjects) produced 5.26 dE2000/g/dL, which is sampling "
-      "noise, and is excluded from the quoted figure.\n\n")
-    A("Using the larger empirical value rather than the model's own is the conservative "
-      "choice: it makes the gate *easier* to pass, and it still fails.\n")
+    A("\n### The model was checked against real tissue - and the check was redone\n\n")
+    A("The signal figure is the load-bearing number, so it is measured from the data by "
+      "`scripts/phase3_empirical_signal.py` and read from "
+      "`data/interim/phase3/empirical_signal.json`; this report holds no copy of it.\n\n")
+    A("> ⚠️ **CORRECTION (2026-09-12, Phase 6.5 Task 1).** Until 2026-09-12 this section "
+      "quoted **about 0.70 dE2000 per g/dL from 216 subjects, binned by haemoglobin**, as a "
+      "string constant with no producing script. Re-measuring found that the binned "
+      f"method returns **{H['binned_method_on_record']:.2f}** on the real labels and "
+      f"**{H['binned_method_null_mean']:.2f} ± {PN['binned_min_n']['null_sd']:.2f} with "
+      f"haemoglobin shuffled** (p = {H['binned_method_p']:.2f}): CIEDE2000 between noisy "
+      "bin means is dominated by the noise in the means, so that method cannot resolve "
+      "the signal at all. **The 0.70 figure is withdrawn as a measurement**, not "
+      "corrected. That the regression estimate below happens to bracket 0.70 is "
+      "coincidence and is not a confirmation of it.\n\n")
+    A(f"**Method now.** Per-subject palpebral colour (the dataset's own mask; mean "
+      f"linear-sRGB, luminance-trimmed 5-95%, CIELAB D65), OLS of Lab on Hb with site, "
+      f"sex and age as covariates, CIEDE2000 between the fitted colour at median Hb and "
+      f"median + 1 g/dL, bootstrap CI over subjects. **{sig:.2f} dE2000 per g/dL "
+      f"(95% CI {lo:.2f}-{hi:.2f})** on {emp['n_subjects']} subjects "
+      f"({emp['n_skipped']} lack a palpebral mask); permutation null "
+      f"{H['null_mean']:.2f}, p = {PN['regression_site_sex_age']['p_empirical']:.3f}. "
+      f"Per site: India {H['per_site'].get('eyes_defy:India', float('nan')):.2f}, "
+      f"Italy {H['per_site'].get('eyes_defy:Italy', float('nan')):.2f}. Grey-world on a "
+      f"tight crop leaves it at {H['grey_world_tight_crop']:.2f}.\n\n")
+    A("Three things the re-measurement established that the constant could not:\n\n")
+    A(f"* **Sex is a confounder here too.** Men carry higher Hb (r = 0.55 with sex in "
+      f"Eyes-Defy). Adjusting for site only gives {H['upper_bound_site_only']:.2f} "
+      f"dE2000/g/dL; adjusting for sex and age as well gives {sig:.2f}. About 40% of "
+      "the colour change that travels with haemoglobin is not haemoglobin.\n")
+    A(f"* **Between-subject colour at FIXED Hb, sex, age and site varies by "
+      f"{H['residual_between_subject_de2000_at_fixed_hb_sex_age_site']:.2f} dE2000** "
+      f"(mean distance from the fit) - "
+      f"{NS['between_subject_residual_in_hb_equivalents']:.1f} g/dL equivalent - before "
+      "any capture-condition noise is added. The real data carries its own noise floor "
+      "several times the signal.\n")
+    A(f"* **The model underestimates the real signal by {NS['simulated_signal_0.452_ratio_to_empirical']:.1f}x** "
+      "(0.452 simulated vs the empirical central estimate), not the ~1.5x previously "
+      "claimed; the empirical CI spans 1.3-2.6x the model. The direction is the "
+      "conservative one for the gate - a stronger real signal makes the inversion "
+      "easier - and the gate still fails at every bound.\n\n")
+    A("Every empirical figure is an *upper* bound on the haemoglobin signal: colour "
+      "correlates of Hb not in the covariates (skin tone, perfusion, tissue thickness) "
+      "are still counted as signal. Using it rather than the model's own is the "
+      "conservative choice: it makes the gate *easier* to pass, and it still fails.\n")
 
     if gate:
         A("\n### No tissue assumption rescues it\n\n")
@@ -242,7 +288,8 @@ def main() -> int:
     A("**The primary claim (N3+N4 - physically-grounded haemoglobin estimation in g/dL "
       "with a calibrated interval) is not achievable from RGB photographs at the "
       "calibration accuracy this project can reach.** Haemoglobin changes tissue colour "
-      "by roughly 0.5-0.7 dE2000 per g/dL; the best available calibration leaves 3.9. "
+      f"by roughly 0.45 (simulated) to {sig:.2f} (measured, CI {lo:.2f}-{hi:.2f}) dE2000 "
+      "per g/dL; the best available calibration leaves 3.9. "
       "The measurement is buried in the calibration residual.\n\n")
     A("Three directions remain open, and the choice between them is the user's:\n\n")
     A("1. **Abandon the point estimate, keep N4.** A three-state screen "

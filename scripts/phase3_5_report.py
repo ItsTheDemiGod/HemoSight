@@ -222,8 +222,10 @@ def main() -> int:
            "loses to grey-world; p ~ 3e-8"]))
     A(row(["Absolute illuminant recovery from corneal specular", "2.5", "REFUTED",
            "no better than sclera, p = 0.29"]))
+    emp = load(P3 / "empirical_signal.json")
+    emp_sig = f"{emp['headline']['de_per_g_dl']:.2f}" if emp else "?"
     A(row(["Absolute colorimetric Hb inversion", "3", "NOT RECOVERABLE",
-           "signal 0.45-0.70 dE2000/g/dL vs 3.9 noise"]))
+           f"signal 0.45 (sim) / {emp_sig} (measured) dE2000/g/dL vs 3.9 noise"]))
     A(row(["Illuminant-free within-image ratio", "3.5", "**REFUTED**",
            "reference noisier within-subject than between; diagonality fails"]))
     A("\nThe negative result is now comprehensive rather than partial. The project has "

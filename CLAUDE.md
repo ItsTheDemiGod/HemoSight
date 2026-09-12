@@ -39,12 +39,46 @@ These drive every design decision.
 
 | rank | claim | status |
 | --- | --- | --- |
-| **CO-PRIMARY (imaging arm)** | **N3 + N4 from photographs** — haemoglobin in g/dL with a calibrated interval and abstention | ⚠️ **contingent** — the Phase 3 gate failed; status depends on Phase 3.5 |
-| **CO-PRIMARY (PPG arm)** | **N3 + N4 from four-wavelength PPG** — the same physical estimation on a better-conditioned measurement | **promoted 2026-09-11**; not yet built |
+| ~~**CO-PRIMARY (imaging arm)**~~ | N3 + N4 from photographs | 🔴 **CLOSED, FINAL (Phase 3.5)** — four approaches refuted, each with a mechanism |
+| ~~**CO-PRIMARY (PPG arm)**~~ | N3 + N4 from four-wavelength PPG | 🔴 **NOT VIABLE (Phase 4)** — negative R², loses to the population mean; sex alone beats it by 30% |
 | **SECONDARY** | **N1** — as a **negative result plus a practical recommendation** | REFUTED as a method; the diagnosis stands |
 | supporting | **N2** — Monte Carlo forward model | unchanged in substance (Phase 3) |
 | supporting | **N5** — mechanistic fairness audit | unchanged in substance |
 | supporting | **N6** — multimodal fusion, scoped | unchanged in substance |
+
+> ## 🔴 FINAL STATUS — EVERY REPRESENTATION TESTED (2026-09-11, after Phase 4.5)
+>
+> **Both modalities have been tested to pre-declared gates. Neither yields a usable
+> haemoglobin estimator. The deep-learning hole is now closed with evidence.**
+>
+> | # | modality | representation | phase | verdict | key number |
+> | --- | --- | --- | --- | --- | --- |
+> | 1 | Imaging | Sclera as absolute white reference | 2 | **REFUTED** | loses to grey-world, p~3e-8 |
+> | 2 | Imaging | Corneal specular highlight | 2.5 | **REFUTED** | no better than sclera, p=0.29 |
+> | 3 | Imaging | Absolute colorimetric Hb inversion | 3 | **NOT RECOVERABLE** | signal 0.45-0.70 vs 3.9 dE2000 noise |
+> | 4 | Imaging | Illuminant-free within-image ratio | 3.5 | **REFUTED** | reference within/between = 1.447 |
+> | 5 | PPG | AC/DC + ratio-of-ratios features | 4 | **NOT VIABLE** | R² **-0.025**; permutation **p=0.978** |
+> | 6 | PPG | Raw waveform, 3 deep architectures | 4.5 | **NOT VIABLE** | best MAE 1.113; **sex alone 0.831** |
+>
+> **The one positive claim survived Phase 5 hardening** (selection-aware permutation, **empirical p <= 0.0041 at n=240**, z=-4.96, 11.9x the seed SD) and remains clinically useless: ~0.05 g/dL better than a constant. The p is still the FLOOR 1/(n+1) - zero of 240 permutations reached the real value - so it is a bound, not a measurement.
+>
+> **The benchmark that beats everything: sex alone, MAE 0.831 g/dL.** No method in six
+> attempts across two modalities beats a single binary demographic variable.
+>
+> **One genuine positive, precisely bounded.** The raw PPG waveform *does* carry
+> haemoglobin-correlated information that AC/DC features discard — a spectrogram CNN is
+> distinguishable from chance at **z = -4.72**. It improves on predicting a constant by
+> **0.054 g/dL** and separates no WHO severity band. Real, significant, useless. Writing
+> "deep learning found nothing" would be false; writing "deep learning worked" would be
+> far more false.
+>
+> **The project's contribution is the body of negative results and their mechanisms** —
+> six refutations, thresholds declared before every experiment, cross-device and
+> cross-subject validation throughout, and a demographic baseline that exposes how
+> easily an apparently working estimator is really a sex classifier. That last point
+> alone is a contribution to a literature that frequently omits it.
+>
+> **Nothing further should be built. What remains is the write-up.**
 
 **Why the PPG arm was promoted to co-primary (2026-09-11, Phase 3.5 Task 4).**
 `Hb_PPG_Dataset` is **not subject to the Phase 3 failure**, and the reason is
@@ -329,6 +363,38 @@ Full detail: `reports/phase1_data_audit.md`, `reports/phase1_summary.md`.
 Every task starts unchecked. Tick a checkbox only when the task is actually complete
 and its output exists on disk.
 
+> ### STATE AT A GLANCE (audit 2026-09-12 — `reports/claude_md_audit.md`)
+>
+> **Legend for unticked boxes.** `🔴 SUPERSEDED —` not to be done: a pre-declared gate
+> that preceded it failed, cited inline. `⛔ BLOCKED —` cannot be done here, blocker cited.
+> `🟡 OUTSTANDING —` genuinely still to do. Ticked boxes annotated `⚠️` have a reduced or
+> missing artefact behind them. Original wording is never removed; annotations are appended.
+>
+> | phase | status | closed by | open items |
+> | --- | --- | --- | --- |
+> | 0 Scaffold | ✅ COMPLETE | — | 0 |
+> | 1 Data audit | ✅ COMPLETE | — | 0 |
+> | 1.5 Remediation | ✅ COMPLETE | — | 0 |
+> | 2 Sclera / illuminant (N1) | ✅ COMPLETE — N1 **REFUTED** | — | 0 (one ⚠️ reduced artefact) |
+> | 2.5 Specular rescue | ✅ COMPLETE — **REFUTED** | — | 0 |
+> | 3 Simulator (N2) | 🔴 CLOSED AT GATE | Task 0: 3.893 g/dL vs >2.0 | **1** (make the empirical 0.70 dE2000/g/dL figure reproducible) |
+> | 3.5 Ratio reformulation | 🔴 CLOSED AT GATE | Task 1: 10.04 g/dL vs >2.0 | 0 |
+> | 4 Imaging (N3) | 🔴 SUPERSEDED | imaging arm CLOSED, FINAL | 0 |
+> | 4 PPG gates | ✅ COMPLETE — **NOT VIABLE** | — | 0 |
+> | 4.5 Deep PPG | ✅ COMPLETE — **NOT VIABLE** (one real, useless signal) | — | 0 |
+> | 5 Harden + consolidate | ✅ COMPLETE | — | 0 |
+> | 5 (orig) CNN baseline | 🔴 SUPERSEDED | no physical model to compare against; ⚠️ §3 constraint unmet for imaging | 0 (optional: cross-site CNN on Eyes-Defy) |
+> | 6 Audit harness | ✅ BUILT | — | **1** (deep-model end-to-end validation — UNBLOCKED, ~7 min GPU) + 1 ⛔ closed-not-applicable |
+> | 6 (orig) Conformal (N4) | 🔴 SUPERSEDED | no estimator | 0 |
+> | 7 Fairness (N5) | 🔴 SUPERSEDED | no estimator; mechanism measured in Phase 3 Task 4 | 0 |
+> | 8 Fusion (N6) | 🔴 SUPERSEDED | no g/dL estimate from any modality | 0 (2 items found done, ticked) |
+> | 9 Web app | 🔴 SUPERSEDED | replaced by Phase 6 audit app | 0 (2 scaffold items ticked, with caveat) |
+> | 10 Flutter | 🔴 SUPERSEDED | no estimator | 0 |
+>
+> **Open work in the whole plan: 2 items**, plus the hygiene list in
+> `reports/claude_md_audit.md` §5 (commit Phases 4–6; licences; constants banner; reportlab;
+> test pre-registration rows; three RESULTS LOG entries stranded after section 9). Then the
+> write-up.
 ### Phase 0: Scaffold
 - [x] Create the repository directory structure
 - [x] Write `pyproject.toml` pinning Python 3.12 and the core dependencies
@@ -337,7 +403,7 @@ and its output exists on disk.
 - [x] Write this CLAUDE.md with claims, constraints, inventory, phase plan and logs
 - [x] Create and populate the Python virtual environment
 - [x] Verify the environment imports the package and passes the smoke test
-- [ ] Initialise the git repository and make the first commit
+- [x] Initialise the git repository and make the first commit *(ticked 2026-09-12 audit: 4 commits, 06aa682 → 4e6eff7, 81 files tracked. ⚠️ Nothing from Phase 4 onward is committed — 32 paths untracked/modified on 2026-09-12; see `reports/claude_md_audit.md`)*
 
 ### Phase 1: Data audit, manifests, overlap check, patient-level splits
 - [x] Inventory every dataset: file counts, formats, resolutions, colour encoding, EXIF and device metadata
@@ -366,7 +432,7 @@ and its output exists on disk.
 - [x] Validate illuminant estimation on `nus8` against ground-truth illuminants (angular error), per camera
 - [x] Compare against standard colour-constancy baselines (grey-world, max-RGB, grey-edge) on the same split
 - [x] Quantify sensitivity to mask error, specular highlights, scleral yellowing and vessel coverage
-- [x] Apply the estimator to the conjunctiva datasets and inspect stability within and across sites *(scope amended: the Ghana conjunctiva pool has no sclera (Phase 1.5), so this ran on Eyes-Defy-Anemia only — see DECISION LOG 2026-09-11)*
+- [x] Apply the estimator to the conjunctiva datasets and inspect stability within and across sites *(scope amended: the Ghana conjunctiva pool has no sclera (Phase 1.5), so this ran on Eyes-Defy-Anemia only — see DECISION LOG 2026-09-11)* *(⚠️ reduced artefact: only segmentation quality per site is on disk (`eyes_defy_segmentation_quality.csv`); no per-image illuminant estimate for Eyes-Defy was stored, so estimator stability across sites was not measured)*
 - [x] Write up the calibration-free argument with its failure modes stated explicitly
 - [x] N1b self-consistency on MOBIUS (3 phones x 3 lighting x 100 subjects), evaluated on a held-out region
 - [x] Per-image segmentation quality score, validated against MOBIUS's deliberately-bad frames
@@ -412,23 +478,23 @@ The result is reported before any further work, whatever it shows.
 
 - [x] Task 0: minimal forward model plus error propagation; report the gate result first
 - [x] Task 0: report whether Hb error is uniform or worse at low Hb, where screening decisions are made
-- [ ] Task 1: layered conjunctival optical model with EVERY constant cited in one documented module *(PARTIAL: constants module built and cited; full layered MC NOT built — gate failed, see DECISION LOG 2026-09-11)*
-- [ ] Task 1: radiative transfer, validated against published benchmark cases before any output is trusted *(NOT BUILT — stopped at the Task 0 gate)*
-- [ ] Task 2: validate simulated spectra against published conjunctival/eyelid reflectance measurements *(NOT DONE — stopped at the gate; simulated colour WAS checked against 216 real Eyes-Defy subjects instead)*
-- [x] Task 2: compare simulated RGB against real Eyes-Defy images at matched Hb; report the gap honestly *(DONE in reduced form: empirical 0.70 vs simulated 0.452 dE2000 per g/dL)*
+- [ ] 🔴 SUPERSEDED — Task 1: layered conjunctival optical model with EVERY constant cited in one documented module *(PARTIAL: constants module built and cited; full layered MC NOT built — gate failed, see DECISION LOG 2026-09-11)* *(gate: Phase 3 Task 0, 3.893 g/dL at the measured 3.935 dE2000 residual vs >2.0 NOT RECOVERABLE)*
+- [ ] 🔴 SUPERSEDED — Task 1: radiative transfer, validated against published benchmark cases before any output is trusted *(NOT BUILT — stopped at the Task 0 gate)* *(gate: Phase 3 Task 0, 3.893 g/dL at the measured 3.935 dE2000 residual vs >2.0 NOT RECOVERABLE)*
+- [ ] 🔴 SUPERSEDED — Task 2: validate simulated spectra against published conjunctival/eyelid reflectance measurements *(NOT DONE — stopped at the gate; simulated colour WAS checked against 216 real Eyes-Defy subjects instead)* *(gate: Phase 3 Task 0, 3.893 g/dL at the measured 3.935 dE2000 residual vs >2.0 NOT RECOVERABLE)*
+- [x] Task 2: compare simulated RGB against real Eyes-Defy images at matched Hb; report the gap honestly *(DONE in reduced form: empirical 0.70 vs simulated 0.452 dE2000 per g/dL)* *(⚠️ artefact gap: the 0.70 dE2000/g/dL figure is hard-coded in `scripts/phase3_report.py`; no script or output file computes it — OUTSTANDING item 1 in `reports/claude_md_audit.md`)*
 - [x] Task 2: state plainly what the model does NOT capture
-- [ ] Task 3: generate the synthetic corpus, storing spectra AND RGB with full generating parameters *(NOT BUILT — stopped at the gate; the inversion the corpus would serve cannot survive realistic calibration error)*
+- [ ] 🔴 SUPERSEDED — Task 3: generate the synthetic corpus, storing spectra AND RGB with full generating parameters *(NOT BUILT — stopped at the gate; the inversion the corpus would serve cannot survive realistic calibration error)* *(gate: Phase 3 Task 0, 3.893 g/dL at the measured 3.935 dE2000 residual vs >2.0 NOT RECOVERABLE)*
 - [x] Task 4: quantify how much reflectance-prior error is tolerable (closes the question Phase 2 could not answer)
 - [x] Task 5: `reports/phase3_simulation.md` with the gate result first and an N2 verdict
 
-- [ ] Assemble chromophore absorption spectra (HbO2, Hb, melanin, water) and tissue scattering parameters with cited sources
-- [ ] Define the layered eyelid/conjunctiva optical model (layer count, thickness ranges, blood volume fraction, oxygenation)
-- [ ] Implement the Monte Carlo photon-transport forward model producing diffuse reflectance spectra
-- [ ] Validate the simulator against published reflectance spectra or an analytic limiting case
-- [ ] Sample the parameter space across Hb 4-18 g/dL and export a synthetic spectral library to `data/synthetic/`
-- [ ] Collect or fit camera spectral sensitivity curves and illuminant SPDs; project spectra to synthetic RGB
-- [ ] Compare the synthetic RGB distribution against real conjunctiva pixels and document the sim-to-real gap
-- [ ] Log the severe-anemia coverage the simulator adds relative to the real data
+- [x] Assemble chromophore absorption spectra (HbO2, Hb, melanin, water) and tissue scattering parameters with cited sources *(ticked 2026-09-12 audit: `data/raw/optical_constants/` (Prahl Hb, spectralLIB water/scattering/melanin) loaded by `simulation/optical_data.py`; Phase 3.5 Task 0 compared them against the transcription. Melanin is a fitted power law, sweep-never-fix)*
+- [x] Define the layered eyelid/conjunctiva optical model (layer count, thickness ranges, blood volume fraction, oxygenation) *(ticked 2026-09-12 audit: `constants.DEFAULT_LAYERS` (3 cited layers) plus HB/OXYGENATION/BVF/MELANIN ranges. ⚠️ Thicknesses and BVF still carry the VERIFICATION REQUIRED banner)*
+- [ ] 🔴 SUPERSEDED — Implement the Monte Carlo photon-transport forward model producing diffuse reflectance spectra *(gate: Phase 3 Task 0, 3.893 g/dL at the measured 3.935 dE2000 residual vs >2.0 NOT RECOVERABLE; a layered diffusion model (`forward.py`) was sufficient to fail it)*
+- [ ] 🔴 SUPERSEDED — Validate the simulator against published reflectance spectra or an analytic limiting case *(gate: Phase 3 Task 0, 3.893 g/dL at the measured 3.935 dE2000 residual vs >2.0 NOT RECOVERABLE; only inversion self-consistency (0.0001 g/dL) was checked, which is not validation)*
+- [ ] 🔴 SUPERSEDED — Sample the parameter space across Hb 4-18 g/dL and export a synthetic spectral library to `data/synthetic/` *(gate: Phase 3 Task 0, 3.893 g/dL at the measured 3.935 dE2000 residual vs >2.0 NOT RECOVERABLE; `data/synthetic/` is empty)*
+- [x] Collect or fit camera spectral sensitivity curves and illuminant SPDs; project spectra to synthetic RGB *(ticked 2026-09-12 audit: REDUCED — camspec (28 cameras, 400-720 nm) on disk and parsed; projection in `forward.py` is via D65 + CIE 1931 observer as camera proxy; only 2 of 6 nus8 cameras have measured SSFs (DECISION LOG 2026-09-11))*
+- [ ] 🟡 OUTSTANDING — Compare the synthetic RGB distribution against real conjunctiva pixels and document the sim-to-real gap *(the comparison WAS made — 0.70 empirical vs 0.452 simulated dE2000/g/dL on 216 Eyes-Defy subjects — but its computation is not on disk; what remains is a script + output file + `reproduce_all.py` stage so the number is reproducible)*
+- [ ] 🔴 SUPERSEDED — Log the severe-anemia coverage the simulator adds relative to the real data *(gate: Phase 3 Task 0, 3.893 g/dL at the measured 3.935 dE2000 residual vs >2.0 NOT RECOVERABLE; no corpus exists)*
 
 ### Phase 3.5: Ratio reformulation — TIME-BOXED test of a possible rescue
 
@@ -455,7 +521,7 @@ Phase 3 gate so the comparison is direct:**
 - [x] Task 0: replace transcribed constants with the downloaded sourced files; report disagreements
 - [x] Task 1: cancellation test on the unchanged MOBIUS protocol; report before proceeding
 - [x] Task 1: decompose the ratio residual by phone, lighting and interaction
-- [ ] Task 2: re-run the Phase 3 gate on ratio features *(NOT RUN — Task 1 failed at 10.04 g/dL equivalent, 5x the pre-declared threshold)*
+- [ ] 🔴 SUPERSEDED — Task 2: re-run the Phase 3 gate on ratio features *(NOT RUN — Task 1 failed at 10.04 g/dL equivalent, 5x the pre-declared threshold)* *(gate: Phase 3.5 Task 1, best ratio 10.04 g/dL equivalent vs >2.0, 5x over)*
 - [x] Task 2: report ratio sensitivity in dE2000-equivalent per g/dL — a ratio may attenuate signal as well as noise
 - [x] Task 3: within- versus between-subject sclera reference stability; state which regime the data is in
 - [x] Task 3: test whether a per-subject offset helps, and whether it is obtainable in deployment
@@ -463,70 +529,217 @@ Phase 3 gate so the comparison is direct:**
 - [x] Task 5: `reports/phase3_5_ratio.md` with the Task 1 result first and a verdict
 
 ### Phase 4: Spectral reconstruction and Hb estimation (N3)
-- [ ] Implement RGB-to-reflectance-spectrum reconstruction trained on the synthetic library
-- [ ] Implement chromophore unmixing from the reconstructed spectrum to Hb, HbO2 and melanin
-- [ ] Produce per-pixel chromophore concentration maps as the explanation artefact
-- [ ] Aggregate pixel-level estimates to a per-image Hb value in g/dL with an uncertainty estimate
-- [ ] Evaluate on real data with MAE, bias, Bland-Altman limits of agreement and correlation, per site
-- [ ] Run leave-one-site-out and leave-one-device-out evaluation; report the drop honestly
-- [ ] Ablate the N1 illuminant estimation to show what calibration-free costs or buys
-- [ ] Record the spectral reconstruction residual per image for downstream use in N4
 
-### Phase 5: CNN baseline comparison arm
-- [ ] Define the baseline: standard backbone, conjunctiva crop input, Hb regression head
-- [ ] Train the baseline under identical splits, preprocessing and augmentation budget
-- [ ] Evaluate with the identical metric suite, including leave-one-site-out
-- [ ] Add a colour-feature baseline (mean/percentile RGB or HSV statistics plus a shallow regressor)
-- [ ] Build a single comparison table that every subsequent claim must cite
-- [ ] Establish the protocol for keeping the baseline current whenever the physical model changes
+> 🔴 **SUPERSEDED IN FULL (audit 2026-09-12).** The imaging arm is CLOSED, FINAL
+> (DECISION LOG 2026-09-11): Phase 3 Task 0 gate 3.893 g/dL and Phase 3.5 Task 1 ratio
+> 10.04 g/dL, both against a >2.0 threshold. Every item below presupposes the synthetic
+> library (never built) and an inversion the gate showed cannot survive the calibration
+> residual. Retained verbatim; not to be started.
+- [ ] 🔴 SUPERSEDED — Implement RGB-to-reflectance-spectrum reconstruction trained on the synthetic library
+- [ ] 🔴 SUPERSEDED — Implement chromophore unmixing from the reconstructed spectrum to Hb, HbO2 and melanin
+- [ ] 🔴 SUPERSEDED — Produce per-pixel chromophore concentration maps as the explanation artefact
+- [ ] 🔴 SUPERSEDED — Aggregate pixel-level estimates to a per-image Hb value in g/dL with an uncertainty estimate
+- [ ] 🔴 SUPERSEDED — Evaluate on real data with MAE, bias, Bland-Altman limits of agreement and correlation, per site
+- [ ] 🔴 SUPERSEDED — Run leave-one-site-out and leave-one-device-out evaluation; report the drop honestly
+- [ ] 🔴 SUPERSEDED — Ablate the N1 illuminant estimation to show what calibration-free costs or buys
+- [ ] 🔴 SUPERSEDED — Record the spectral reconstruction residual per image for downstream use in N4
 
-### Phase 6: Conformal prediction and abstention (N4)
-- [ ] Carve a dedicated calibration split, disjoint from training and test at patient level
-- [ ] Implement split conformal prediction intervals over the Hb estimate
-- [ ] Verify empirical coverage against the nominal level, overall and per site
-- [ ] Define the non-conformity signal from the spectral reconstruction residual and justify it
-- [ ] Implement the three-state decision rule: screen negative / screen positive-refer / cannot decide
-- [ ] Plot accuracy versus abstention rate and choose an operating point with a stated rationale
-- [ ] Test coverage under distribution shift (unseen site, unseen device) and report the degradation
-- [ ] Compare against the CNN baseline equipped with the same conformal wrapper
+### Phase 4: PPG arm — TWO GATES (imaging arm is CLOSED)
+
+**Why PPG is not a fifth reformulation of a dead claim.** Every imaging failure traces
+to one of two measured causes: the illuminant must be estimated and cannot be estimated
+accurately enough (Phases 2, 2.5, 3), and the reference surface is less stable within a
+subject than between subjects (Phase 3.5 Task 3, within/between = 1.447). Contact PPG is
+structurally exempt from both — the LED in contact with tissue IS the illuminant, and
+AC/DC normalisation cancels static tissue, skin tone, source intensity and sensor gain
+by construction in the TIME domain, not the spatial domain that failed in Phase 3.5.
+It is the principle under which pulse oximetry already works clinically without
+per-subject calibration. **It must still be gated, not assumed.**
+
+**GATE A thresholds, declared BEFORE running (2026-09-11):**
+- Nuisance variance reduction **>= 50%** AND signal exceeding non-Hb variation -> PASS.
+- Reduction present but signal comparable to noise -> MARGINAL, stop for a decision.
+- No meaningful reduction -> FAIL, the normalisation does not cancel on real data.
+
+**GATE B thresholds (same bands as the Phase 3 gate), applied SEPARATELY to each of
+three conditions:**
+- **< 1.0 g/dL MAE** -> viable. **1.0-2.0** -> marginal, screening bands only.
+  **> 2.0** -> not viable.
+- Conditions: (1) all four wavelengths = the physics ceiling; (2) 660 nm only = the one
+  channel a phone shares; (3) simulated phone-RGB = what is actually deployable.
+- If (1) passes and (3) fails, that is the honest finding and is reported as such.
+
+⚠️ **Phase 3.5 showed exact algebraic cancellation on synthetic data and 139x that
+residual on real captures. Cancellation is verified ON REAL DATA; any synthetic check is
+an implementation test only.**
+
+- [x] Task 0 / GATE A: AC-DC extraction documented precisely; cancellation verified on real data
+- [x] Task 0 / GATE A: nuisance variance reduction and signal-to-noise in per-g/dL units; report before proceeding
+- [x] Task 1 / GATE B: Hb estimators under 4-wavelength, 660-nm-only, and simulated phone-RGB conditions
+- [x] Task 1 / GATE B: grouped leave-subject-out CV; never split within a subject
+- [x] Task 2: signal quality index; check explicitly whether it rejects anything at the operating threshold
+- [x] Task 2: verify the dataset's own SNR claims (940 nm worst, 850 nm cleanest) independently
+- [x] Task 3: demographics-only and population-mean baselines on identical splits
+- [x] Task 4: `reports/phase4_ppg_gate.md` with both gate results stated first
+
+### Phase 4.5: Deep models on raw PPG — closing the last untested representation
+
+**Not a rescue attempt.** Phase 4 tested hand-engineered features and found no skilled
+model. A deep model over raw waveforms is the one representation not yet tried, and any
+reader of a negative-results paper will ask whether it was. It is answered with evidence
+rather than omission. **The expected outcome is failure, and failure is the useful
+result.**
+
+**Same pre-declared thresholds as Phase 4 Gate B:** <1.0 g/dL viable, 1.0-2.0 marginal,
+>2.0 not viable. Same baselines: population mean, sex alone, full demographics. Same
+grouped leave-subject-out splits.
+
+⚠️ **With 252 subjects a deep model can trivially memorise.** Subject-disjoint folds are
+verified explicitly, the train-test gap is reported, and **if any model beats the
+demographic baseline a sex probe is run on its learned representation FIRST** — Phase 4
+Task 3 showed how easily an apparent Hb model is really a sex classifier.
+
+- [x] Task 1: 1D CNN and a sequence model over raw waveforms; 4-channel and 660-nm-only
+- [x] Task 1: verify subject-disjoint folds explicitly; report train-test gap
+- [x] Task 1: sex probe on the learned representation if any model beats demographics
+- [x] Task 2: mutual information and ranked correlations with multiple-comparison correction
+- [x] Task 2: permutation test — establish numerically what "no signal" looks like
+- [x] Task 3: `reports/phase4_5_deep.md`, and a FINAL status table of every tested representation
+
+### Phase 5: Harden the positive claim, and consolidate
+
+Two objectives, no new modelling directions.
+
+- [x] Task 1: >=200 permutations of the selected model; report EMPIRICAL p beside the parametric z
+- [x] Task 1: account for selection — run the full best-of-six inside each permutation
+- [x] Task 1: seed stability; retract if seed spread is comparable to the real-vs-null gap
+- [x] Task 1: verify the effect is not carried by a small subset of subjects
+- [x] Task 2: `reports/final_results.md` — master table, mechanisms, limitations, corrections
+- [x] Task 3: single entry-point reproduction script with documented runtime
+- [x] Task 3: dataset manifest with source, licence status and how to obtain
+- [x] Task 3: confirm no data files and no dataset-derived figures are tracked in git
+- [x] Task 4: `reports/literature_gap.md` — counts only, from papers already cited
+
+### Phase 5 (original plan): CNN baseline comparison arm
+
+> 🔴 **SUPERSEDED (audit 2026-09-12).** Every item is a comparison arm *for the physical
+> model*, which was never built because the Phase 3 gate failed. For the one surviving
+> claim (PPG waveform) the conventional arm exists: Phase 4.5 ran three deep architectures
+> under identical subject-disjoint folds and Phase 4 Task 3 ran the demographic baseline.
+>
+> ⚠️ **Section 3's hard constraint — a CNN baseline for every claim — is UNMET for the
+> imaging arm: no image CNN was ever trained.** The write-up must say so. A cross-site
+> CNN on Eyes-Defy (217 subjects, sex and age available for all 218) is cheap and optional;
+> it is not required by any surviving claim. Author's call, recorded so it is a decision
+> rather than a default.
+- [ ] 🔴 SUPERSEDED — Define the baseline: standard backbone, conjunctiva crop input, Hb regression head
+- [ ] 🔴 SUPERSEDED — Train the baseline under identical splits, preprocessing and augmentation budget
+- [ ] 🔴 SUPERSEDED — Evaluate with the identical metric suite, including leave-one-site-out
+- [ ] 🔴 SUPERSEDED — Add a colour-feature baseline (mean/percentile RGB or HSV statistics plus a shallow regressor)
+- [ ] 🔴 SUPERSEDED — Build a single comparison table that every subsequent claim must cite
+- [ ] 🔴 SUPERSEDED — Establish the protocol for keeping the baseline current whenever the physical model changes
+
+### Phase 6: HemoSight Audit - the software deliverable (web application)
+
+The project's shippable product is **not** a haemoglobin estimator; six representations
+across two modalities failed their pre-declared gates. It is the methodological audit
+pipeline those gates were run with, generalised so it operates on any claimed screening
+model's predictions. **This section REPLACES the original Phase 6 for sequencing
+purposes only; the original is retained verbatim below.** See the DECISION LOG,
+2026-09-12.
+
+- [x] Task 1: generalise Phases 1-5 into `src/hemosight/audit/`, wrapping the existing modules rather than rewriting them
+- [x] Task 1: one generic input contract (subject_id, y_true, y_pred + optional split/age/sex/device/site/group/images)
+- [x] Task 1: eight checks, each returning PASS / FAIL / INSUFFICIENT DATA with the measured quantity and a plain-language explanation
+- [x] Task 1: INSUFFICIENT DATA is a first-class outcome; no verdict is ever inferred from what could not be measured
+- [x] Task 1: existing tests continue to pass (121 passing, was 102)
+- [x] Task 2: FastAPI backend - upload, run, retrieve, export, with long checks as background jobs reporting progress *(⚠️ export is half-delivered: Markdown works, PDF returns HTTP 501 because reportlab is absent. The stated blocker (no network) has lapsed — `pip download reportlab` succeeded on 2026-09-12)*
+- [x] Task 2: pre-registration endpoint recording thresholds and whether they predate the results
+- [x] Task 2: SQLite for development, PostgreSQL-ready; no authentication in this phase
+- [x] Task 3: React + TypeScript + Vite + Tailwind + Framer Motion front end, seven pages
+- [ ] ⛔ BLOCKED — Task 3: read `/mnt/skills/public/frontend-design/SKILL.md` before writing components *(NOT DONE - the file does not exist on this machine; see the DECISION LOG, 2026-09-12)* *(blocker: the path is a Linux mount from another environment and has no source here; the components have since been written, built and linted, so the step can no longer precede them. CLOSED AS NOT APPLICABLE — not ticked because it was not done)*
+- [x] Task 4: validate the harness against this project's own data, where every verdict is already on the record
+- [x] Task 4: validate against synthetic inputs carrying one known injected fault each
+- [x] Task 4: validate against clean inputs and report the false-positive rate whatever it is
+- [ ] 🟡 OUTSTANDING — Task 4: end-to-end validation of the three Phase 5 checks against the Phase 4.5 DEEP model *(DEFERRED - needs the GPU, which is held by the extended permutation run; validated at statistic level instead)* *(UNBLOCKED 2026-09-12: the permutation run finished 240/240 and the GPU is free. Needs per-subject predictions written by ~16 `fit_predict` calls (~7 min GPU) into the audit contract format, then the three checks run and added as a 16th known-truth case — see `reports/claude_md_audit.md` §4.1)*
+- [x] Task 5: `reports/phase6_audit_harness.md` - architecture, catalogue with provenance, validation, limitations
+
+### Phase 6 (original plan): Conformal prediction and abstention (N4)
+
+> WARNING: **NOT APPLICABLE as written, and not started.** N4 wraps a haemoglobin
+> estimator in conformal intervals and a three-state decision rule. There is no
+> estimator to wrap: the imaging arm is closed and the PPG arm is not viable. The tasks
+> are retained verbatim rather than deleted, per the WORKING PROTOCOL. See the DECISION
+> LOG, 2026-09-12.
+
+- [ ] 🔴 SUPERSEDED — Carve a dedicated calibration split, disjoint from training and test at patient level
+- [ ] 🔴 SUPERSEDED — Implement split conformal prediction intervals over the Hb estimate
+- [ ] 🔴 SUPERSEDED — Verify empirical coverage against the nominal level, overall and per site
+- [ ] 🔴 SUPERSEDED — Define the non-conformity signal from the spectral reconstruction residual and justify it
+- [ ] 🔴 SUPERSEDED — Implement the three-state decision rule: screen negative / screen positive-refer / cannot decide
+- [ ] 🔴 SUPERSEDED — Plot accuracy versus abstention rate and choose an operating point with a stated rationale
+- [ ] 🔴 SUPERSEDED — Test coverage under distribution shift (unseen site, unseen device) and report the degradation
+- [ ] 🔴 SUPERSEDED — Compare against the CNN baseline equipped with the same conformal wrapper
 
 ### Phase 7: Fairness audit (N5)
-- [ ] Attach skin tone labels using SCIN (self-reported Fitzpatrick, dermatologist Fitzpatrick, Monk Skin Tone); document how labels transfer to the anemia datasets and where they cannot
-- [ ] Stratify every headline metric by skin tone and by source device
-- [ ] Report abstention rate by stratum, not only accuracy
-- [ ] Decompose any performance gap into a melanin-absorption component and an illuminant-estimation-error component
-- [ ] Use the simulator to test the decomposition on synthetic data where true melanin is known
-- [ ] Compare the gap profile of the physical model against the CNN baseline
-- [ ] Write the audit with the limits of the skin-tone labelling stated plainly
+
+> 🔴 **SUPERSEDED (audit 2026-09-12).** There is no estimator whose performance could
+> be stratified: imaging arm closed (Phase 3/3.5 gates), PPG arm NOT VIABLE (Gate B).
+> The first item was superseded a second time by the Phase 1.5 decision that deleted SCIN
+> and rebuilt N5 on ITA. **The N5 *mechanism* WAS measured** — Phase 3 Task 4: melanin
+> fraction 0.005 shifts recovered Hb by +9.6 g/dL with the illuminant held perfect — and
+> the write-up carries it together with the three N5 limitations in section 2.
+- [ ] 🔴 SUPERSEDED — Attach skin tone labels using SCIN (self-reported Fitzpatrick, dermatologist Fitzpatrick, Monk Skin Tone); document how labels transfer to the anemia datasets and where they cannot *(also superseded by DECISION LOG 2026-09-11: SCIN deleted, N5 rebuilt on ITA)*
+- [ ] 🔴 SUPERSEDED — Stratify every headline metric by skin tone and by source device
+- [ ] 🔴 SUPERSEDED — Report abstention rate by stratum, not only accuracy *(no N4 abstention exists)*
+- [ ] 🔴 SUPERSEDED — Decompose any performance gap into a melanin-absorption component and an illuminant-estimation-error component *(no gap to decompose; the melanin mechanism itself was measured in Phase 3 Task 4)*
+- [ ] 🔴 SUPERSEDED — Use the simulator to test the decomposition on synthetic data where true melanin is known *(the melanin half was done in Phase 3 Task 4 (`task4_prior_sensitivity.json`); the illuminant-error half needs an estimator)*
+- [ ] 🔴 SUPERSEDED — Compare the gap profile of the physical model against the CNN baseline *(neither exists)*
+- [ ] 🔴 SUPERSEDED — Write the audit with the limits of the skin-tone labelling stated plainly *(folds into the paper)*
 
 ### Phase 8: Multimodal fusion (N6)
-- [ ] Build the PPG pipeline: load `Hb_PPG_Dataset`, filter, extract four-wavelength features, produce a per-subject Hb estimate
-- [ ] Build the nail and palm pipelines against their datasets
-- [ ] Define the fusion model that combines modalities into one physical Hb estimate rather than an ensemble average
-- [ ] Train with modality dropout and evaluate every subset of available modalities
-- [ ] Add per-modality quality gating so low-quality inputs are down-weighted rather than trusted
-- [ ] Demonstrate graceful degradation: performance versus number of available modalities
-- [ ] Propagate uncertainty through fusion and re-verify conformal coverage
-- [ ] Document which subjects have which modalities and the resulting evaluation limits
+
+> 🔴 **SUPERSEDED except two items (audit 2026-09-12).** No modality yields a g/dL
+> estimate to fuse (Phase 3/3.5 gates; Phase 4 Gate B; Phase 4.5). Two items were in fact
+> completed by earlier phases and are ticked below with their evidence. **No palm dataset
+> exists anywhere in the inventory** — the claim names a modality the project never had.
+- [x] Build the PPG pipeline: load `Hb_PPG_Dataset`, filter, extract four-wavelength features, produce a per-subject Hb estimate *(ticked 2026-09-12 audit: `src/hemosight/ppg/features.py`, `scripts/phase4_gate_a.py`/`phase4_gate_b.py`, `data/interim/phase4/features.csv` (252 subjects) and `gate_b.json` (per-subject CV estimates). The estimate is NOT VIABLE, but the pipeline the box asks for exists and ran)*
+- [ ] 🔴 SUPERSEDED — Build the nail and palm pipelines against their datasets *(no estimator to feed; nail data is binary-only; NO palm dataset exists — also BLOCKED)*
+- [ ] 🔴 SUPERSEDED — Define the fusion model that combines modalities into one physical Hb estimate rather than an ensemble average
+- [ ] 🔴 SUPERSEDED — Train with modality dropout and evaluate every subset of available modalities
+- [ ] 🔴 SUPERSEDED — Add per-modality quality gating so low-quality inputs are down-weighted rather than trusted *(two SQIs were built anyway and both found unusable: Phase 2 image score rejects 0 of 17 bad frames; Phase 4 PPG SQI r(SQI,|error|) = -0.033)*
+- [ ] 🔴 SUPERSEDED — Demonstrate graceful degradation: performance versus number of available modalities
+- [ ] 🔴 SUPERSEDED — Propagate uncertainty through fusion and re-verify conformal coverage *(no N4)*
+- [x] Document which subjects have which modalities and the resulting evaluation limits *(ticked 2026-09-12 audit: Phase 1 overlap — conjunctiva/nail roster Jaccard 1.000 (204/204), ~454 paired subjects, binary labels only; Hb_PPG shares no subject with any image set (`data/interim/overlap/overlap_results.json`; DECISION LOG 2026-09-11, N6 scoped))*
 
 ### Phase 9: Web application
-- [ ] Scaffold the FastAPI backend with SQLite and a PostgreSQL-ready data layer
-- [ ] Define the inference API: image upload, optional PPG, three-state result with interval
-- [ ] Scaffold the React + TypeScript + Vite frontend with Tailwind
-- [ ] Build the capture and upload flow with input quality feedback
-- [ ] Build the results view: Hb value, uncertainty interval, three-state decision, chromophore map
-- [ ] Add the Three.js / react-three-fiber visualisation and Framer Motion transitions
-- [ ] Enforce screening-not-diagnosis framing and the no-clinical-validation disclaimer everywhere a result appears
-- [ ] Add end-to-end tests covering the abstention path and the missing-modality path
+
+> 🔴 **SUPERSEDED except the two scaffold items (audit 2026-09-12).** This phase is the
+> inference application around an estimator that does not exist. The software deliverable
+> became the audit harness (Phase 6, DECISION LOG 2026-09-12). The two scaffold items are
+> ticked because `app/backend/` and `app/frontend/` exist, build and are tested — **for the
+> audit tool, not the inference app**; the caveat is part of the tick.
+- [x] Scaffold the FastAPI backend with SQLite and a PostgreSQL-ready data layer *(ticked 2026-09-12 audit: `app/backend/{main,db,models,schemas,jobs}.py`, `HEMOSIGHT_AUDIT_DB` connection-string override, `SafeJSON` column type — built for the AUDIT tool, not the inference app)*
+- [ ] 🔴 SUPERSEDED — Define the inference API: image upload, optional PPG, three-state result with interval *(no estimator)*
+- [x] Scaffold the React + TypeScript + Vite frontend with Tailwind *(ticked 2026-09-12 audit: `app/frontend/`, 7 routed pages, `tsc -b && vite build` 2.15 s, lint clean — built for the AUDIT tool, not the inference app)*
+- [ ] 🔴 SUPERSEDED — Build the capture and upload flow with input quality feedback *(the audit app uploads CSVs, which is not image capture with quality feedback)*
+- [ ] 🔴 SUPERSEDED — Build the results view: Hb value, uncertainty interval, three-state decision, chromophore map *(no estimator)*
+- [ ] 🔴 SUPERSEDED — Add the Three.js / react-three-fiber visualisation and Framer Motion transitions *(Framer Motion is in use in the audit app; Three.js is not in `package.json` and nothing in the surviving product needs 3D)*
+- [ ] 🔴 SUPERSEDED — Enforce screening-not-diagnosis framing and the no-clinical-validation disclaimer everywhere a result appears *(the item is about estimator results; the audit app already carries "Nothing here is a clinical validation" on every page shell (`App.tsx`, `Landing.tsx`))*
+- [ ] 🔴 SUPERSEDED — Add end-to-end tests covering the abstention path and the missing-modality path *(neither path exists)*
 
 ### Phase 10: Flutter mobile application
-- [ ] Verify the Flutter toolchain at `C:\src\flutter` and scaffold the project in `mobile/`
-- [ ] Implement camera capture with on-device quality checks (focus, exposure, sclera visibility)
-- [ ] Integrate with the backend API, including offline and failure states
-- [ ] Port the results view with parity to the web three-state output
-- [ ] Evaluate on-device versus server-side inference and record the decision
-- [ ] Test across a range of phone cameras and log the cross-device behaviour
-- [ ] Carry the screening-not-diagnosis framing into every mobile surface
+
+> 🔴 **SUPERSEDED IN FULL (audit 2026-09-12).** Every item ports an estimator's capture
+> and results flow that does not exist. Not blocked on tooling: `C:\src\flutter` is
+> present. `mobile/README.md` is a placeholder.
+- [ ] 🔴 SUPERSEDED — Verify the Flutter toolchain at `C:\src\flutter` and scaffold the project in `mobile/`
+- [ ] 🔴 SUPERSEDED — Implement camera capture with on-device quality checks (focus, exposure, sclera visibility)
+- [ ] 🔴 SUPERSEDED — Integrate with the backend API, including offline and failure states
+- [ ] 🔴 SUPERSEDED — Port the results view with parity to the web three-state output
+- [ ] 🔴 SUPERSEDED — Evaluate on-device versus server-side inference and record the decision
+- [ ] 🔴 SUPERSEDED — Test across a range of phone cameras and log the cross-device behaviour
+- [ ] 🔴 SUPERSEDED — Carry the screening-not-diagnosis framing into every mobile surface
 
 ---
 
@@ -1224,8 +1437,534 @@ is more representative of this project's inputs than any DSLR.
 **Consequences.** Any camera-specific claim over all six nus8 sensors remains
 unsupported by measured SSFs.
 
+## PHASE 4 DECISIONS (2026-09-11)
+
+### 2026-09-11 — The imaging arm is CLOSED. Final. Not to be reopened.
+**Decision.** The imaging arm of this project is a closed negative result. No further
+reformulation will be attempted or proposed.
+**Record.** Four approaches tested, each with pre-declared thresholds, on 100 subjects
+across 3 devices and 3 lighting conditions:
+absolute illuminant from sclera (Phase 2, REFUTED, p~3e-8 vs grey-world);
+absolute illuminant from corneal specular (Phase 2.5, REFUTED, no better than sclera
+p=0.29); absolute colorimetric Hb inversion (Phase 3, NOT RECOVERABLE, signal
+0.45-0.70 dE2000/g/dL vs 3.9 noise); illuminant-free within-image ratio (Phase 3.5,
+REFUTED, reference noisier within-subject than between at 1.447).
+**Consequences.** Any future work citing this project must cite the imaging arm as a
+negative result with mechanism, never as a method.
+
+### 2026-09-11 — GATE A FAILED: AC/DC does not cancel nuisance variance on real data
+**Decision.** Gate A fails against its pre-declared threshold (>=50% nuisance variance
+reduction).
+**Evidence.** Median nuisance CV: raw DC **0.5633**; AC/DC **1.5299** (**-171.6%**, i.e.
+worse); ratio-of-ratios **1.1152** (-98.0%). Best single feature's equivalent Hb noise
+is **9.75 g/dL** against a population SD of **1.470** — noise is 6.6x the signal it must
+resolve. Median R^2 with Hb across all feature groups <= 0.021.
+**Honest limitation of the gate as designed.** Half the cancellation claim is NOT
+testable here: all 252 subjects used ONE device, so there is no source-intensity or
+sensor-gain variation for AC/DC to cancel. Between-subject DC variation (CV 0.39-0.63)
+reflects finger thickness, perfusion and skin tone. What Gate A *does* establish is the
+other half — AC/DC also claims to cancel static tissue absorption, and it demonstrably
+does not: normalised features are MORE subject-variable than the raw DC they came from.
+**Consequences.** Gate A is weak on device-invariance and decisive on tissue-invariance.
+
+### 2026-09-11 — GATE B: PPG carries no recoverable Hb signal; three of four wavelengths are invisible to a phone
+**Decision.** The PPG arm is NOT VIABLE on this dataset, in all three conditions.
+**Evidence.** Grouped 10-fold CV, 252 subjects (one record each, so subject-level
+K-fold IS leave-subject-out):
+four wavelengths MAE **1.190**, R^2 **-0.025**; 660 nm only MAE 1.209, R^2 -0.037;
+phone-RGB MAE 1.175, R^2 +0.007. **Two of three have NEGATIVE R^2 — worse than
+predicting the population mean (MAE 1.175).** Gradient boosting finds nothing either
+(MAE 1.193, r=+0.121). Best univariate |r| between any PPG feature and Hb is 0.149.
+**The hardware fact.** Measured camspec sensitivities (28 cameras, 400-720 nm): at
+660 nm R=0.179, G=0.016, B=0.007; at **730/850/940 nm all three channels are zero** —
+beyond the characterised range and behind the IR-cut filter every phone carries. **A
+phone senses one of the four wavelengths, in one channel.** Even a working
+four-wavelength method could not transfer to the target hardware.
+
+### 2026-09-11 — TASK 3 decided the phase: the best predictor of Hb is SEX
+**Decision.** No PPG result may be reported without the demographic baseline beside it.
+**Evidence.** Sex alone MAE **0.831** g/dL, R^2 0.415. Full demographics (age, sex,
+height, weight) MAE **0.831** — age, height and weight add exactly nothing. Population
+mean 1.175. Four-wavelength PPG 1.190. **PPG loses to the null model; sex beats PPG by
+30%.** Adding PPG to demographics does not improve demographics (0.824 vs 0.831 — noise).
+**Why this matters more than any PPG number.** A "PPG + demographics" model scores MAE
+0.824, inside the pre-declared VIABLE band. Reported without the baseline it would look
+like a working PPG haemoglobin estimator. **It is a sex classifier with a PPG-shaped
+decoration attached.** Men carry higher haemoglobin — it is why the WHO thresholds
+themselves differ by sex (13 vs 12 g/dL). Task 3 exists to catch exactly this, and did.
+**Consequences.** This failure mode is a standing risk for every later claim in this
+project and for the literature it was meant to improve on.
+
+### 2026-09-11 — The dataset's published SNR could not be reproduced
+**Decision.** Reported as a difference of definition, NOT tuned into agreement.
+**Evidence.** The dataset reports 850 nm cleanest (19.04 dB) and 940 nm worst
+(16.44 dB, 17.5% below 10 dB). Independent computation — cardiac-band power including
+harmonics, against out-of-band power — gives **8.1-8.3 dB for all four channels**, no
+meaningful ordering, 71-73% below 10 dB. The README does not define its SNR.
+**An extraction bug WAS found and fixed along the way:** an earlier version counted PPG
+harmonics as noise, giving ~4.5 dB. A real pulse has a sharp systolic upstroke and a
+dicrotic notch, so 2f and 3f carry genuine signal. Fixing that moved SNR to 8.2 dB but
+still did not reproduce the published ordering.
+**Why no further tuning.** Matching a published number by adjusting an undocumented
+definition is fitting to the answer. Extraction was validated instead against physiology
+it can be checked on: heart rate median 82.5 bpm, IQR 75-90, 90.5% within 40-120 bpm,
+and all four channels agreeing to **0.0 bpm SD** — the same heart, correctly found.
+
+### 2026-09-11 — The Task 2 SQI does NOT repeat the Phase 2 defect, but cannot be validated here
+**Evidence.** The Phase 2 image quality score had AUROC 0.816 yet rejected **0 of 17**
+deliberately-bad frames — it ranked but never refused. This PPG SQI rejects **17.5%** at
+its 0.3 operating threshold, and rejected subjects do show higher error (0.930 vs 0.810).
+**But it cannot be meaningfully validated on this data.** r(SQI, |error|) = **-0.033**
+and MAE by SQI quartile is flat (0.892, 0.796, 0.868, 0.769). More fundamentally, the
+only model with any skill is the demographics model, which uses **no PPG at all** — so
+"signal quality predicting its error" has no mechanism and the small difference is most
+likely chance. A quality index cannot be validated against a model that ignores the
+signal it measures.
+
+## PHASE 4.5 DECISIONS (2026-09-11)
+
+### 2026-09-11 — The deep-learning hole is CLOSED with evidence
+**Decision.** Deep models over raw waveforms were tested and do not change the Phase 4
+verdict. The PPG arm remains NOT VIABLE. No further representation will be tried.
+**Evidence.** Three architectures (1D dilated CNN, bidirectional GRU, spectrogram CNN)
+x two conditions (four-wavelength, 660 nm), subject-disjoint 10-fold CV, target
+standardised per fold. Best: **speccnn on 660 nm, MAE 1.113-1.121 g/dL, R^2 +0.061**.
+**None beats sex alone (0.831).** Three of six have negative R^2.
+**Consequences.** A negative-results write-up can now answer "did you try deep
+learning?" with evidence rather than omission.
+
+### 2026-09-11 — CORRECTION: the raw waveform DOES contain a real signal
+**Decision.** The claim "deep learning found nothing" is **wrong and must not be
+written**. A more precise two-part finding replaces it.
+**Evidence.** The best deep model was permutation-tested on its own terms (same
+architecture, same folds, Hb shuffled across subjects, n=30): real MAE **1.1210**, null
+**1.1969 +/- 0.0161**, **z = -4.72**, distinguishable from chance at p<0.05.
+Meanwhile the hand-engineered feature model permutation-tested at **p = 0.978** — worse
+than 97.8% of shuffled-label models.
+**The two-part finding.**
+1. The hand-engineered AC/DC features contain **no** signal (0 of 51 features above the
+   null mutual information, 0 surviving FDR, permutation p=0.978).
+2. The raw waveform contains a **real but useless** signal: significant at z=-4.72, yet
+   MAE 1.12 g/dL against 0.83 for sex alone and 1.18 for a constant.
+**Interpretation.** The AC/DC features were discarding something real. That is exactly
+what this phase was run to find out, and it is a more defensible finding than a blanket
+negative. It is still nowhere near clinical utility: MAE 1.12 g/dL separates no WHO
+severity band.
+**Caveat on attribution.** The permutation breaks subject-level association, so
+significance means the waveform encodes something tracking Hb at the subject level —
+Hb itself or a physiological correlate. The sex probe rules out sex specifically
+(43.6-52.3% against a 57.0% base rate) but not every confound.
+
+### 2026-09-11 — Memorisation was measured, not assumed
+**Decision.** Subject-disjoint folds are asserted in code; train-test gaps are reported.
+**Evidence.** Every fold raises if a subject id appears in both splits. Gaps: cnn1d
+four-wavelength **+0.557** (train 0.623 / test 1.180), cnn1d 660 nm +0.421, gru
+four-wavelength +0.308, speccnn 660 nm +0.096. The larger models fit training subjects
+well and carry none of it across — the signature of memorising subject identity.
+**The sex probe came back clean**, so unlike Phase 4's feature models these did not
+secretly become sex classifiers.
+
+### 2026-09-11 — A fair test required standardising the target
+**Decision.** The regression target is standardised using TRAIN-fold statistics only.
+**Rationale.** Without it the output head starts at 0 against a mean Hb of 13.9 g/dL and
+spends the whole budget travelling to the intercept: the first run gave MAE 9.1, which
+looks like catastrophic failure but is only an unfair initialisation. The phase was
+trying to FIND signal, so the models got the best honest chance.
+**Consequences.** Any future negative result from a regression head should be checked
+for this before being believed.
+
+## PHASE 5 DECISIONS (2026-09-11)
+
+### 2026-09-11 — The positive claim SURVIVES hardening. Not retracted.
+**Decision.** The claim that a spectrogram CNN on raw 660 nm PPG is distinguishable
+from chance survives all four hardening tests and is retained — with its uselessness
+attached as a mandatory clause.
+**Evidence.**
+- **Selection-aware permutation (the decisive test):** the full best-of-six selection
+  re-run inside each permutation. **Extended to n = 240 on 2026-09-12**: real MAE
+  **1.1124**, null **1.1959 +/- 0.0168**, null min 1.1279, **empirical p <= 0.0041**,
+  z = -4.96, **zero of 240 permutations reached the real value**. (At n = 60 this read
+  p = 0.0164; the figure is superseded, not withdrawn.)
+- **Selected model alone, n=200:** empirical p = **0.00498**, z = -5.34, null
+  1.2009 +/- 0.0166.
+- **Seed stability, 10 seeds:** SD **0.0069**, range 1.1069-1.1279. The real-vs-null gap
+  (0.0815) is **11.9x** the seed SD.
+- **Subject robustness:** dropping the best-performing decile moves MAE 1.1124 ->
+  **1.2258** — the model degrades rather than the effect vanishing, consistent with a
+  weak signal spread across the cohort rather than a few lucky subjects.
+**Why the selection-aware construction was chosen over a correction.** It reflects the
+procedure that actually produced the claim and needs no assumption about how the six
+configurations correlate. A Bonferroni-style correction would have required that
+assumption and is strictly more conservative than warranted.
+**The correction mattered and did not explain the effect.** Taking the best of six does
+buy 0.0071 g/dL by chance (selection-aware null 1.1938 vs single-model null 1.2009) —
+real, and an order of magnitude below the 0.0815 gap.
+**Honest statement of the p-value.** p is **still a floor, now 1/(240+1) = 0.0041**,
+not a measured value; the true p is bounded above by it. Extending the run from 60 to
+240 permutations tightened the bound fourfold and did NOT turn it into a measurement,
+because no null draw ever reached the real value. The parametric z is
+reported beside it and assumes a normal null, which the 200-permutation distribution
+supports but does not prove.
+**Mandatory clause.** Any statement of this claim must carry: *the effect improves on
+predicting a constant by ~0.05 g/dL, sex alone beats it by six times that margin, and
+an estimator at MAE 1.12 g/dL separates no WHO severity band.*
+
+### 2026-09-11 — Consolidation and reproducibility package complete
+**Decision.** The project's results are consolidated into a publication-ready set. No
+further modelling will be run.
+**Artefacts.** `reports/final_results.md` (master table of all six representations,
+nine mechanisms as measured quantities, limitations from every phase, and a **12-item
+corrections table**); `reports/dataset_manifest.md` (generated from disk: 38.1 GB,
+40,831 files, **8 of 10 licences UNVERIFIED**); `reports/literature_gap.md` (counts
+only, with caveats enforced by a test); `scripts/reproduce_all.py` (33 stages, ~12 h
+full / ~22 min `--fast`, per-stage runtimes, `--list` and `--from`).
+**Reproducibility limits recorded rather than hidden.** Two stages are non-deterministic
+from cuDNN autotune: segmentation training reproduces sclera IoU to ~0.005, and the deep
+sweep reproduces MAE to ~0.01 — which is the measured seed SD and an order of magnitude
+below every effect reported.
+**Git hygiene enforced by test.** 0 data files, 0 figures, 0 binary artefacts tracked.
+`tests/test_phase5.py::test_no_dataset_files_are_tracked_by_git` fails the suite if that
+ever regresses.
+
+### 2026-09-11 — The literature table is deliberately under-claimed
+**Decision.** `reports/literature_gap.md` reports counts over 10 already-cited sources
+and explicitly refuses to generalise.
+**Rationale.** The sample is 10 sources chosen because this project used them, not
+sampled from the field, and most attributes are UNKNOWN because the full papers were not
+read. The report states that UNKNOWN is not evidence of absence, that the sample cannot
+support claims of the form "most papers omit X", and that a systematic review would be
+required for any general statement.
+**The one attribute recorded as NO** is `duplicate_or_leakage_check`, and only where
+this project **measured** duplicates a check would have caught: 52.7% and 50.8%
+redundancy in the two Ghana sets, and 419 MD5 hashes shared between two datasets
+distributed separately. That is a measurement of the data, not an inference about the
+papers.
+**A test enforces the caveats.** `test_literature_table_does_not_overclaim` fails if the
+"too small to support" and "UNKNOWN is not evidence of absence" language is removed.
+
+### 2026-09-12 — The selection-aware permutation null is being extended to n >= 240
+**Decision.** The selection-aware test (Phase 5 Task 1, test B) is being re-run to at
+least 240 permutations. **Until that run completes and is consolidated deliberately, the
+reported figure remains p = 0.0164 at n = 60 and must not be altered anywhere.** The
+runner reads the real MAE from `harden.json` and writes only its own files, so it cannot
+move the number it is testing against; `test_extended_run_does_not_alter_the_reported_p`
+enforces that.
+**Rationale.** p = 0.0164 is the **floor** 1/(60+1), not a measurement: zero of the 60
+draws reached the real MAE, so the test reported the smallest number its sample size
+allowed. At n = 240 the floor is 0.0041. Either the real value still sits below every
+draw — a bound four times tighter — or a draw finally lands at or below it and the p
+becomes measured. Both are better statements than the one on record, and neither
+requires a new modelling direction, so this does not reopen any closed arm.
+**A first attempt was killed by an out-of-memory condition at n = 41 and could not be
+resumed.** Its 41 draws are **discarded, not reused**, because its shuffles came from one
+sequentially consumed generator: permutation *i* depended on every permutation before it,
+so a partial run could not be continued or reproduced. The replacement draws permutation
+*i*'s labels from `default_rng(PERM_SEED + i)` and from nothing else, which is what makes
+the checkpoint sound rather than merely convenient.
+**What was fixed before relaunching.**
+- **Checkpointing.** Each completed permutation is appended to
+  `data/interim/phase5/perm_selection_aware.jsonl` and fsynced immediately. A restart
+  reads the file, skips the indices present and continues. A torn final line from a
+  killed process is dropped, not fatal (`test_checkpoint_reader_survives_a_torn_final_line`).
+- **Memory.** One permutation builds 6 architectures x 10 folds = 60 models and nothing
+  was released between them. Each fold now drops its model, optimiser, schedule and
+  resident tensors explicitly and returns the CUDA cache to the driver; evaluation is
+  chunked rather than forwarding a whole fold at once, which is numerically exact here
+  (no cross-sample operation, BatchNorm in eval mode) and removes the largest single
+  allocation. **Measured before relaunching: 401 MB peak allocated, 824 MB reserved
+  against the 8,585 MB ceiling, identical on consecutive permutations** — flat, not
+  accumulating. Host RSS is recorded per permutation as well, because the cause of the
+  kill was never confirmed to be GPU memory.
+- **Detachment.** The run is launched by `scripts/launch_perm_extended.ps1` as an
+  independent OS process, not a Claude Code background job, so it survives this session
+  being compacted, cleared or closed. Verified: the launching shell exited while the run
+  continued. It does not survive a reboot; re-running the launcher resumes from the
+  checkpoint.
+**OUTCOME (added 2026-09-12, on completion).** The run finished: **240/240 permutations
+in 10.65 h, zero draws at or below the real MAE, empirical p = 0.004149 = 1/241.** Of the
+two possible outcomes set out above, this is the first: the bound is four times tighter
+and the p is **still a floor, not a measurement.** Consolidated into `harden.json` by
+`scripts/phase5_consolidate_extended.py` as a separate deliberate step; the n=60 block is
+retained with a `superseded_by` pointer. Peak GPU 401 MB of 8,585 throughout, flat.
+
+**Consequences.** The shared CV driver was extracted to `src/hemosight/ppg/cv.py` so the
+original hardening script and the extended runner cannot drift apart; the extraction
+preserves seeding, folds and batch size exactly, so `phase5_harden.py` reproduces the
+numbers already logged. Progress is readable at any time with
+`scripts/phase5_perm_status.py`. **Nothing else about the claim changes**: whatever p the
+extended run returns, the mandatory clause stands — the effect improves on predicting a
+constant by ~0.05 g/dL, sex alone beats it by six times that margin, and an estimator at
+MAE 1.12 g/dL separates no WHO severity band.
+
+### 2026-09-12 - Phase 6 is an AUDIT HARNESS, not conformal prediction
+**Decision.** Phase 6 was redirected on instruction to build the project's software
+deliverable: **HemoSight Audit**, a tool that takes a claimed screening model's
+predictions and runs the checks Phases 1-5 ran. The original Phase 6 (N4, conformal
+prediction and abstention) is **retained verbatim and marked NOT APPLICABLE**, not
+deleted.
+**Rationale.** N4 wraps a haemoglobin estimator in calibrated intervals and a
+three-state decision rule. There is no estimator to wrap. Building split-conformal
+intervals around a model that loses to sex alone would produce a correctly calibrated
+interval around a number nobody should use, which is a worse outcome than not building
+it. The same reasoning applies downstream: **Phase 7 (fairness audit of an estimator),
+Phase 8 (multimodal fusion into one physical estimate), Phase 9's inference API and
+Phase 10's mobile capture flow all presuppose a working estimator** and are affected.
+They are left as written and unticked; no claim is made here about what should replace
+them.
+**What was built instead, and why it is the honest product.** The project's own
+literature survey found 0 of 5 applicable sources reporting a demographic baseline and
+0 reporting a duplicate check. Its own duplicate check found 419 MD5 hashes shared
+between two datasets distributed as independent sources and 52.7% / 50.8% internal
+redundancy in two others; its own split construction found 1,708 nominal subject ids
+collapsing to 1,067 leak-proof groups; its own demographic baseline found sex alone at
+MAE 0.831 g/dL beating every model it built. Each of those is a check, each is already
+implemented, and none of them is visible from a reported score.
+**Wrapped, not rewritten.** `hemosight.io.hashing` and `hemosight.io.splits` are
+imported unchanged; the baseline estimator is Phase 4 Gate B's exact construction; and
+`benjamini_hochberg()` was re-homed into `hemosight.audit.stats` with
+`scripts/phase4_5_ceiling.py` importing it from there - the same move as
+`phase5_harden.py` importing its CV driver from `hemosight.ppg.cv`, for the same reason:
+two copies of a statistical routine drift, and the drift is invisible. A test asserts
+the script no longer defines its own.
+**Consequences.** `scripts/reproduce_all.py` gains two Phase 6 stages (35 total). The
+extended Phase 5 permutation run is deliberately NOT a stage: it is a ~10 h GPU job
+whose figure has not been consolidated. Phase 6 is CPU and disk work throughout and did
+not touch the GPU; **p = 0.0164 stands unaltered everywhere.**
+
+### 2026-09-12 - Three checks were generalised deliberately, and the deviations are recorded
+**Decision.** Three Phase 1-5 checks could not be lifted unchanged into a tool that
+receives predictions rather than re-running training. Each deviation is logged here
+rather than made quietly.
+**1. Subgroup robustness now compares ADVANTAGE, not raw MAE.** Phase 5 reported MAE
+1.1124 -> 1.2258 after dropping the best-performing decile. Read as a raw before/after
+that comparison is uninterpretable: removing the subjects a model does best on also
+removes the easiest subjects, so *any* model looks worse afterwards, a perfect one
+included. The check recomputes the baseline on the same reduced set and reports the
+retained advantage fraction. The Phase 5 result reproduces as a PASS under it, which it
+should - Phase 5 read its own number that way in prose.
+**2. The demographic proxy probe counts as evidence only on a SUPPLIED representation.**
+Phase 4.5 ran its sex probe on each learned representation. Probing the prediction
+vector instead is still reported but cannot be a finding on its own: a model
+legitimately given sex as an input will of course encode sex in its output. Before this
+distinction was drawn the check failed 2 of 5 clean replicates.
+**3. The permutation test permutes labels against FIXED predictions.** Phases 4.5 and 5
+refit the model inside every permutation; that is unavailable to a tool that receives
+predictions. The nulls are genuinely different and the numbers differ - on the Phase 4
+feature model the harness reports p = 0.271 where the refitting construction reported
+0.978. The VERDICT is identical (not distinguishable from chance) and the check states
+its scope in its own output, but **the 0.271 must never be presented as a reproduction
+of the 0.978.**
+**Consequences.** All three are stated in `reports/phase6_audit_harness.md` section 8.
+
+### 2026-09-12 - The frontend-design skill could not be read; Task 3 item left unticked
+**Decision.** The Phase 6 brief required reading
+`/mnt/skills/public/frontend-design/SKILL.md` before writing any component. That path
+does not exist on this machine. The checkbox is left **unticked** and the omission is
+recorded rather than the task being reported as complete.
+**What was done instead.** The design was driven by the brief's stated intent - an
+instrument rather than a consumer app, data-forward, animation supporting comprehension
+rather than decorating. Concretely: colour is used for nothing except verdicts; numbers
+are set in a monospace so columns of them can be read against each other; result cards
+keep their identity under Framer Motion layout animation while the reader re-sorts or
+filters, so a card that moves can be tracked; detail panes animate their height so it is
+visible what opened.
+**Also not verified.** The front end type-checks and builds (`tsc -b && vite build`, 400
+modules) and serves with the API proxy reachable, but no browser automation was
+available on this machine, so **no screenshot-level check of the rendered pages was
+made**. Recorded in the report's limitations rather than left for a reader to assume.
+
+### 2026-09-12 - CORRECTION: the Phase 6 fault-injection seeds were not reproducible
+**What was wrong.** `scripts/phase6_validate_harness.py` seeded each injected fault with
+`abs(hash(kind)) % 2**31`. Python salts string hashing per process, so that seed changes
+between runs: the injected faults were a different dataset every time the validation was
+executed. The recorded sensitivity of 12/12 was therefore a measurement of one
+unrepeatable draw, and the claim in `scripts/reproduce_all.py` that every stage is
+deterministic given the frozen seed would have been false for that stage.
+**How it surfaced.** Writing the validation inputs out as CSV files for the sample-data
+directory. Two consecutive generations produced different files from the same code,
+which is the symptom.
+**Fix.** `case_seed(name) = (SEED + zlib.crc32(name)) % 2**31`, which is stable across
+processes and versions. Verified by generating the sample CSVs twice and comparing
+SHA-256 hashes: 9 of 9 identical.
+**Effect on the recorded result: none.** Re-running the validation under the corrected
+seeds returns the same figures - 15/15 known-truth verdicts reproduced, 12/12 faults
+caught, 6 of 160 clean check-runs false-positive (3.75%), with the same per-check
+breakdown. The RESULTS LOG entry dated 2026-09-12 stands unamended. The clean replicates
+were never affected: they were already seeded `4000 + i`.
+**Lesson, matching the one logged on 2026-09-11 about inferred causes.** A seed that is
+not reproducible does not announce itself - every individual run looks fine. The only
+thing that exposes it is running the same code twice and comparing the bytes.
+
+### 2026-09-12 - Sample submissions are split by whether they contain real measurements
+**Decision.** `app/backend/sample_data/` holds the nine SYNTHETIC submissions and is
+tracked in git. The three submissions derived from real data are written to
+`data/interim/phase6/known_truth/`, which is not tracked, and the sample images and
+their zip to `data/interim/phase6/`.
+**Rationale.** The known-truth inputs carry 41 PPG features and venous-blood haemoglobin
+for 252 real subjects from `Hb_PPG_Dataset`, plus file paths into the Ghana pool.
+Committing them would redistribute dataset-derived measurements from collections whose
+terms are unverified - 8 of 10 ship no licence file - which is the exposure that got
+`reports/figures/` untracked in Phase 1.5. The images are binary, and
+`test_no_dataset_files_are_tracked_by_git` fails the suite if a `.png` is ever tracked.
+**Consequences.** A fresh clone has the nine synthetic samples immediately and
+regenerates the other three with `scripts/phase6_make_sample_data.py`, which is now a
+stage in `reproduce_all.py` (36 stages). `app/backend/sample_data/README.md` records, per
+file, which checks do not pass - measured by running the harness over each file, not
+predicted.
+
+### 2026-09-12 - CORRECTION: NumPy scalars reached a JSON column and 500ed the upload endpoint
+**Symptom.** `POST /api/submissions` returned 500 for every submission with a `split`
+column. The traceback ended in SQLAlchemy's `json_serializer`, with the final line
+`TypeError: Object of type bool is not JSON serializable` - which reads as nonsense
+until you notice the type is `numpy.bool_`, which prints as `bool` and is **not** a
+subclass of it.
+**Cause.** `AuditInput.has()` was written as
+`col in self.df.columns and self.df[col].notna().any()`. `and` returns its second
+operand, and `notna().any()` is a `numpy.bool_`. That value reached `summary()` as
+`has_split` and `has_image_path`, and from there a JSON column.
+**Fix, placed at the boundary rather than on the field.** Three layers, because a
+per-field repair only relocates the defect to whichever field is added next:
+1. `hemosight.audit.jsonsafe.to_jsonable()` - NumPy scalars to natives, `ndarray` to
+   lists, NaN and +/-Inf to `null`, recursively.
+2. `SafeJSON`, a SQLAlchemy `TypeDecorator` in `app/backend/db.py`, used by **every**
+   JSON column in `models.py`. It is a column type, not a helper someone has to
+   remember to call, so a column added later is covered without anyone thinking about
+   it. A test fails the suite if a plain `JSON` column ever reappears.
+3. `AuditReport.to_dict()` coerces at the point the report leaves the analysis, so the
+   Markdown renderer, the report fingerprint and the database all see the same values
+   and a fingerprint computed in memory matches one computed after a round trip.
+`AuditInput.has()` now returns a real `bool` as well - correct regardless of storage.
+**NaN and Infinity were the quieter half.** `json.dumps` emits them as the bare tokens
+`NaN` and `Infinity` **without raising**; SQLite stores the text and Python reads it
+back, so the defect stays invisible until a PostgreSQL `json` column or a non-Python
+client rejects it. This service is declared PostgreSQL-ready, so they are coerced to
+null now rather than after a migration.
+**Second affected column, found by audit rather than by report.** `Run.report` takes the
+same analysis output and would have failed the same way; it is covered by the same
+column type, and an end-to-end run through the API now persists, re-reads and exports.
+`Run.options`, `Run.checks` and `PreRegistrationRow.thresholds` arrive already decoded
+from request JSON and were never at risk. `/api/submissions/{id}/preview` routes through
+pandas' own JSON writer and `/api/case-study` reads files from disk; neither was
+affected.
+**Verified to bite.** The fix was reverted and the new tests re-run: 4 of the 6 fail
+without it. The other two pass because `main.py` coerces on assignment as an independent
+second layer - which is the point of having more than one.
+**Effect on the recorded Phase 6 result: none.** The validation re-run returns 15/15
+known-truth verdicts, 12/12 faults caught, 6 of 160 clean check-runs false-positive
+(3.75%). The RESULTS LOG entry dated 2026-09-12 stands unamended. Tests: **129 passing**
+(was 121).
+
+### 2026-09-12 - OBSERVATION: the Overview page became unresponsive to browser automation
+**Observation, recorded before any explanation.** Automated browser inspection of
+`http://localhost:5173` loaded and rendered the Overview page, then became
+unresponsive. Every subsequent script injection timed out with "the page is busy".
+Screenshot, scroll and text extraction all failed, consistently, across waits of 5 and
+10 seconds and repeated retries. A page-text extraction reported that the document never
+reached `document_idle` after 45 seconds.
+**What that establishes.** The page did not settle into an idle state as far as that
+tooling could tell, and script execution was not scheduled.
+**What it does not establish.** Anything about the cause. The observation was made
+through a browser extension, which sits between the question and the answer; the
+document state, the main thread and the extension's own injection mechanism are three
+different things and this observation cannot separate them.
+**Recorded separately from its explanation deliberately**, following the lesson logged on
+2026-09-11 about the CPU-only PyTorch entry: an inferred cause must not be written down
+as a finding. The investigation is the next entry.
+
+### 2026-09-12 - INVESTIGATION: the Overview page is idle; two real polling defects were found elsewhere
+**Method.** The question was asked directly through the DevTools protocol instead of
+through the extension, driving a headless instance of the installed Chrome
+(`app/frontend/tools/measure_idle.mjs`, `measure_polling.mjs`,
+`measure_poll_failure.mjs`). Instrumentation is installed before any page script runs,
+counting `requestAnimationFrame`, `setInterval`, `setTimeout` and WebSocket
+constructions, alongside CDP performance counters and request logs.
+**Result 1 - the Overview page is idle, in both builds.** Over a 10-second window after
+load, identical in the Vite dev server and the production `vite preview` build: main
+thread 0.0024 s (**0.02% of wall clock**), script time 0 s, layout count 0, style
+recalc count 0, **0 network requests, 0 rAF callbacks, 0 timers**, `readyState`
+"complete", network idle reached, and a trivial `evaluate()` returning in **1 ms (dev)
+and 3 ms (prod)**. Whatever "the page is busy" described, it is not main-thread
+occupancy, a render loop, a polling loop or an animation.
+**Result 2 - the code agrees.** `Landing.tsx`, the Overview page, contains no
+`useState`, no `useEffect` and no network call. It is static. A React render or polling
+loop cannot live there.
+**Result 3 - the only difference between dev and production is the HMR WebSocket**: 1
+socket open in dev, 0 in production, with identical idle profiles otherwise.
+**Conclusion, stated with its limits.** Every cause internal to the application is ruled
+out by measurement. The remaining candidates - the dev server's persistent HMR socket
+holding off whatever readiness signal the extension waits for, or the extension's
+injection mechanism itself - **could not be distinguished from this side**, because the
+browser extension is not connected to this environment and cannot be driven. **No cause
+is recorded as established.** What is established is that the application is not
+responsible, and that a production build behaves identically.
+**Two real defects WERE found, in the pages that genuinely poll.** Neither can explain
+the Overview observation - `Run.tsx` is not mounted at `/` - but both are the exact
+failure class the investigation was asked to look for, and both were measured, not
+inferred:
+- **A poll loop with no terminating condition.** With the backend made to stop
+  answering, `await api.run(id)` rejected inside a `setInterval` callback with nothing
+  catching it. The interval kept firing every **706 ms indefinitely**, producing an
+  uncaught `TypeError: Failed to fetch` per tick - **34 uncaught errors in 12 seconds** -
+  while the interface went on animating a progress bar. Measured: **17 polls in 12 s,
+  no end.**
+- **Overlapping requests.** `setInterval` does not wait for the request it has already
+  issued. Against a 3-second response, **5 concurrent polls** were in flight, growing
+  with latency.
+**Fix.** Polling moved out of the effect into `src/polling.ts`, a plain async function
+that schedules the next request only after the previous one settles, backs off linearly
+on failure, gives up after a bounded number of consecutive failures, and cancels
+synchronously on unmount. **Measured after: 17 polls -> 5 then stop; 34 uncaught errors
+-> 0 uncaught `TypeError`s; 5 concurrent requests -> 1.** The give-up is surfaced in the
+interface, which also takes down the live progress view - and with it the app's only
+`repeat: Infinity` animation - rather than leaving a spinner implying progress that has
+stopped.
+**Two further defects found while in there.** Navigating away from a running job and
+back stranded the user: the component remounted with no run, never polled again, and
+never moved on while the job completed on the server unnoticed. It now resumes from the
+session. And `Upload.tsx` carried an `eslint-disable-line react-hooks/exhaustive-deps`
+whose only purpose was a `!sub` guard that could never fire on mount; the guard was
+removed and the suppression with it.
+**Prevention.** ESLint is now configured with `react-hooks/exhaustive-deps` set to
+**error** and `npm run lint` is clean with **zero suppressions anywhere in `src/`** - the
+original defect had been sitting behind exactly such a comment, which costs nothing when
+there is no lint run to suppress it from. `src/polling.ts` has 8 vitest cases covering
+stop-on-done, stop-on-error, give-up, recovery from a transient failure, no overlapping
+requests, cancel-during-flight and idempotent cancel. Four structural tests in
+`tests/test_phase6.py` keep the shape of the fix from regressing without needing node.
+**Honest note on the measurement tooling.** Two of the early readings were artefacts of
+the probe, not of the application, and are recorded rather than quietly corrected: the
+probe re-seeded `localStorage` on every navigation, destroying the `runId` the resume
+path reads and making the app look as though it had failed to resume; and "never reached
+the results page" was the two-worker job queue saturated by the investigation's own
+400,000-permutation sabotage runs. Both were found by checking the probe before blaming
+the code.
+
 ---
 
+
+### 2026-09-12 — Phase plan restructured for readability after a completeness audit
+**Decision.** Every unticked box in section 6 now carries an inline class — SUPERSEDED,
+BLOCKED or OUTSTANDING — with the gate or blocker cited on the same line, and a
+state-at-a-glance table heads the section. Eight boxes whose work was already on disk were
+ticked with their evidence appended. Three ticked boxes with a reduced or missing artefact
+were annotated ⚠️ and left ticked. **No text was deleted and no box was un-ticked.**
+**Rationale.** 68 unticked boxes across eleven phases read as 68 pieces of outstanding
+work. The audit (`reports/claude_md_audit.md`) found 57 superseded by a failed gate, 1
+blocked, 8 already done, and **2 genuinely outstanding** — the deferred Phase 6 deep-model
+validation (now unblocked: the permutation run finished and the GPU is free) and the
+Phase 3 empirical-signal figure, whose computation is not on disk.
+**Findings that are not plan items, recorded so they are not lost.** (1) Nothing from
+Phase 4 onward is committed — 32 paths. (2) The 0.70 dE2000/g/dL empirical signal on 216
+Eyes-Defy subjects is hard-coded in `scripts/phase3_report.py` with no producing script;
+it is the numerator of the project's central noise/signal ratio. (3) Section 3's hard
+constraint — a CNN baseline for every claim — is unmet for the imaging arm; no image CNN
+was trained. (4) The last three RESULTS LOG entries sit after section 9, not in section 8.
+(5) Network is now reachable (`pip download reportlab` succeeded), so the licence, constants
+and reportlab items are closeable. (6) Three smoke-test pre-registration rows (`t`, `t`,
+`e2e`) sit in the untracked development `audit.db`.
+**Consequences.** The plan can be read at a glance. Nothing about any result, verdict or
+claim changes. The two outstanding items and the hygiene list are prioritised in the
+audit report's section 5; the answer to "what remains" is the write-up and those.
 ## 8. RESULTS LOG
 
 Dated entries recording **every** metric produced, including failures and negative
@@ -1703,6 +2442,146 @@ matched.
 verified crossing points, which were right, not the values between them. Internal
 consistency is not verification. **Status: confirmed.**
 
+### 2026-09-11 — Phase 4 GATE A: AC/DC normalisation FAILS to cancel (negative)
+**Config.** `scripts/phase4_gate_a.py`, `src/hemosight/ppg/features.py`. 252 subjects,
+200 Hz, 4th-order Butterworth zero-phase: DC low-pass 0.4 Hz, AC band-pass 0.5-8 Hz,
+per-beat median trough-to-peak amplitude.
+**Metrics.** Median nuisance CV: raw DC 0.5633 | raw AC ~1.03 | **AC/DC 1.5299
+(-171.6%)** | **ratio-of-ratios 1.1152 (-98.0%)**. Median R^2 with Hb <= 0.021 in every
+group. Best single-feature equivalent Hb noise **9.75 g/dL** vs population SD **1.470**.
+**Interpretation.** Pre-declared threshold was >=50% nuisance reduction. Normalisation
+*increases* nuisance variance. Device-invariance is untestable here (single device);
+tissue-invariance is decisively refuted. **Status: confirmed. GATE A FAIL.**
+
+### 2026-09-11 — Phase 4 GATE B: no recoverable Hb signal in PPG (major negative)
+**Config.** `scripts/phase4_gate_b.py`. Grouped 10-fold CV, Ridge + gradient boosting.
+**Metrics.**
+
+| condition | n feat | MAE g/dL | Pearson r | R^2 | band |
+| --- | --- | --- | --- | --- | --- |
+| four wavelengths | 41 | 1.190 | +0.059 | **-0.025** | NOT VIABLE |
+| 660 nm only | 9 | 1.209 | +0.013 | **-0.037** | NOT VIABLE |
+| simulated phone-RGB | 13 | 1.175 | +0.090 | +0.007 | NOT VIABLE |
+| gradient boosting (4 wl) | 41 | 1.193 | +0.121 | — | NOT VIABLE |
+
+Phone sensor coverage (camspec, 28 cameras): 660 nm R=0.179/G=0.016/B=0.007;
+**730, 850, 940 nm = 0.000 in all channels** (beyond 720 nm and behind the IR-cut
+filter).
+**Interpretation.** Two of three conditions have NEGATIVE R^2 — worse than a constant.
+Three of the four wavelengths are invisible to the target hardware regardless.
+**Status: confirmed. GATE B FAIL in all conditions.**
+
+### 2026-09-11 — Phase 4 TASK 3: sex alone beats PPG by 30% (the decisive baseline)
+**Metrics.** Identical folds: population mean MAE **1.175**; **sex alone MAE 0.831,
+R^2 0.415**; full demographics MAE **0.831** (age/height/weight add nothing);
+four-wavelength PPG **1.190**; PPG+demographics 0.824 (vs demographics 0.831 — noise).
+**Interpretation.** PPG loses to the null model. A "PPG + demographics" model lands
+inside the pre-declared VIABLE band at 0.824 and would look like a working PPG
+estimator if reported without the baseline — **it is a sex classifier**. Men carry
+higher haemoglobin, which is why WHO thresholds differ by sex (13 vs 12 g/dL).
+**Status: confirmed. This is the finding that decides the phase.**
+
+### 2026-09-11 — Phase 4 TASK 2: SQI rejects, but cannot be validated here
+**Metrics.** Rejection rate 4.4% / 10.7% / **17.5%** / 32.1% at SQI < 0.1/0.2/0.3/0.5.
+MAE rejected 0.930 vs retained 0.810. r(SQI, |error|) = **-0.033**; MAE by quartile
+0.892, 0.796, 0.868, 0.769 (no trend).
+Independent SNR: **8.1-8.3 dB all four channels**, no ordering, 71-73% below 10 dB —
+does NOT reproduce the dataset's published 850 nm cleanest (19.04) / 940 nm worst
+(16.44, 17.5% below 10 dB). README does not define its SNR; not tuned to match.
+Extraction validated instead on physiology: HR median 82.5 bpm, 90.5% in 40-120 bpm,
+four channels agreeing to 0.0 bpm SD.
+**Interpretation.** Unlike the Phase 2 image SQI (AUROC 0.816, rejected 0 of 17), this
+one does refuse. But the error relationship is ~zero and the only skilled model uses no
+PPG, so there is no mechanism for SQI to predict its error. **Status: confirmed.**
+
+### 2026-09-11 — Phase 4.5: deep models on raw PPG (verdict unchanged, finding refined)
+**Config.** `scripts/phase4_5_deep.py`, `src/hemosight/ppg/deep.py`. 200 Hz -> 50 Hz,
+0.5-8 Hz band-pass, 10 s windows (2,584 from 252 subjects), per-channel z-score within
+window. Subject-disjoint 10-fold CV, target standardised per fold.
+**Metrics.**
+
+| model | condition | MAE g/dL | r | R^2 | train gap | sex probe |
+| --- | --- | --- | --- | --- | --- | --- |
+| speccnn | 660 nm | **1.113** | +0.248 | +0.061 | +0.096 | 50.0% |
+| gru | 660 nm | 1.119 | +0.247 | +0.003 | +0.213 | 52.3% |
+| speccnn | 4-wl | 1.121 | +0.244 | +0.051 | +0.137 | 50.2% |
+| cnn1d | 660 nm | 1.161 | +0.203 | -0.077 | +0.421 | 46.1% |
+| cnn1d | 4-wl | 1.180 | +0.201 | -0.112 | +0.557 | 43.6% |
+| gru | 4-wl | 1.196 | +0.118 | -0.116 | +0.308 | 50.3% |
+
+Baselines: sex alone **0.831**, demographics 0.831, population mean 1.175, Phase 4
+features 1.190. Sex-probe base rate 57.0% — **no representation encodes sex above it**.
+**Interpretation.** No deep model beats a single binary demographic variable. Three of
+six have negative R^2. Large train-test gaps show the bigger models memorise subject
+identity. **Status: confirmed. PPG arm remains NOT VIABLE.**
+
+### 2026-09-11 — Phase 4.5 ceiling analysis: features carry NO signal (stronger claim warranted)
+**Config.** `scripts/phase4_5_ceiling.py`, 51 PPG features, 500 permutations.
+**Metrics.** Mutual information: max 0.0608 vs null p95 0.0676 — **0 of 51 features
+above the null**. Correlations: 4 at raw p<0.05 against **2.6 expected by chance**;
+**0 survive Benjamini-Hochberg FDR** (best ac_dc_660 r=+0.149, p_FDR=0.359).
+Permutation: real MAE **1.2075**, null **1.1869 +/- 0.0102**, **p = 0.978**, z = +2.03
+(wrong direction).
+**Interpretation.** The feature model is **not distinguishable from models trained on
+shuffled labels** — it is worse than 97.8% of them. This licenses the stronger claim for
+the feature representation: the signal is not present, not merely that one model failed.
+**Status: confirmed.**
+
+### 2026-09-11 — Phase 4.5: the raw waveform DOES carry a real signal (positive, but useless)
+**Config.** Permutation test on the best deep model specifically (speccnn, 660 nm), same
+architecture and folds, Hb shuffled across subjects, n=30 permutations.
+**Metrics.** Real MAE **1.1210**; null **1.1969 +/- 0.0161**; **z = -4.72**;
+distinguishable from chance at p<0.05.
+**Interpretation.** **This corrects the blanket negative.** The raw waveform contains
+haemoglobin-correlated information that the AC/DC ratio features discard — the features
+were throwing something away. But the effect improves on predicting a constant by only
+0.054 g/dL, and sex alone beats it by six times that margin. **Real, statistically
+significant, and clinically useless: MAE 1.12 g/dL separates no WHO severity band.**
+Attribution caveat: significance means the waveform tracks something at the subject
+level — Hb or a correlate; the sex probe excludes sex but not every confound.
+**Status: confirmed. The one positive finding in Phases 4 and 4.5.**
+
+### 2026-09-11 — Phase 5 TASK 1: the positive claim survives hardening
+**Config.** `scripts/phase5_harden.py`. 10-fold subject-disjoint CV, 40 epochs, target
+standardised per fold. 270 full CV runs in total.
+**Metrics.**
+
+| test | n | real MAE | null mean +/- SD | empirical p | parametric z |
+| --- | --- | --- | --- | --- | --- |
+| selected model alone | 200 | 1.1124 | 1.2009 +/- 0.0166 | **0.00498** | -5.34 |
+| **selection-aware (best-of-six inside each perm)** | 60 | 1.1124 | 1.1938 +/- 0.0162 | **0.01639** | -5.02 |
+| **selection-aware, EXTENDED (supersedes the row above)** | **240** | 1.1124 | 1.1959 +/- 0.0168 | **0.00415** | -4.96 |
+
+Seed stability (10 seeds): mean 1.1153, **SD 0.0069**, range 1.1069-1.1279.
+Subject robustness: MAE 1.1124 -> **1.2258** after dropping the best-performing decile.
+**Interpretation.** All four tests pass. The real-vs-null gap (0.0815) is **11.9x** the
+seed SD. The selection step buys 0.0071 g/dL by chance — real, and an order of magnitude
+below the gap. The p is the **empirical floor**, not a measured value - 0.0164 at n=60,
+and 0.0041 after the 2026-09-12 extension to n=240.
+**The claim is retained and remains clinically useless**: ~0.05 g/dL better than a
+constant, six times worse than sex alone, separating no WHO severity band.
+**Status: confirmed. NOT retracted.**
+
+### 2026-09-11 — Phase 5 TASKS 2-4: consolidation, reproducibility, literature
+**Artefacts.** `reports/final_results.md`, `reports/dataset_manifest.md`,
+`reports/literature_gap.md`, `scripts/reproduce_all.py`.
+**Metrics.** Reproduction: 33 stages, ~12 h full / ~22 min `--fast`; 12 CPU-only stages
+verified to regenerate. Manifest: 38.1 GB, 40,831 files, **8 of 10 licences
+UNVERIFIED**. Git: **0 data files, 0 figures, 0 binary artefacts tracked**, enforced by
+test. Literature counts over 5 applicable sources: demographic baseline 0 yes / 5
+unknown; subject-level splits 1/0/4; cross-device 1/1/3; duplicate check 0 yes / **3 no**
+/ 2 unknown. Tests: **98 passing**.
+**Reproduction VERIFIED, not just claimed.** A clean `--fast` run completed 22/22
+stages in **10.3 minutes** and regenerated the reported numbers exactly: Phase 3 gate
+3.893, Phase 4 four-wavelength 1.190, sex-alone 0.831, Phase 4.5 permutation p=0.978,
+Phase 2 yellowing 4.40 deg. The single non-exact stage is the deep sweep (1.111 vs 1.113
+reported), which differs by less than the measured seed SD of 0.0069 — the expected
+cuDNN non-determinism, documented in the entry point.
+**Interpretation.** The package reproduces from raw data with a frozen seed, and the two
+non-deterministic stages have measured tolerances an order of magnitude below the
+reported effects. The literature table is deliberately under-claimed and its caveats are
+test-enforced. **Status: confirmed.**
+
 ---
 
 ## 9. WORKING PROTOCOL
@@ -1728,3 +2607,96 @@ Additional standing rules:
   re-run before the new number is reported.
 - When a result is worse than the baseline, log it and say so plainly. That is the
   point of having a baseline.
+
+### 2026-09-12 - Phase 6: the audit harness, validated against known ground truth
+**Config.** `scripts/phase6_validate_harness.py` (58 s, CPU only),
+`src/hemosight/audit/`, 8 checks. Verdicts compared against CLAUDE.md's own DECISION and
+RESULTS LOG entries dated 2026-09-11.
+**Data.** (A) this project's own artefacts: 9,232 Ghana-pool images, the 252-subject PPG
+feature table, `harden.json`; (B) 7 synthetic submissions carrying one injected fault
+each plus a genuine-signal positive control; (C) 20 clean replicates, n=240, no fault.
+**Metrics.**
+
+| | result |
+| --- | --- |
+| known-truth verdicts reproduced | **15 / 15 (100%)** |
+| sensitivity to injected faults | **12 / 12 (100%)** |
+| false positives on clean inputs | **6 of 160 check-runs (3.75%)** |
+
+Reproduced exactly from this project's own data: **419** byte-identical image groups
+spanning the split boundary (Phase 1 recorded 419 shared MD5); **1,708 nominal subject
+ids -> 1,067 leak-proof groups** (Phase 1 recorded the same); PPG four-wavelength MAE
+**1.190** and PPG+demographics **0.824** g/dL, regenerated with Phase 4's own estimator;
+0 of 41 features above the MI null; empirical p **0.01639** at n=60 with `at_floor` true;
+effect **11.9x** the seed SD.
+**The false positives are reported, not tuned away.** All 6 fall in the two checks that
+compare point estimates with no uncertainty interval (`demographic_baseline` 2/20,
+`subgroup_robustness` 4/20), on a clean generator whose model advantage over the
+population mean is genuinely modest - borderline inputs rather than clean ones. Both
+checks now flag a narrow margin in their own output; the thresholds were **not** moved,
+because matching a number by adjusting a definition is fitting to the answer.
+**Interpretation.** The harness returns the verdict the phase returned on every case
+already on the record, catches every fault it was built to catch, and cries wolf on
+3.75% of clean check-runs with a named and measured cause. Tests: **121 passing** (was
+102). **Status: confirmed.**
+
+### 2026-09-12 - Phase 5 extended permutation run: IN PROGRESS, not consolidated
+**Config.** `scripts/phase5_perm_extended.py`, detached OS process, target 240.
+**Metrics at the time of writing (111 of 240 complete).** Real MAE 1.1124 (read from
+`harden.json`, never recomputed); null mean 1.1951, SD 0.0154, min 1.1425; **0 draws at
+or below the real value**; empirical p **0.00893, which is the floor 1/(n+1)**;
+parametric z -5.37. Peak GPU 401 MB of 8,585, flat across every permutation.
+**Interpretation.** Provisional and **not** a reportable figure. Until the run reaches
+240 and is consolidated as a deliberate step, **the reported result remains p = 0.0164
+at n = 60** and must not be altered anywhere. **Status: SUPERSEDED by the entry below,
+dated the same day, once the run completed.**
+
+
+### 2026-09-12 - Phase 5 extended permutation: COMPLETE at n=240. The bound tightens fourfold; it is still a bound
+**Config.** `scripts/phase5_perm_extended.py`, detached OS process, 240 permutations,
+each re-running the full best-of-six selection (60 complete 10-fold subject-disjoint CV
+runs per permutation). **14,400 CV runs in 10.65 h.** Consolidated into `harden.json` by
+`scripts/phase5_consolidate_extended.py`, a separate deliberate step; the runner itself
+never writes that file and a test enforces it.
+**Data.** 252 subjects, 2,584 windows, Hb shuffled across subjects with permutation i's
+labels drawn from `default_rng(770000 + i)` and nothing else.
+**Metrics.**
+
+| | n = 60 (superseded) | **n = 240** |
+| --- | --- | --- |
+| real MAE (seed-averaged, unchanged) | 1.1124 | **1.1124** |
+| null mean | 1.1938 | **1.1959** |
+| null SD | 0.0162 | **0.0168** |
+| null minimum | - | **1.1279** |
+| draws at or below the real MAE | 0 of 60 | **0 of 240** |
+| empirical p | 0.01639 | **0.004149** |
+| floor 1/(n+1) | 0.01639 | **0.004149** |
+| at the floor? | yes | **yes** |
+| parametric z | -5.02 | **-4.96** |
+
+**Interpretation - and the honest reading of what was asked.** The run was launched to
+find out whether the empirical p would become a *measured value* rather than the n=60
+floor. **It did not.** Two outcomes were declared in advance: either a draw finally lands
+at or below the real value and the p becomes a measurement, or none does and the bound
+gets four times tighter. This is the second. Zero of 240 permutations reached the real
+MAE, so p = 0.004149 is again exactly 1/(n+1) - **a bound, not a measurement**, and any
+statement of it that omits that word repeats the error this whole exercise existed to
+correct.
+The closest any null draw came was **1.1279 against the real 1.1124**, still 0.0155
+above it - more than twice the seed SD of 0.0069. The null mean moved by 0.0021 between
+n=60 and n=240, and the SD by 0.0006, so the n=60 estimate of the null was already
+sound; what n=60 could not do was resolve the tail.
+**The parametric z moved the WRONG way and that is worth stating**: -5.02 to -4.96,
+because the larger sample gave a slightly wider null SD. The two statistics are
+answering different questions - the z assumes a normal null and got marginally less
+extreme, while the empirical bound got four times tighter - and reporting only the more
+flattering one would be the exact selection this project keeps refusing to make.
+**Nothing else about the claim changes.** The mandatory clause stands verbatim: the
+effect improves on predicting a constant by ~0.05 g/dL, sex alone beats it by six times
+that margin, and an estimator at MAE 1.12 g/dL separates no WHO severity band. Real,
+statistically distinguishable from chance, and clinically useless.
+**Consolidated into:** `data/interim/phase5/harden.json` (n=60 retained with a
+`superseded_by` pointer), the FINAL STATUS banner in section 2, the Phase 5 DECISION LOG
+evidence block, the Phase 5 RESULTS LOG table, `reports/final_results.md`, the audit
+package's own provenance docstrings, and the case-study endpoint - which reads the figure
+from `harden.json` rather than holding a copy. **Status: confirmed.**

@@ -44,6 +44,7 @@ dependencies = [
     "sqlalchemy>=2.0",
     "pydantic>=2.6",
     "python-multipart>=0.0.9",
+    "reportlab>=4.0",        # PDF export of audit reports (Phase 6.5: was a 501 without it)
 ]
 
 [project.optional-dependencies]

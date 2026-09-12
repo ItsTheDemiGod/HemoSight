@@ -50,3 +50,30 @@ ethical approvals. This project collects no new data and enrols no participants,
 requires no separate ethics approval - but it inherits each source's consent scope.
 Nothing here supports a clinical claim, and none of these consents covers clinical
 deployment.
+
+
+---
+
+## Verification (2026-09-12, Phase 6.5 Task 5)
+
+Network access became available and each source was checked directly. The table
+above is retained as the Phase 1 record; this section supersedes its *Status* column.
+
+| dataset | verified licence / terms | where |
+| --- | --- | --- |
+| Ghana conjunctiva (`nt7r8hv2pz`) | **CC BY 4.0** | Mendeley Data record, DOI 10.17632/nt7r8hv2pz.1 |
+| Ghana fingernails (`2xx4j3kjg2`) | **CC BY 4.0** | Mendeley Data record, DOI 10.17632/2xx4j3kjg2.1 |
+| CP-AnemiC | **CC BY 4.0**, plus the authors' statement "can be reused by other author(s) for academic purpose only and should be cited as such" | Mendeley Data, DOI 10.17632/m53vz6b7fx.1 |
+| Hb-PPG | **CC BY 4.0** | figshare API, article 22256143 (v7; the README cites v5) |
+| SBVPI | **Custom agreement**: non-commercial research, stated purpose only, no redistribution of the data or any part, mandatory acknowledgement + 3 references, publication copies to the provider. No figure allowance. | Provider's access form (University of Ljubljana) |
+| MOBIUS | **Custom agreement**: as SBVPI, except scaled-down or watermarked figures are permitted "for demonstrative purposes" | Provider's access form |
+| NUS-8 | **No licence stated.** Landing page (now `yorkucvil.github.io`) has downloads, an acknowledgement and no terms. | Landing page |
+| Eyes-Defy-Anemia | **No licence stated.** IEEE DataPort record has no licence field (subscription access). Bundled `Dataset anemia.docx`: free of charge, three papers to be cited. Kaggle mirror is third-party. | IEEE DataPort + bundled docx |
+| Optical constants (OMLC) | public research resource | as before |
+| camspec | public research resource | as before |
+
+**Consequences for publication.** SBVPI and MOBIUS images may not be redistributed;
+MOBIUS figures must be scaled down or watermarked; SBVPI figures have no stated
+allowance and should be avoided or cleared with the provider. The Eyes-Defy and NUS-8
+authors' requested citations are mandatory in practice. `reports/figures/` stays
+untracked; nothing changes about what may enter git.

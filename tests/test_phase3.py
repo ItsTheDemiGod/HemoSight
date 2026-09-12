@@ -196,3 +196,46 @@ def test_ratio_does_not_cancel_a_non_diagonal_transform():
     base = ratio_feature(a.mean(axis=0), b.mean(axis=0))
     mixed = ratio_feature((a @ mix.T).mean(axis=0), (b @ mix.T).mean(axis=0))
     assert not np.allclose(mixed, base, atol=1e-3)
+
+
+# ------------------------------------------------- Phase 6.5 Task 1: the empirical signal
+# The "~0.70 dE2000 per g/dL" figure was a string constant in phase3_report.py with no
+# producing script (audit 2026-09-12). These keep it from ever becoming one again.
+def _root():
+    from pathlib import Path
+    return Path(__file__).resolve().parents[1]
+
+
+def test_phase3_report_holds_no_copy_of_the_empirical_signal():
+    src = (_root() / "scripts" / "phase3_report.py").read_text(encoding="utf-8")
+    # The withdrawn figure may be NAMED in the correction paragraph; it may not be
+    # PRESENTED as the value (the old table cell was "**~0.70 dE2000 per g/dL**").
+    assert "**~0.70 dE2000" not in src, (
+        "the empirical signal must be read from empirical_signal.json, not typed into the report")
+    assert 'load("empirical_signal.json")' in src
+    assert "5.6x" not in src, "the derived noise/signal ratio must be computed, not typed"
+
+
+def test_empirical_signal_is_a_reproduce_stage():
+    src = (_root() / "scripts" / "reproduce_all.py").read_text(encoding="utf-8")
+    assert "phase3_empirical_signal.py" in src
+
+
+def test_empirical_signal_output_carries_its_own_null():
+    """Every estimator in the file reports what it returns under shuffled labels.
+    The binned method on record turned out to have a null of ~2.1 dE2000/g/dL - it
+    cannot measure the signal - and that fact has to travel with the number."""
+    import json
+    p = _root() / "data" / "interim" / "phase3" / "empirical_signal.json"
+    if not p.exists():
+        pytest.skip("run scripts/phase3_empirical_signal.py")
+    d = json.loads(p.read_text(encoding="utf-8"))
+    h, pn = d["headline"], d["permutation_null"]
+    assert h["estimator"].startswith("OLS Lab ~ Hb + site + sex + age")
+    assert h["ci95"][0] < h["de_per_g_dl"] < h["ci95"][1]
+    assert h["de_per_g_dl"] > pn["regression_site_sex_age"]["null_p95"], "signal must clear its null"
+    assert pn["binned_min_n"]["p_empirical"] > 0.05, \
+        "the binned estimator was shown not to resolve the signal; if that changes, re-read the report"
+    assert "WITHDRAWN" in h["verdict_on_previous_figure"]
+    assert d["noise_over_signal"]["equivalent_hb_error_g_dl_at_3.935"] > 2.0, \
+        "the Phase 3 gate verdict (NOT RECOVERABLE) would change - stop and report"
