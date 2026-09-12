@@ -139,9 +139,7 @@ def test_register_entries_and_availability_report_agree():
 
 def test_external_run_record_produced_no_predictions_and_touched_no_repo_code():
     root = Path(__file__).resolve().parents[1]
-    p = root / "data" / "interim" / "phase7" / "external" / "anemia-detection" / "run_results.json"
-    if not p.exists():
-        pytest.skip("external run not present on this machine")
+    p = root / "configs" / "external_audit_run_record.json"
     run = json.loads(p.read_text(encoding="utf-8"))
     assert run["summary"]["ran_to_completion"] == 0
     assert run["summary"]["produced_per_subject_predictions"] == 0

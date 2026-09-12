@@ -1,0 +1,264 @@
+{
+  "scope": "student repository, NOT a published paper; used only to test the harness's external path; nothing generalises",
+  "environment": {
+    "python": "C:\\Users\\demia\\Desktop\\anemia-detection-env\\Scripts\\python.exe",
+    "requirements_txt_installs_as_written": false,
+    "requirements_txt_failure": "pip: No matching distribution found for glob (glob and pathlib are stdlib, not packages)",
+    "installed_subset_ok": true,
+    "torch_cuda_available": false,
+    "note": "CPU torch; every notebook fails before any .cuda() call"
+  },
+  "rules": [
+    "cloned repo untouched; copies executed",
+    "data paths repointed only",
+    "Colab drive-mount cells skipped (the only cell-level allowance)",
+    "stop at the first error; no code repaired"
+  ],
+  "notebooks": [
+    {
+      "notebook": "baselines/hue_score_svm.ipynb",
+      "substitutions": [
+        {
+          "cell": 4,
+          "from": "C:\\Users\\manas\\Documents\\Winter 2022\\Digital Health Systems\\Project\\anemia_detection\\",
+          "to": "C:\\Users\\demia\\Desktop\\HemoSight\\data\\interim\\phase7\\external\\anemia-detection\\authors_intermediates/"
+        },
+        {
+          "cell": 5,
+          "from": "C:\\Users\\manas\\Documents\\Winter 2022\\Digital Health Systems\\Project\\anemia_detection\\",
+          "to": "C:\\Users\\demia\\Desktop\\HemoSight\\data\\interim\\phase7\\external\\anemia-detection\\authors_intermediates/"
+        },
+        {
+          "cell": 6,
+          "from": "C:\\Users\\manas\\Documents\\Winter 2022\\Digital Health Systems\\Project\\anemia_detection\\",
+          "to": "C:\\Users\\demia\\Desktop\\HemoSight\\data\\interim\\phase7\\external\\anemia-detection\\authors_intermediates/"
+        }
+      ],
+      "skipped_cells": [],
+      "completed": false,
+      "failed_cell": {
+        "index": 4,
+        "source": "y_it = np.load(r\"C:/Users/demia/Desktop/HemoSight/data/interim/phase7/external/anemia-detection/authors_intermediates/y_forniceal_italy.npy\") #/30\nX_it = np.load(r\"C:/Users/demia/Desktop/HemoSight/data/interim/phase7/external/anemia-detection/authors_intermediates/X_forniceal_italy.npy\")/255",
+        "ename": "FileNotFoundError",
+        "evalue": "[Errno 2] No such file or directory: 'C:/Users/demia/Desktop/HemoSight/data/interim/phase7/external/anemia-detection/authors_intermediates/y_forniceal_italy.npy'"
+      },
+      "error": "31mFileNotFoundError\u001b[39m                         Traceback (most recent call last)\n\u001b[36mCell\u001b[39m\u001b[36m \u001b[39m\u001b[32mIn[3]\u001b[39m\u001b[32m, line 1\u001b[39m\n\u001b[32m----> \u001b[39m\u001b[32m1\u001b[39m y_it = np.load(\u001b[33mr\"C:/Users/demia/Desktop/HemoSight/data/interim/phase7/external/anemia-detection/authors_intermediates/y_forniceal_italy.npy\"\u001b[39m) \u001b[38;5;66;03m#/30\u001b[39;00m\n\u001b[32m      2\u001b[39m X_it = np.load(\u001b[33mr\"C:/Users/demia/Desktop/HemoSight/data/interim/phase7/external/anemia-detection/authors_intermediates/X_forniceal_italy.npy\"\u001b[39m)/\u001b[32m255\u001b[39m\n\n\u001b[36mFile \u001b[39m\u001b[32m~\\Desktop\\anemia-detection-env\\Lib\\site-packages\\numpy\\lib\\_npyio_impl.py:454\u001b[39m, in \u001b[36mload\u001b[39m\u001b[34m(file, mmap_mode, allow_pickle, fix_imports, encoding, max_header_size)\u001b[39m\n\u001b[32m    452\u001b[39m     own_fid = \u001b[38;5;28;01mFalse\u001b[39;00m\n\u001b[32m    453\u001b[39m \u001b[38;5;28;01melse\u001b[39;00m:\n\u001b[32m--> \u001b[39m\u001b[32m454\u001b[39m     fid = stack.enter_context(\u001b[30;43mopen\u001b[39;49m\u001b[30;43m(\u001b[39;49m\u001b[30;43mos\u001b[39;49m\u001b[30;43m.\u001b[39;49m\u001b[30;43mfspath\u001b[39;49m\u001b[30;43m(\u001b[39;49m\u001b[30;43mfile\u001b[39;49m\u001b[30;43m)\u001b[39;49m\u001b[30;43m,\u001b[39;49m\u001b[30;43m \u001b[39;49m\u001b[30;43m\"\u001b[39;49m\u001b[30;43mrb\u001b[39;49m\u001b[30;43m\"\u001b[39;49m\u001b[30;43m)\u001b[39;49m)\n\u001b[32m    455\u001b[39m     own_fid = \u001b[38;5;28;01mTrue\u001b[39;00m\n\u001b[32m    457\u001b[39m \u001b[38;5;66;03m# Code to distinguish from NumPy binary files and pickles.\u001b[39;00m\n\n\u001b[31mFileNotFoundError\u001b[39m: [Errno 2] No such file or directory: 'C:/Users/demia/Desktop/HemoSight/data/interim/phase7/external/anemia-detection/authors_intermediates/y_forniceal_italy.npy'\n",
+      "cells_run": 3,
+      "seconds": 8.1
+    },
+    {
+      "notebook": "baselines/mean_ann.ipynb",
+      "substitutions": [
+        {
+          "cell": 4,
+          "from": "C:\\Users\\manas\\Documents\\Winter 2022\\Digital Health Systems\\Project\\anemia_detection\\",
+          "to": "C:\\Users\\demia\\Desktop\\HemoSight\\data\\interim\\phase7\\external\\anemia-detection\\authors_intermediates/"
+        },
+        {
+          "cell": 5,
+          "from": "C:\\Users\\manas\\Documents\\Winter 2022\\Digital Health Systems\\Project\\anemia_detection\\",
+          "to": "C:\\Users\\demia\\Desktop\\HemoSight\\data\\interim\\phase7\\external\\anemia-detection\\authors_intermediates/"
+        },
+        {
+          "cell": 6,
+          "from": "C:\\Users\\manas\\Documents\\Winter 2022\\Digital Health Systems\\Project\\anemia_detection\\",
+          "to": "C:\\Users\\demia\\Desktop\\HemoSight\\data\\interim\\phase7\\external\\anemia-detection\\authors_intermediates/"
+        }
+      ],
+      "skipped_cells": [],
+      "completed": false,
+      "failed_cell": {
+        "index": 4,
+        "source": "y_it = np.load(r\"C:/Users/demia/Desktop/HemoSight/data/interim/phase7/external/anemia-detection/authors_intermediates/y_forniceal_italy.npy\") #/30\nX_it = np.load(r\"C:/Users/demia/Desktop/HemoSight/data/interim/phase7/external/anemia-detection/authors_intermediates/X_forniceal_italy.npy\")/255",
+        "ename": "FileNotFoundError",
+        "evalue": "[Errno 2] No such file or directory: 'C:/Users/demia/Desktop/HemoSight/data/interim/phase7/external/anemia-detection/authors_intermediates/y_forniceal_italy.npy'"
+      },
+      "error": "31mFileNotFoundError\u001b[39m                         Traceback (most recent call last)\n\u001b[36mCell\u001b[39m\u001b[36m \u001b[39m\u001b[32mIn[3]\u001b[39m\u001b[32m, line 1\u001b[39m\n\u001b[32m----> \u001b[39m\u001b[32m1\u001b[39m y_it = np.load(\u001b[33mr\"C:/Users/demia/Desktop/HemoSight/data/interim/phase7/external/anemia-detection/authors_intermediates/y_forniceal_italy.npy\"\u001b[39m) \u001b[38;5;66;03m#/30\u001b[39;00m\n\u001b[32m      2\u001b[39m X_it = np.load(\u001b[33mr\"C:/Users/demia/Desktop/HemoSight/data/interim/phase7/external/anemia-detection/authors_intermediates/X_forniceal_italy.npy\"\u001b[39m)/\u001b[32m255\u001b[39m\n\n\u001b[36mFile \u001b[39m\u001b[32m~\\Desktop\\anemia-detection-env\\Lib\\site-packages\\numpy\\lib\\_npyio_impl.py:454\u001b[39m, in \u001b[36mload\u001b[39m\u001b[34m(file, mmap_mode, allow_pickle, fix_imports, encoding, max_header_size)\u001b[39m\n\u001b[32m    452\u001b[39m     own_fid = \u001b[38;5;28;01mFalse\u001b[39;00m\n\u001b[32m    453\u001b[39m \u001b[38;5;28;01melse\u001b[39;00m:\n\u001b[32m--> \u001b[39m\u001b[32m454\u001b[39m     fid = stack.enter_context(\u001b[30;43mopen\u001b[39;49m\u001b[30;43m(\u001b[39;49m\u001b[30;43mos\u001b[39;49m\u001b[30;43m.\u001b[39;49m\u001b[30;43mfspath\u001b[39;49m\u001b[30;43m(\u001b[39;49m\u001b[30;43mfile\u001b[39;49m\u001b[30;43m)\u001b[39;49m\u001b[30;43m,\u001b[39;49m\u001b[30;43m \u001b[39;49m\u001b[30;43m\"\u001b[39;49m\u001b[30;43mrb\u001b[39;49m\u001b[30;43m\"\u001b[39;49m\u001b[30;43m)\u001b[39;49m)\n\u001b[32m    455\u001b[39m     own_fid = \u001b[38;5;28;01mTrue\u001b[39;00m\n\u001b[32m    457\u001b[39m \u001b[38;5;66;03m# Code to distinguish from NumPy binary files and pickles.\u001b[39;00m\n\n\u001b[31mFileNotFoundError\u001b[39m: [Errno 2] No such file or directory: 'C:/Users/demia/Desktop/HemoSight/data/interim/phase7/external/anemia-detection/authors_intermediates/y_forniceal_italy.npy'\n",
+      "cells_run": 3,
+      "seconds": 8.0
+    },
+    {
+      "notebook": "experiments/visualize.ipynb",
+      "substitutions": [
+        {
+          "cell": 4,
+          "from": "/content/drive/MyDrive/Project/dataset_anemia/India/India.xlsx",
+          "to": "C:\\Users\\demia\\Desktop\\HemoSight\\data\\raw\\dataset anemia\\India\\India.xlsx"
+        },
+        {
+          "cell": 4,
+          "from": "/content/drive/MyDrive/Project/TRIAL/Italy_new.xlsx",
+          "to": "C:\\Users\\demia\\Desktop\\HemoSight\\data\\raw\\dataset anemia\\Italy\\Italy.xlsx"
+        },
+        {
+          "cell": 34,
+          "from": "/content/drive/MyDrive/Project/dataset_anemia/India/",
+          "to": "C:\\Users\\demia\\Desktop\\HemoSight\\data\\raw\\dataset anemia\\India/"
+        },
+        {
+          "cell": 35,
+          "from": "/content/drive/MyDrive/Project/dataset_anemia/India/",
+          "to": "C:\\Users\\demia\\Desktop\\HemoSight\\data\\raw\\dataset anemia\\India/"
+        },
+        {
+          "cell": 36,
+          "from": "/content/drive/MyDrive/Project/dataset_anemia/India/",
+          "to": "C:\\Users\\demia\\Desktop\\HemoSight\\data\\raw\\dataset anemia\\India/"
+        },
+        {
+          "cell": 37,
+          "from": "/content/drive/MyDrive/Project/dataset_anemia/India/",
+          "to": "C:\\Users\\demia\\Desktop\\HemoSight\\data\\raw\\dataset anemia\\India/"
+        },
+        {
+          "cell": 41,
+          "from": "/content/drive/MyDrive/Project/dataset_anemia/India/",
+          "to": "C:\\Users\\demia\\Desktop\\HemoSight\\data\\raw\\dataset anemia\\India/"
+        }
+      ],
+      "skipped_cells": [
+        {
+          "cell": 1,
+          "reason": "Google Colab drive mount; data is local"
+        },
+        {
+          "cell": 42,
+          "reason": "Google Colab drive mount; data is local"
+        }
+      ],
+      "completed": false,
+      "failed_cell": {
+        "index": 4,
+        "source": "a = pd.read_excel('C:/Users/demia/Desktop/HemoSight/data/raw/dataset anemia/India/India.xlsx', index_col=0, dtype={'Hgb': float, 'Gender': str,'Age': float})  \ndf = pd.DataFrame(data=a)\nb = pd.read_excel('C:/Users/demia/Desktop/HemoSight/data/raw/dataset anemia/Italy/Italy.xlsx', index_col=0, dtype={'Hgb': float, 'Gender': str,'Age': float})  \ndf2 = pd.DataFrame(data=b)\ndata = pd.concat([df,df2])",
+        "ename": "ValueError",
+        "evalue": "Unable to convert column Hgb to type float64 (sheet: 0)"
+      },
+      "error": "01mraise\u001b[39;00m \u001b[38;5;167;01mValueError\u001b[39;00m(\u001b[33mf\u001b[39m\u001b[33m\"\u001b[39m\u001b[33mBool column has NA values in column \u001b[39m\u001b[38;5;132;01m{\u001b[39;00mc\u001b[38;5;132;01m}\u001b[39;00m\u001b[33m\"\u001b[39m)\n\u001b[32m--> \u001b[39m\u001b[32m479\u001b[39m             cvals = \u001b[30;43mself\u001b[39;49m\u001b[30;43m.\u001b[39;49m\u001b[30;43m_cast_types\u001b[39;49m\u001b[30;43m(\u001b[39;49m\u001b[30;43mcvals\u001b[39;49m\u001b[30;43m,\u001b[39;49m\u001b[30;43m \u001b[39;49m\u001b[30;43mcast_type\u001b[39;49m\u001b[30;43m,\u001b[39;49m\u001b[30;43m \u001b[39;49m\u001b[30;43mc\u001b[39;49m\u001b[30;43m)\u001b[39;49m\n\u001b[32m    481\u001b[39m     result[c] = cvals\n\u001b[32m    482\u001b[39m \u001b[38;5;28;01mreturn\u001b[39;00m result\n\n\u001b[36mFile \u001b[39m\u001b[32m~\\Desktop\\anemia-detection-env\\Lib\\site-packages\\pandas\\io\\parsers\\python_parser.py:553\u001b[39m, in \u001b[36mPythonParser._cast_types\u001b[39m\u001b[34m(self, values, cast_type, column)\u001b[39m\n\u001b[32m    551\u001b[39m         values = astype_array(values, cast_type, copy=\u001b[38;5;28;01mTrue\u001b[39;00m)\n\u001b[32m    552\u001b[39m     \u001b[38;5;28;01mexcept\u001b[39;00m \u001b[38;5;167;01mValueError\u001b[39;00m \u001b[38;5;28;01mas\u001b[39;00m err:\n\u001b[32m--> \u001b[39m\u001b[32m553\u001b[39m         \u001b[38;5;28;01mraise\u001b[39;00m \u001b[38;5;167;01mValueError\u001b[39;00m(\n\u001b[32m    554\u001b[39m             \u001b[33mf\u001b[39m\u001b[33m\"\u001b[39m\u001b[33mUnable to convert column \u001b[39m\u001b[38;5;132;01m{\u001b[39;00mcolumn\u001b[38;5;132;01m}\u001b[39;00m\u001b[33m to type \u001b[39m\u001b[38;5;132;01m{\u001b[39;00mcast_type\u001b[38;5;132;01m}\u001b[39;00m\u001b[33m\"\u001b[39m\n\u001b[32m    555\u001b[39m         ) \u001b[38;5;28;01mfrom\u001b[39;00m\u001b[38;5;250m \u001b[39m\u001b[34;01merr\u001b[39;00m\n\u001b[32m    556\u001b[39m \u001b[38;5;28;01mreturn\u001b[39;00m values\n\n\u001b[31mValueError\u001b[39m: Unable to convert column Hgb to type float64 (sheet: 0)\n",
+      "cells_run": 3,
+      "seconds": 4.7
+    },
+    {
+      "notebook": "experiments/xgboost_linreg.ipynb",
+      "substitutions": [
+        {
+          "cell": 7,
+          "from": "C:\\Users\\manas\\Documents\\Winter 2022\\Digital Health Systems\\Project\\anemia_detection\\",
+          "to": "C:\\Users\\demia\\Desktop\\HemoSight\\data\\interim\\phase7\\external\\anemia-detection\\authors_intermediates/"
+        }
+      ],
+      "skipped_cells": [],
+      "completed": false,
+      "failed_cell": {
+        "index": 7,
+        "source": "# y = np.load(r\"C:/Users/demia/Desktop/HemoSight/data/interim/phase7/external/anemia-detection/authors_intermediates/y_base_italy.npy\") #/30\n# X = np.load(r\"C:/Users/demia/Desktop/HemoSight/data/interim/phase7/external/anemia-detection/authors_intermediates/X_base_italy.npy\")/255\nyit = np.load(r\"y_base_italy.npy\")\n# x = np.load(r\"/content/X_new.npy\")/255\nx = np.load(r\"X_new_RGB.npy\")",
+        "ename": "FileNotFoundError",
+        "evalue": "[Errno 2] No such file or directory: 'y_base_italy.npy'"
+      },
+      "error": "all last)\n\u001b[36mCell\u001b[39m\u001b[36m \u001b[39m\u001b[32mIn[6]\u001b[39m\u001b[32m, line 3\u001b[39m\n\u001b[32m      1\u001b[39m \u001b[38;5;66;03m# y = np.load(r\"C:/Users/demia/Desktop/HemoSight/data/interim/phase7/external/anemia-detection/authors_intermediates/y_base_italy.npy\") #/30\u001b[39;00m\n\u001b[32m      2\u001b[39m \u001b[38;5;66;03m# X = np.load(r\"C:/Users/demia/Desktop/HemoSight/data/interim/phase7/external/anemia-detection/authors_intermediates/X_base_italy.npy\")/255\u001b[39;00m\n\u001b[32m----> \u001b[39m\u001b[32m3\u001b[39m yit = np.load(\u001b[33mr\"y_base_italy.npy\"\u001b[39m)\n\u001b[32m      4\u001b[39m \u001b[38;5;66;03m# x = np.load(r\"/content/X_new.npy\")/255\u001b[39;00m\n\u001b[32m      5\u001b[39m x = np.load(\u001b[33mr\"X_new_RGB.npy\"\u001b[39m)\n\n\u001b[36mFile \u001b[39m\u001b[32m~\\Desktop\\anemia-detection-env\\Lib\\site-packages\\numpy\\lib\\_npyio_impl.py:454\u001b[39m, in \u001b[36mload\u001b[39m\u001b[34m(file, mmap_mode, allow_pickle, fix_imports, encoding, max_header_size)\u001b[39m\n\u001b[32m    452\u001b[39m     own_fid = \u001b[38;5;28;01mFalse\u001b[39;00m\n\u001b[32m    453\u001b[39m \u001b[38;5;28;01melse\u001b[39;00m:\n\u001b[32m--> \u001b[39m\u001b[32m454\u001b[39m     fid = stack.enter_context(\u001b[30;43mopen\u001b[39;49m\u001b[30;43m(\u001b[39;49m\u001b[30;43mos\u001b[39;49m\u001b[30;43m.\u001b[39;49m\u001b[30;43mfspath\u001b[39;49m\u001b[30;43m(\u001b[39;49m\u001b[30;43mfile\u001b[39;49m\u001b[30;43m)\u001b[39;49m\u001b[30;43m,\u001b[39;49m\u001b[30;43m \u001b[39;49m\u001b[30;43m\"\u001b[39;49m\u001b[30;43mrb\u001b[39;49m\u001b[30;43m\"\u001b[39;49m\u001b[30;43m)\u001b[39;49m)\n\u001b[32m    455\u001b[39m     own_fid = \u001b[38;5;28;01mTrue\u001b[39;00m\n\u001b[32m    457\u001b[39m \u001b[38;5;66;03m# Code to distinguish from NumPy binary files and pickles.\u001b[39;00m\n\n\u001b[31mFileNotFoundError\u001b[39m: [Errno 2] No such file or directory: 'y_base_italy.npy'\n",
+      "cells_run": 6,
+      "seconds": 8.0
+    },
+    {
+      "notebook": "experiments/vanilla_cnn.ipynb",
+      "substitutions": [
+        {
+          "cell": 4,
+          "from": "/home/ssaoji/228_Project/Aug_Seg/Augmented_Segmented_data/",
+          "to": "C:\\Users\\demia\\Desktop\\HemoSight\\data\\interim\\phase7\\external\\anemia-detection\\authors_intermediates\\Augmented_Segmented_data/"
+        },
+        {
+          "cell": 5,
+          "from": "/home/ssaoji/228_Project/dataset_anemia/India/India.xlsx",
+          "to": "C:\\Users\\demia\\Desktop\\HemoSight\\data\\raw\\dataset anemia\\India\\India.xlsx"
+        },
+        {
+          "cell": 5,
+          "from": "/home/ssaoji/228_Project/dataset_anemia/Italy/Italy_copy.xlsx",
+          "to": "C:\\Users\\demia\\Desktop\\HemoSight\\data\\raw\\dataset anemia\\Italy\\Italy.xlsx"
+        },
+        {
+          "cell": 5,
+          "from": "/home/ssaoji/228_Project/Aug_Seg/Augmented_Segmented_data/",
+          "to": "C:\\Users\\demia\\Desktop\\HemoSight\\data\\interim\\phase7\\external\\anemia-detection\\authors_intermediates\\Augmented_Segmented_data/"
+        }
+      ],
+      "skipped_cells": [],
+      "completed": false,
+      "failed_cell": {
+        "index": 4,
+        "source": "path = \"C:/Users/demia/Desktop/HemoSight/data/interim/phase7/external/anemia-detection/authors_intermediates/Augmented_Segmented_data/\"#Final_Augmented_Data/\" # path to augmented data\nfolders = ['Scale']#['Flip','Rotate','Scale','Translation']\nfor f in folders:\n  print(len(os.listdir(path+f)))",
+        "ename": "FileNotFoundError",
+        "evalue": "[WinError 3] The system cannot find the path specified: 'C:/Users/demia/Desktop/HemoSight/data/interim/phase7/external/anemia-detection/authors_intermediates/Augmented_Segmented_data/Scale'"
+      },
+      "error": "An error occurred while executing the following cell:\n------------------\npath = \"C:/Users/demia/Desktop/HemoSight/data/interim/phase7/external/anemia-detection/authors_intermediates/Augmented_Segmented_data/\"#Final_Augmented_Data/\" # path to augmented data\nfolders = ['Scale']#['Flip','Rotate','Scale','Translation']\nfor f in folders:\n  print(len(os.listdir(path+f)))\n------------------\n\n\n\u001b[31m---------------------------------------------------------------------------\u001b[39m\n\u001b[31mFileNotFoundError\u001b[39m                         Traceback (most recent call last)\n\u001b[36mCell\u001b[39m\u001b[36m \u001b[39m\u001b[32mIn[3]\u001b[39m\u001b[32m, line 4\u001b[39m\n\u001b[32m      1\u001b[39m path = \u001b[33m\"C:/Users/demia/Desktop/HemoSight/data/interim/phase7/external/anemia-detection/authors_intermediates/Augmented_Segmented_data/\"\u001b[39m\u001b[38;5;66;03m#Final_Augmented_Data/\" # path to augmented data\u001b[39;00m\n\u001b[32m      2\u001b[39m folders = [\u001b[33m'Scale'\u001b[39m]\u001b[38;5;66;03m#['Flip','Rotate','Scale','Translation']\u001b[39;00m\n\u001b[32m      3\u001b[39m \u001b[38;5;28;01mfor\u001b[39;00m f \u001b[38;5;28;01min\u001b[39;00m folders:\n\u001b[32m----> \u001b[39m\u001b[32m4\u001b[39m   print(len(os.listdir(path+f)))\n\n\u001b[31mFileNotFoundError\u001b[39m: [WinError 3] The system cannot find the path specified: 'C:/Users/demia/Desktop/HemoSight/data/interim/phase7/external/anemia-detection/authors_intermediates/Augmented_Segmented_data/Scale'\n",
+      "cells_run": 3,
+      "seconds": 7.9
+    },
+    {
+      "notebook": "experiments/transfer-learning/training.ipynb",
+      "substitutions": [],
+      "skipped_cells": [
+        {
+          "cell": 5,
+          "reason": "Google Colab drive mount; data is local"
+        }
+      ],
+      "completed": false,
+      "failed_cell": {
+        "index": 2,
+        "source": "# Keras Imports\n\nimport tensorflow as tf\nfrom keras.preprocessing.image import ImageDataGenerator\nfrom keras.models import Model, Sequential\nfrom keras.layers import Activation, Dense, BatchNormalization, Dropout, Conv2D, Conv2DTranspose, MaxPooling2D, UpSampling2D, Input, Reshape, GlobalAveragePooling2D\nfrom keras.callbacks import EarlyStopping\nfrom keras import backend as K\nfrom keras.optimizers import adam_v2 #, SGD\n",
+        "ename": "ImportError",
+        "evalue": "cannot import name 'ImageDataGenerator' from 'keras.preprocessing.image' (C:\\Users\\demia\\Desktop\\anemia-detection-env\\Lib\\site-packages\\keras\\preprocessing\\image\\__init__.py)"
+      },
+      "error": "nerator\nfrom keras.models import Model, Sequential\nfrom keras.layers import Activation, Dense, BatchNormalization, Dropout, Conv2D, Conv2DTranspose, MaxPooling2D, UpSampling2D, Input, Reshape, GlobalAveragePooling2D\nfrom keras.callbacks import EarlyStopping\nfrom keras import backend as K\nfrom keras.optimizers import adam_v2 #, SGD\n\n------------------\n\n\n\u001b[31m---------------------------------------------------------------------------\u001b[39m\n\u001b[31mImportError\u001b[39m                               Traceback (most recent call last)\n\u001b[36mCell\u001b[39m\u001b[36m \u001b[39m\u001b[32mIn[2]\u001b[39m\u001b[32m, line 4\u001b[39m\n\u001b[32m      1\u001b[39m \u001b[38;5;66;03m# Keras Imports\u001b[39;00m\n\u001b[32m      2\u001b[39m \n\u001b[32m      3\u001b[39m \u001b[38;5;28;01mimport\u001b[39;00m tensorflow \u001b[38;5;28;01mas\u001b[39;00m tf\n\u001b[32m----> \u001b[39m\u001b[32m4\u001b[39m \u001b[38;5;28;01mfrom\u001b[39;00m keras.preprocessing.image \u001b[38;5;28;01mimport\u001b[39;00m ImageDataGenerator\n\u001b[32m      5\u001b[39m \u001b[38;5;28;01mfrom\u001b[39;00m keras.models \u001b[38;5;28;01mimport\u001b[39;00m Model, Sequential\n\u001b[32m      6\u001b[39m \u001b[38;5;28;01mfrom\u001b[39;00m keras.layers \u001b[38;5;28;01mimport\u001b[39;00m Activation, Dense, BatchNormalization, Dropout, Conv2D, Conv2DTranspose, MaxPooling2D, UpSampling2D, Input, Reshape, GlobalAveragePooling2D\n\u001b[32m      7\u001b[39m \u001b[38;5;28;01mfrom\u001b[39;00m keras.callbacks \u001b[38;5;28;01mimport\u001b[39;00m EarlyStopping\n\n\u001b[31mImportError\u001b[39m: cannot import name 'ImageDataGenerator' from 'keras.preprocessing.image' (C:\\Users\\demia\\Desktop\\anemia-detection-env\\Lib\\site-packages\\keras\\preprocessing\\image\\__init__.py)\n",
+      "cells_run": 2,
+      "seconds": 8.7
+    },
+    {
+      "notebook": "experiments/transfer-learning/learning.ipynb",
+      "substitutions": [
+        {
+          "cell": 8,
+          "from": "/content/drive/MyDrive/Spring 2022/Machine Learning for Physical Applications/Project/dataset_anemia/India/India.xlsx",
+          "to": "C:\\Users\\demia\\Desktop\\HemoSight\\data\\raw\\dataset anemia\\India\\India.xlsx"
+        },
+        {
+          "cell": 8,
+          "from": "/content/drive/MyDrive/Spring 2022/Machine Learning for Physical Applications/Project/TRIAL/Italy_new.xlsx",
+          "to": "C:\\Users\\demia\\Desktop\\HemoSight\\data\\raw\\dataset anemia\\Italy\\Italy.xlsx"
+        },
+        {
+          "cell": 8,
+          "from": "/content/drive/MyDrive/Spring 2022/Machine Learning for Physical Applications/Project/dataset_anemia/India/",
+          "to": "C:\\Users\\demia\\Desktop\\HemoSight\\data\\raw\\dataset anemia\\India/"
+        },
+        {
+          "cell": 8,
+          "from": "/content/drive/MyDrive/Spring 2022/Machine Learning for Physical Applications/Project/dataset_anemia/Italy/",
+          "to": "C:\\Users\\demia\\Desktop\\HemoSight\\data\\raw\\dataset anemia\\Italy/"
+        }
+      ],
+      "skipped_cells": [
+        {
+          "cell": 5,
+          "reason": "Google Colab drive mount; data is local"
+        }
+      ],
+      "completed": false,
+      "failed_cell": {
+        "index": 2,
+        "source": "from keras.models import Model, Sequential, load_model\nfrom keras.layers import Activation, Dense, BatchNormalization, Dropout, Conv2D, Conv2DTranspose, MaxPooling2D, UpSampling2D, Input, Reshape, GlobalAveragePooling2D\nfrom keras.callbacks import EarlyStopping\nfrom keras import backend as K\nfrom keras.optimizers import adam_v2 #, SGD\nimport tensorflow as tf",
+        "ename": "ImportError",
+        "evalue": "cannot import name 'adam_v2' from 'keras.optimizers' (C:\\Users\\demia\\Desktop\\anemia-detection-env\\Lib\\site-packages\\keras\\optimizers\\__init__.py)"
+      },
+      "error": "rom keras.layers import Activation, Dense, BatchNormalization, Dropout, Conv2D, Conv2DTranspose, MaxPooling2D, UpSampling2D, Input, Reshape, GlobalAveragePooling2D\nfrom keras.callbacks import EarlyStopping\nfrom keras import backend as K\nfrom keras.optimizers import adam_v2 #, SGD\nimport tensorflow as tf\n------------------\n\n\n\u001b[31m---------------------------------------------------------------------------\u001b[39m\n\u001b[31mImportError\u001b[39m                               Traceback (most recent call last)\n\u001b[36mCell\u001b[39m\u001b[36m \u001b[39m\u001b[32mIn[2]\u001b[39m\u001b[32m, line 5\u001b[39m\n\u001b[32m      1\u001b[39m \u001b[38;5;28;01mfrom\u001b[39;00m keras.models \u001b[38;5;28;01mimport\u001b[39;00m Model, Sequential, load_model\n\u001b[32m      2\u001b[39m \u001b[38;5;28;01mfrom\u001b[39;00m keras.layers \u001b[38;5;28;01mimport\u001b[39;00m Activation, Dense, BatchNormalization, Dropout, Conv2D, Conv2DTranspose, MaxPooling2D, UpSampling2D, Input, Reshape, GlobalAveragePooling2D\n\u001b[32m      3\u001b[39m \u001b[38;5;28;01mfrom\u001b[39;00m keras.callbacks \u001b[38;5;28;01mimport\u001b[39;00m EarlyStopping\n\u001b[32m      4\u001b[39m \u001b[38;5;28;01mfrom\u001b[39;00m keras \u001b[38;5;28;01mimport\u001b[39;00m backend \u001b[38;5;28;01mas\u001b[39;00m K\n\u001b[32m----> \u001b[39m\u001b[32m5\u001b[39m \u001b[38;5;28;01mfrom\u001b[39;00m keras.optimizers \u001b[38;5;28;01mimport\u001b[39;00m adam_v2 \u001b[38;5;66;03m#, SGD\u001b[39;00m\n\u001b[32m      6\u001b[39m \u001b[38;5;28;01mimport\u001b[39;00m tensorflow \u001b[38;5;28;01mas\u001b[39;00m tf\n\n\u001b[31mImportError\u001b[39m: cannot import name 'adam_v2' from 'keras.optimizers' (C:\\Users\\demia\\Desktop\\anemia-detection-env\\Lib\\site-packages\\keras\\optimizers\\__init__.py)\n",
+      "cells_run": 2,
+      "seconds": 8.6
+    }
+  ],
+  "summary": {
+    "notebooks": 7,
+    "ran_to_completion": 0,
+    "produced_per_subject_predictions": 0
+  }
+}

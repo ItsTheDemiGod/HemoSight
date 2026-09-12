@@ -168,6 +168,7 @@ def main() -> int:
     results["summary"] = {"notebooks": n, "ran_to_completion": done,
                           "produced_per_subject_predictions": 0 if done == 0 else None}
     (WORK / "run_results.json").write_text(json.dumps(results, indent=2), encoding="utf-8")
+    (HS / "configs" / "external_audit_run_record.json").write_text(json.dumps(results, indent=2), encoding="utf-8")
     print(f"\n{done} of {n} notebooks ran to completion. results -> {WORK / 'run_results.json'}")
     return 0
 

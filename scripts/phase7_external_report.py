@@ -10,7 +10,9 @@ import json
 from hemosight.io import paths
 
 REG = paths.ROOT / "configs" / "external_audit_register.json"
-RUN = paths.INTERIM / "phase7" / "external" / "anemia-detection" / "run_results.json"
+# The run record is committed beside the register (it holds error strings and paths,
+# no data); the data/ copy is the runner's live output.
+RUN = paths.ROOT / "configs" / "external_audit_run_record.json"
 
 SCOPE = ("> **Scope, stated first.** `mbedmutha/anemia-detection` is a three-person student "
          "project with 18 commits, zero stars, self-described as \"initial experiments\". It "
