@@ -389,6 +389,7 @@ and its output exists on disk.
 > | 6 Audit harness | ✅ COMPLETE | — | 0 (deep-model validation closed in Phase 6.5) + 1 ⛔ closed-not-applicable |
 > | 6.5 Closure | ✅ COMPLETE | — | 0 |
 > | 7 Additions | ✅ COMPLETE | Task 1 outcome B; external audit: 0 of 3 candidates auditable | 0 |
+> | 8A Language for a dual audience | ✅ COMPLETE | — | 0 (8B: visual design, not started) |
 > | 6 (orig) Conformal (N4) | 🔴 SUPERSEDED | no estimator | 0 |
 > | 7 Fairness (N5) | 🔴 SUPERSEDED | no estimator; mechanism measured in Phase 3 Task 4 | 0 |
 > | 8 Fusion (N6) | 🔴 SUPERSEDED | no g/dL estimate from any modality | 0 (2 items found done, ticked) |
@@ -712,6 +713,20 @@ measurement it does support. Reported whichever way it falls.
 - [x] Task 3B: methodology from paper text for the paper that cannot be run - `reports/literature_gap.md` extended with NOT REPORTED as a value distinct from UNKNOWN and from NO *(ticked 2026-09-13: BPANet; Hemo-ConViT unlocated and excluded)*
 - [x] Task 3B: `reports/external_audit.md`, leading with the availability result *(ticked 2026-09-13)*
 - [x] `reports/phase7.md`; CLAUDE.md updated; decisions and results logged *(ticked 2026-09-12)*
+
+### Phase 8A: The audit tool's language, for a dual audience (2026-09-13)
+
+A content and information-architecture phase, not a visual one (8B). Two audiences, equally:
+a researcher who needs every number, caveat and bound intact, and a first-time visitor who
+needs to know what the tool is and what a result means. **Layered disclosure: plain language
+is the default; the technical statement is one click away and never removed. Simplify the
+sentence, never the claim.**
+
+- [x] Task 1: content model in ONE place - `hemosight.audit.content` - per check: plain headline (rendered from the measured values), what it means, mechanism (plain and computational), technical statement (the check's own wording, verbatim), what to do, provenance *(ticked 2026-09-13; attached to every result by `run_audit` as `plain`; served by `/api/content`)*
+- [x] Task 2: what-to-do in exactly one of FIXABLE / REPORT IT / STOP, category always visible, never phrased as a way to make a failing check pass; this project as the STOP worked example *(ticked 2026-09-13; FAIL is FIXABLE only for the two split-construction checks; enforced by test)*
+- [x] Task 3: pages rewritten for orientation - landing (the problem in plain terms, how it works in three steps, a live worked example from the PPG result), pre-registration (why, with the project's own gate as the example), upload (what a predictions file is, each column in plain words, downloadable samples), results (plain headline per check, technical statement one click away), report export (both layers in Markdown and PDF) *(ticked 2026-09-13)*
+- [x] Task 4: every user-facing string audited; glossary (`/glossary`, 24 terms) linked from unavoidable terms; `reports/content_review.md` with both layers side by side and real sample outputs; tests that every field is populated and INSUFFICIENT DATA never carries pass styling *(ticked 2026-09-13; 151 tests passing)*
+
 
 ### Phase 6 (original plan): Conformal prediction and abstention (N4)
 
@@ -2169,6 +2184,40 @@ added for full-text-read papers, distinct from UNKNOWN (not read) and NO (measur
 **Standing rule.** "Not auditable" and "audited and failed" are different findings. No external model is
 recorded as failing any check, because no check ran. Three candidates support no statement about the
 field; the register is how one would be earned.
+
+## PHASE 8A DECISIONS (2026-09-13)
+
+### 2026-09-13 — Plain language is the default view; the claim is never simplified with the sentence
+**Decision.** Every check's user-facing wording lives in `hemosight.audit.content` and nowhere
+else: the plain headline is a template over the check's measured values, so the same numbers
+that produce the technical statement produce the plain one, and the two cannot drift. The
+plain layer is attached server-side to every result (`plain` on each CheckResult dict) and is
+read by the results page, the Markdown export, the PDF and the case study. The technical
+statement is preserved verbatim beneath it, one click away, never removed.
+**What survived the rewrite, by construction and by test.** INSUFFICIENT DATA reads "We could
+not check this - your file did not include X" and its what-to-do says it must not be read as a
+pass; no pass-like word appears in any insufficient wording and the one place verdict colour
+is assigned maps it to its own class. A p at the permutation floor reads "N is the smallest
+p-value n permutations can produce; the true value may be smaller. It is a bound, not a
+measurement", and whether the null re-ran the model selection is stated either way. A narrow
+demographic margin and a near-threshold retained fraction are carried into the plain sentence.
+Precision is a claim too: a first draft printed a +0.0047 margin as "+0.00" and a seed SD of
+0.00049 as "0.000"; both templates now keep significant figures.
+**What to do, with the framing that keeps it honest.** Each check's remedy is one of FIXABLE,
+REPORT IT or STOP, and the category is shown beside the text. FAIL is FIXABLE only for the two
+split-construction checks (duplicates across the split, subjects across the split), because a
+correction to how the evidence is produced exists there. Losing to a demographic baseline, or
+being a demographic in disguise, is REPORT IT. Indistinguishable from shuffled labels, an
+effect no bigger than seed noise, or an empty input, is STOP. No text is phrased as a way to
+make a failing check pass; a test forbids the phrasing. The project's own history is the
+worked example throughout: six representations refuted, and the correct action each time was
+to report the negative result rather than search for a seventh.
+**Glossary.** Twenty-four terms, served from the same module, linked from the results page
+and the landing page. Plain text avoids them where a plain substitute exists.
+**Not changed.** Visual design, layout, colours and typography (Phase 8B). The checks' own
+technical headlines and explanations are untouched.
+**Known limit.** Plain headlines are templates; a check that gains a new measured key or caveat
+must extend its template and the test table together, or the plain layer will silently omit it.
 
 ## 8. RESULTS LOG
 

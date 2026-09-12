@@ -126,6 +126,8 @@ STAGES = [
     # the register and the report regenerates from it.
     Stage("Phase 7  external audit reports", "phase7_external_report.py", 0.1,
           note="from configs/external_audit_register.json and the run record"),
+    Stage("Phase 8A content review", "phase8a_content_review.py", 1.0,
+          note="plain and technical layers side by side; runs the harness on the shipped samples"),
 ]
 
 

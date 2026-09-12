@@ -70,10 +70,28 @@ export default function PreRegPage() {
   return (
     <div>
       <SectionTitle
-        index="01 — Pre-registration"
-        title="Declare the thresholds before you see the results"
-        lede="Every gate in this project was written into CLAUDE.md with a date before the script that tested it ran. That is the only reason results like 3.417 g/dL against a >2.0 failing threshold read as a verdict rather than as a number with an interpretation attached afterwards. Two of those pre-declarations went on to refute the project's own hypotheses."
+        index="01 — Declare thresholds"
+        title="Write down what would count as a failure before you see the numbers"
+        lede="A threshold chosen after the result is known is an interpretation, not a test: whatever the number turned out to be, a line can be drawn just past it. Declaring the line first is what makes a verdict a verdict. This step is optional, and the report records whether you took it."
       />
+
+      <div className="mb-8 border-l-2 border-rule pl-4">
+        <div className="label">Why this matters - the project's own experience</div>
+        <p className="prose-measure mt-2 text-[13.5px]">
+          Before every experiment, this project wrote into its log what result would count
+          as viable, marginal or a failure - for instance, that a haemoglobin error above
+          2.0 g/dL would mean the photograph approach was not recoverable. The experiment
+          then returned 3.9 g/dL. Because the line had been drawn first, that was a refutation
+          and the work stopped; drawn afterwards, it would have been a number to argue about.
+          Two of the project's own hypotheses were refuted this way, and both refutations
+          held up.
+        </p>
+        <p className="prose-measure mt-2 text-[13.5px] text-muted">
+          Below, each check shows the threshold it applies by default. Change any of them,
+          untick checks you will not run, give the declaration a title, and save it. It is
+          fingerprinted so it cannot be edited quietly afterwards.
+        </p>
+      </div>
 
       {saved ? (
         <div className="border border-ink p-6">
@@ -83,9 +101,9 @@ export default function PreRegPage() {
             Fingerprint <span className="num">{saved.fingerprint.slice(0, 32)}…</span>
           </p>
           <Notice>
-            The fingerprint is a SHA-256 over this declaration's own content. It shows the
-            declaration has not been edited since it was written. It is not a trusted
-            timestamp, and the report says so rather than implying a guarantee it cannot give.
+            The fingerprint is a checksum of this declaration's own text. It shows the
+            declaration has not been edited since it was written. It does not prove when it
+            was written, and the report says so rather than implying a guarantee it cannot give.
           </Notice>
           <div className="mt-6 flex gap-3">
             <button className="btn" onClick={() => nav("/upload")}>

@@ -7,15 +7,17 @@ import RunPage from "./pages/Run";
 import ResultsPage from "./pages/Results";
 import ReportPage from "./pages/Report";
 import CaseStudy from "./pages/CaseStudy";
+import GlossaryPage from "./pages/Glossary";
 
 const NAV = [
-  { to: "/", label: "Overview", n: "00" },
-  { to: "/prereg", label: "Pre-registration", n: "01" },
-  { to: "/upload", label: "Upload", n: "02" },
-  { to: "/run", label: "Run", n: "03" },
+  { to: "/", label: "Start here", n: "00" },
+  { to: "/prereg", label: "Declare thresholds", n: "01" },
+  { to: "/upload", label: "Upload predictions", n: "02" },
+  { to: "/run", label: "Run the checks", n: "03" },
   { to: "/results", label: "Results", n: "04" },
-  { to: "/report", label: "Report", n: "05" },
-  { to: "/case-study", label: "Case study", n: "06" },
+  { to: "/report", label: "Export report", n: "05" },
+  { to: "/case-study", label: "Worked example", n: "06" },
+  { to: "/glossary", label: "Glossary", n: "07" },
 ];
 
 export default function App() {
@@ -28,7 +30,7 @@ export default function App() {
       >
         <NavLink to="/" className="block">
           <div className="font-serif text-[17px] leading-tight">HemoSight Audit</div>
-          <div className="label mt-1">Methodological checks</div>
+          <div className="label mt-1">Checks for screening models</div>
         </NavLink>
 
         <nav className="mt-8 flex flex-wrap gap-x-5 gap-y-1 md:block">
@@ -63,8 +65,8 @@ export default function App() {
         </nav>
 
         <p className="mt-10 hidden max-w-[190px] text-[11.5px] leading-relaxed text-faint md:block">
-          Built from the analysis pipeline of a project whose own haemoglobin model
-          failed every pre-declared gate. Nothing here is a clinical validation.
+          Built by a research project whose own haemoglobin model failed every test it
+          set itself. Nothing here is a clinical validation.
         </p>
       </aside>
 
@@ -88,6 +90,7 @@ export default function App() {
                 <Route path="/report" element={<ReportPage />} />
                 <Route path="/report/:runId" element={<ReportPage />} />
                 <Route path="/case-study" element={<CaseStudy />} />
+                <Route path="/glossary" element={<GlossaryPage />} />
               </Routes>
             </motion.div>
           </AnimatePresence>

@@ -15,6 +15,23 @@ export interface CheckSpec {
   defaults: Record<string, number | boolean>;
 }
 
+/* The plain layer, rendered server-side from hemosight.audit.content so that every
+   page and every export says the same thing. what_to_do.category is one of
+   FIXABLE / REPORT IT / STOP and is always shown. */
+export type TodoCategory = "FIXABLE" | "REPORT IT" | "STOP";
+
+export interface PlainLayer {
+  title: string;
+  question: string;
+  headline: string;
+  what_it_means: string;
+  mechanism: string;
+  mechanism_technical: string;
+  what_to_do: { category: TodoCategory; category_plain: string; text: string };
+  provenance: string;
+  glossary_terms: string[];
+}
+
 export interface CheckResult {
   check_id: string;
   title: string;
@@ -28,6 +45,22 @@ export interface CheckResult {
   missing: string[];
   details: Record<string, unknown>;
   seconds: number;
+  plain?: PlainLayer;
+}
+
+export interface ContentCatalogue {
+  checks: {
+    check_id: string;
+    title_plain: string;
+    question_plain: string;
+    what_it_means_plain: string;
+    mechanism_plain: string;
+    mechanism_technical: string;
+    provenance: string;
+    glossary_terms: string[];
+  }[];
+  glossary: Record<string, string>;
+  categories: { id: TodoCategory; plain: string }[];
 }
 
 export interface AuditReport {
@@ -94,6 +127,8 @@ async function req<T>(path: string, init?: RequestInit): Promise<T> {
 export const api = {
   checks: () => req<CheckSpec[]>("/api/checks"),
   caseStudy: () => req<any>("/api/case-study"),
+  content: () => req<ContentCatalogue>("/api/content"),
+  sampleUrl: (name: string) => `/api/sample/${name}`,
 
   createPreReg: (body: {
     title: string;

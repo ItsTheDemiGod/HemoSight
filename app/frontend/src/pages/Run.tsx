@@ -1,14 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { api, CheckSpec, PreReg, Run, Submission } from "../api";
+import { api, CheckSpec, ContentCatalogue, PreReg, Run, Submission } from "../api";
 import { Notice, Progress, SectionTitle, Spinner } from "../components/ui";
+import { Reveal } from "../components/disclosure";
 import { isSettled, pollUntilSettled, type PollHandle } from "../polling";
 import { readSession, writeSession } from "../store";
 
 export default function RunPage() {
   const nav = useNavigate();
   const [specs, setSpecs] = useState<CheckSpec[]>([]);
+  const [content, setContent] = useState<ContentCatalogue | null>(null);
   const [sub, setSub] = useState<Submission | null>(null);
   const [prereg, setPrereg] = useState<PreReg | null>(null);
   const [chosen, setChosen] = useState<Set<string>>(new Set());
@@ -24,6 +26,7 @@ export default function RunPage() {
 
   useEffect(() => {
     const s = readSession();
+    api.content().then(setContent).catch(() => undefined);
     api.checks().then(setSpecs);
     if (s.submissionId) {
       api
@@ -122,8 +125,8 @@ export default function RunPage() {
     <div>
       <SectionTitle
         index="03 — Run"
-        title="Choose the checks"
-        lede="Long checks run as background jobs. Duplicate detection hashes every image; the permutation test iterates the null thousands of times. Progress below is live and survives a reload."
+        title="Choose the checks to run"
+        lede="Each check asks one question of your file. Two of them take longer - comparing every image with every other, and re-scoring the model against thousands of shuffles - and run in the background; progress is live and survives a page reload."
       />
 
       <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1 border-t border-ink pt-3 text-[13px]">
@@ -174,7 +177,14 @@ export default function RunPage() {
                       <span className="label text-pass">threshold pre-declared</span>
                     )}
                   </div>
-                  <p className="prose-measure mt-1 text-[13px]">{c.summary}</p>
+                  <p className="prose-measure mt-1 text-[13px]">
+                    {content?.checks.find((k) => k.check_id === c.check_id)?.question_plain ?? c.summary}
+                  </p>
+                  <div className="mt-1">
+                    <Reveal label="How it is computed">
+                      <p className="prose-measure text-[12.5px] text-muted">{c.summary}</p>
+                    </Reveal>
+                  </div>
                   {unavailable && (
                     <p className="mt-1 text-[12.5px] text-insufficient">{unavailable}</p>
                   )}
@@ -187,21 +197,22 @@ export default function RunPage() {
 
       <section className="mt-8 grid gap-6 sm:grid-cols-2">
         <div>
-          <label className="label">Permutations</label>
+          <label className="label">Number of shuffles (permutations)</label>
           <input
             className="field mt-1.5 num w-[160px]"
             value={perms}
             onChange={(e) => setPerms(e.target.value)}
           />
           <p className="prose-measure mt-2 text-[13px]">
-            The smallest empirical p obtainable is 1/(n+1) ={" "}
-            <span className="num">{floor.toFixed(5)}</span>. Below about 19 permutations the
-            test cannot reach the conventional 0.05 at all, and the check declines rather than
-            running.
+            How many times the labels are shuffled and the model re-scored. With this many, the
+            smallest p-value the test can ever report is{" "}
+            <span className="num">{floor.toFixed(5)}</span>; a result sitting exactly there is
+            a bound, not a measurement. Below about 19 shuffles the test cannot reach 0.05 at
+            all, and it declines rather than running.
           </p>
         </div>
         <div>
-          <label className="label">Embedding nearest neighbours</label>
+          <label className="label">Look-alike images (slower)</label>
           <label className="mt-2 flex items-center gap-2 text-[13px]">
             <input
               type="checkbox"
@@ -209,11 +220,12 @@ export default function RunPage() {
               checked={embedding}
               onChange={(e) => setEmbedding(e.target.checked)}
             />
-            run the semantic duplicate signal
+            also look for re-shot or re-cropped copies of the same picture
           </label>
           <p className="prose-measure mt-2 text-[13px]">
-            Off by default. It is the only signal that catches a re-shot or re-cropped image,
-            and it is also the only one that loads a neural network.
+            Off by default. Exact and near-identical copies are always checked; this extra
+            pass compares images by what they show, using a neural network, and is the only
+            way to catch a photograph that was re-taken or re-cropped.
           </p>
         </div>
       </section>

@@ -67,8 +67,8 @@ export default function ReportPage() {
     <div>
       <SectionTitle
         index="05 — Report"
-        title="Audit report"
-        lede="A document that states what was measured, what could not be measured, and whether the thresholds were declared before the results were seen."
+        title="Export the report"
+        lede="A document you can hand to someone else. Every finding is stated twice - in plain words, then in the check's exact technical wording - with what was measured, what could not be measured and why, and whether the thresholds were declared before the results were seen."
       />
 
       <div className="flex flex-wrap gap-3">

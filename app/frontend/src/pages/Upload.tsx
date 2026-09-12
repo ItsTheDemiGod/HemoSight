@@ -5,17 +5,25 @@ import { api, Submission } from "../api";
 import { Notice, SectionTitle } from "../components/ui";
 import { readSession, writeSession } from "../store";
 
-const CONTRACT: [string, string, string][] = [
-  ["subject_id", "required", "The unit of independence. Never a row or image id."],
-  ["y_true", "required", "Reference measurement."],
-  ["y_pred", "required", "The model's held-out prediction."],
-  ["split", "optional", "Unlocks leakage and split integrity."],
-  ["age, sex, device, site", "optional", "Unlocks the demographic baseline and proxy probe."],
-  ["group", "optional", "Your own claimed grouping unit, checked against the one the data needs."],
-  ["image_path", "optional", "Unlocks duplicate detection over pixels."],
-  ["y_pred__<name>", "optional", "A candidate the model was selected from — enables the selection-aware null."],
-  ["y_pred_seed__<k>", "optional", "The same model under another seed. Three or more enables seed stability."],
-  ["any other numeric column", "optional", "Treated as a model input feature for the ceiling analysis."],
+/* Plain first, technical name second. Every optional column names the check it unlocks. */
+const CONTRACT: [string, string, string, string][] = [
+  ["subject_id", "required", "Who the row is about", "One id per person. Not a row number and not an image name: if the same person has several rows, they must share this id, or the checks cannot tell whether the model was tested on people it trained on."],
+  ["y_true", "required", "The true value", "The reference measurement the model was trying to predict - here, haemoglobin from a blood test, in g/dL."],
+  ["y_pred", "required", "The model's prediction", "What the model said for that person, made on data it was not trained on."],
+  ["split", "optional", "Which rows were used for training", "train, calibration or test per row. Unlocks the two checks for people or pictures on both sides of the split."],
+  ["age, sex, device, site", "optional", "Things a form would know", "Whichever you have. Unlocks the check that asks whether the model beats simply knowing these - and every one the data has should be included, because a model can learn any of them."],
+  ["image_path", "optional", "Where the picture is", "The file each row came from. Unlocks duplicate detection by pixels."],
+  ["group", "optional", "Your own grouping", "If you split the data by some unit of your own, name it here and it is checked against the one the data actually needs."],
+  ["y_pred__<name>", "optional", "Other models you chose between", "If this model was picked as the best of several, include the others' predictions so the shuffled-labels test can price in that choice."],
+  ["y_pred_seed__<k>", "optional", "The same model, re-run", "Predictions from the same model trained again with different random seeds. Three or more unlocks the check for luck of the seed."],
+  ["any other numeric column", "optional", "Model inputs", "Treated as an input feature, to ask whether the inputs contain any information about the outcome at all."],
+];
+
+const SAMPLES: [string, string][] = [
+  ["01_mixed_start_here.csv", "a mixed example with several faults - start here"],
+  ["02_clean_no_injected_fault.csv", "a clean submission"],
+  ["05_fault_model_is_a_sex_classifier.csv", "a model that is really detecting sex"],
+  ["03_fault_duplicates_across_split.csv", "duplicate images across the split"],
 ];
 
 export default function UploadPage() {
@@ -72,8 +80,8 @@ export default function UploadPage() {
     <div>
       <SectionTitle
         index="02 — Upload"
-        title="One table of held-out predictions"
-        lede="Every optional column unlocks a specific check. A column you do not supply is not assumed away: the check that needed it returns insufficient data and says which column was missing."
+        title="Upload your model's predictions"
+        lede="A predictions file is one spreadsheet with a row per person: the true value, what the model predicted, and whatever else you know about that person. Three columns are required; every extra one unlocks a check. A column you leave out is not guessed: the check that needed it says it could not run, and names the column."
       />
 
       {!sub && (
@@ -132,13 +140,31 @@ export default function UploadPage() {
             </label>
           </div>
           <p className="prose-measure mt-3 text-[13px]">
-            A local path is usually the right answer for research data: it avoids copying a
-            corpus to upload it, and this project's own raw data is read-only by rule.
+            Images are only needed for the duplicate check. A local folder path avoids copying
+            a whole image collection to upload it.
           </p>
+
+          <div className="mt-6 border-l-2 border-rule pl-4">
+            <div className="label">No file yet? Try a sample</div>
+            <p className="prose-measure mt-1 text-[13px]">
+              These are synthetic - made-up subjects with a known fault built in - so you can
+              see what a result looks like before uploading anything of your own.
+            </p>
+            <ul className="mt-2 space-y-1 text-[13px]">
+              {SAMPLES.map(([f, what]) => (
+                <li key={f}>
+                  <a className="num underline underline-offset-2" href={api.sampleUrl(f)} download>
+                    {f}
+                  </a>{" "}
+                  <span className="text-muted">- {what}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
 
           {error && <p className="mt-5 text-[13px] text-fail">{error}</p>}
           <button className="btn mt-7" disabled={!csv || busy} onClick={send}>
-            {busy ? "Validating…" : "Upload and validate"}
+            {busy ? "Checking the file…" : "Upload"}
           </button>
         </>
       )}
@@ -178,10 +204,10 @@ export default function UploadPage() {
           )}
 
           <section className="mt-9">
-            <h3 className="label">Column mapping</h3>
+            <h3 className="label">Columns recognised</h3>
             <p className="prose-measure mt-2 text-[13px]">
-              Columns are matched by name against the contract. Anything numeric and
-              unrecognised is treated as a model input feature.
+              Columns are matched by name. Anything numeric and unrecognised is treated as a
+              model input feature.
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               {preview?.columns.map((c) => {
@@ -205,7 +231,11 @@ export default function UploadPage() {
           </section>
 
           <section className="mt-10">
-            <h3 className="label">What this submission can support</h3>
+            <h3 className="label">Which checks this file can support</h3>
+            <p className="prose-measure mt-2 text-[13px]">
+              A check listed as unavailable will be reported as <em>could not be checked</em>,
+              with the missing column named. That is not a pass.
+            </p>
             <div className="mt-4 grid gap-x-10 gap-y-1 sm:grid-cols-2">
               <div>
                 {sub.available_checks.map((c) => (
@@ -228,19 +258,22 @@ export default function UploadPage() {
           </section>
 
           <button className="btn mt-9" onClick={() => nav("/run")}>
-            Choose checks
+            Run the checks
           </button>
         </motion.div>
       )}
 
       <section className="mt-16">
-        <h2 className="text-[17px]">The input contract</h2>
+        <h2 className="text-[17px]">What each column does</h2>
         <table className="mt-4 w-full text-[13px]">
           <tbody>
-            {CONTRACT.map(([name, req, what]) => (
+            {CONTRACT.map(([name, req, plain, what]) => (
               <tr key={name}>
-                <td className="cell num w-[210px]">{name}</td>
-                <td className="cell w-[90px] text-[11px] uppercase tracking-wider text-faint">
+                <td className="cell w-[200px] align-top">
+                  <div>{plain}</div>
+                  <div className="num text-[11.5px] text-faint">{name}</div>
+                </td>
+                <td className="cell w-[80px] align-top text-[11px] uppercase tracking-wider text-faint">
                   {req}
                 </td>
                 <td className="cell text-muted">{what}</td>

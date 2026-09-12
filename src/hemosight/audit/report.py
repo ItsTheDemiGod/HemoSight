@@ -102,13 +102,33 @@ def to_markdown(report: AuditReport, title: str = "HemoSight Audit report") -> s
 
     out.append("## Findings")
     out.append("")
+    out.append("Each finding is stated twice: in plain language first, then in the check's own "
+               "technical wording. The two say the same thing; neither softens a caveat the "
+               "other carries.")
+    out.append("")
     for r in sorted(d["results"], key=lambda r: ORDER[r["verdict"]]):
         out.append(f"### {r['title']} - {BADGE[r['verdict']]}")
         out.append("")
+        pl = r.get("plain")
+        if pl:
+            out.append(f"**In plain terms:** {pl['headline']}")
+            out.append("")
+            out.append(pl["what_it_means"])
+            out.append("")
+            todo = pl["what_to_do"]
+            out.append(f"**What to do - {todo['category']}.** {todo['text']}")
+            out.append("")
+            out.append(f"*Why this happens:* {pl['mechanism']}")
+            out.append("")
+            out.append("**Technical statement:**")
+            out.append("")
         out.append(f"**{r['headline']}**")
         out.append("")
         out.append(r["explanation"])
         out.append("")
+        if pl:
+            out.append(f"*Mechanism, computationally:* {pl['mechanism_technical']}")
+            out.append("")
         if r.get("missing"):
             out.append("*Not measurable without:* " + ", ".join(r["missing"]))
             out.append("")
@@ -190,8 +210,18 @@ def to_pdf(report: AuditReport, path: str | Path,
     for r in sorted(d["results"], key=lambda r: ORDER[r["verdict"]]):
         story.append(Paragraph(f"{r['title']} - {BADGE[r['verdict']]}",
                                styles["Heading3"]))
+        pl = r.get("plain")
+        if pl:
+            story.append(Paragraph(f"<b>In plain terms:</b> {pl['headline']}", body))
+            story.append(Paragraph(pl["what_it_means"], body))
+            story.append(Paragraph(f"<b>What to do - {pl['what_to_do']['category']}.</b> "
+                                   f"{pl['what_to_do']['text']}", body))
+            story.append(Paragraph(f"<i>Why this happens:</i> {pl['mechanism']}", small))
+            story.append(Paragraph("<b>Technical statement:</b>", body))
         story.append(Paragraph(f"<b>{r['headline']}</b>", body))
         story.append(Paragraph(r["explanation"], body))
+        if pl:
+            story.append(Paragraph(f"<i>Mechanism, computationally:</i> {pl['mechanism_technical']}", small))
         if r.get("measured"):
             mrows = [[Paragraph(str(k), small), Paragraph(str(v), small)]
                      for k, v in r["measured"].items()]

@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { api, CheckResult, Run, Verdict } from "../api";
 import { KeyValue, Notice, SectionTitle, VerdictMark, formatValue } from "../components/ui";
+import { Reveal, Term, TodoMark } from "../components/disclosure";
 import { readSession } from "../store";
 
 const ORDER: Record<Verdict, number> = { FAIL: 0, INSUFFICIENT_DATA: 1, PASS: 2 };
@@ -70,15 +71,15 @@ export default function ResultsPage() {
     <div>
       <SectionTitle
         index="04 — Results"
-        title={`${c.FAIL} failure${c.FAIL === 1 ? "" : "s"}, ${c.INSUFFICIENT_DATA} not measurable, ${c.PASS} passed`}
-        lede="Failures first. Insufficient data is not a soft pass: it means the submission did not carry what the check needed, and nothing was inferred from what could not be measured."
+        title={`${c.FAIL} check${c.FAIL === 1 ? "" : "s"} failed, ${c.INSUFFICIENT_DATA} could not be checked, ${c.PASS} passed`}
+        lede="Failures first. Each check says in plain words what happened and what to do about it; the exact technical statement is one click away. A check that could not be run is not a pass: it means your file did not include what that check needs, and nothing was inferred from what could not be measured."
       />
 
       {!hasPre && (
         <Notice tone="warn">
           No thresholds were declared before these results were seen, so every verdict below
-          was judged against this tool's defaults. That is weaker evidence than a pre-declared
-          threshold, and the exported report says so.
+          was judged against this tool's defaults. A threshold chosen after seeing the numbers
+          is an interpretation, not a test; the exported report says so.
         </Notice>
       )}
 
@@ -140,26 +141,73 @@ export default function ResultsPage() {
               className="rule overflow-hidden py-6"
             >
               <div className="flex flex-wrap items-baseline justify-between gap-3">
-                <h2 className="text-[19px]">{r.title}</h2>
+                <h2 className="text-[19px]">{r.plain?.title ?? r.title}</h2>
                 <VerdictMark v={r.verdict} big />
               </div>
+              {r.plain && <p className="mt-1 text-[13px] text-muted">{r.plain.question}</p>}
 
-              <p className="mt-2 text-[15px] leading-snug">{r.headline}</p>
-              <p className="prose-measure mt-3">{r.explanation}</p>
-
-              {r.missing.length > 0 && (
-                <p className="mt-3 text-[13px] text-insufficient">
-                  Not measurable without: <span className="num">{r.missing.join(", ")}</span>
-                </p>
+              {/* Plain layer: the default view. */}
+              <p className="mt-3 text-[15.5px] leading-snug">{r.plain?.headline ?? r.headline}</p>
+              {r.plain && r.verdict !== "INSUFFICIENT_DATA" && (
+                <p className="prose-measure mt-3">{r.plain.what_it_means}</p>
               )}
+
+              {r.plain && (
+                <div className="mt-4 border-l-2 border-rule pl-4">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <span className="label">What to do</span>
+                    <TodoMark category={r.plain.what_to_do.category} />
+                  </div>
+                  <p className="prose-measure mt-2 text-[13.5px]">{r.plain.what_to_do.text}</p>
+                  <p className="mt-1 text-[12px] text-faint">{r.plain.what_to_do.category_plain}</p>
+                </div>
+              )}
+
+              {r.plain && r.verdict !== "INSUFFICIENT_DATA" && (
+                <div className="mt-4">
+                  <Reveal label="Why this happens">
+                    <p className="prose-measure text-[13.5px]">{r.plain.mechanism}</p>
+                  </Reveal>
+                </div>
+              )}
+
+              {/* Technical layer: one click away, never removed. */}
+              <div className="mt-4">
+                <Reveal label="Technical statement" hideLabel="Hide technical statement">
+                  <p className="text-[14px] leading-snug num">{r.headline}</p>
+                  <p className="prose-measure mt-2 text-[13.5px]">{r.explanation}</p>
+                  {r.plain && (
+                    <p className="prose-measure mt-3 text-[13px] text-muted">
+                      <span className="label">Mechanism, computationally.</span>{" "}
+                      {r.plain.mechanism_technical}
+                    </p>
+                  )}
+                  {r.missing.length > 0 && (
+                    <p className="mt-3 text-[13px] text-insufficient">
+                      Not measurable without: <span className="num">{r.missing.join(", ")}</span>
+                    </p>
+                  )}
+                  {r.plain && r.plain.glossary_terms.length > 0 && (
+                    <p className="mt-3 text-[12px] text-faint">
+                      Terms:{" "}
+                      {r.plain.glossary_terms.map((g, i) => (
+                        <span key={g}>
+                          {i > 0 && ", "}
+                          <Term t={g} />
+                        </span>
+                      ))}
+                    </p>
+                  )}
+                </Reveal>
+              </div>
 
               <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1 text-[12px] text-faint">
                 <span className="num">{r.provenance}</span>
                 <span className="num">{r.seconds.toFixed(1)}s</span>
                 <span className={r.threshold_preregistered ? "text-pass" : "text-insufficient"}>
                   {r.threshold_preregistered
-                    ? "threshold pre-declared"
-                    : "tool default, supplied after the results"}
+                    ? "threshold declared before the results"
+                    : "threshold not declared in advance (tool default)"}
                 </span>
                 {Object.keys(r.measured).length > 0 && (
                   <button
@@ -213,7 +261,7 @@ export default function ResultsPage() {
 
       <section className="mt-12 flex flex-wrap gap-3">
         <Link className="btn" to={`/report/${run.id}`}>
-          Audit report
+          Export the report
         </Link>
         <Link className="btn-ghost" to="/run">
           Run more checks

@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { api } from "../api";
 import { Figure, Notice, SectionTitle, VerdictMark } from "../components/ui";
+import { Reveal } from "../components/disclosure";
+import type { ContentCatalogue } from "../api";
 import type { Verdict } from "../api";
 
 interface CaseCheck {
@@ -14,6 +16,7 @@ interface CaseCheck {
 
 export default function CaseStudy() {
   const [data, setData] = useState<any>(null);
+  const [content, setContent] = useState<ContentCatalogue | null>(null);
   const [err, setErr] = useState("");
 
   useEffect(() => {
@@ -21,6 +24,7 @@ export default function CaseStudy() {
       .caseStudy()
       .then(setData)
       .catch((e) => setErr(String(e)));
+    api.content().then(setContent).catch(() => undefined);
   }, []);
 
   if (err) return <Notice tone="warn">{err}</Notice>;
@@ -33,9 +37,9 @@ export default function CaseStudy() {
   return (
     <div>
       <SectionTitle
-        index="06 — Case study"
+        index="06 — Worked example"
         title="The tool, run on the project that built it"
-        lede="These are not illustrations. Every verdict below is recorded in this project's own decision and results logs, and the page reads the figures from the artefacts on disk rather than repeating them from memory."
+        lede="A real audit of a real model: the project's own attempt to estimate haemoglobin from a fingertip pulse signal. Every verdict below is on the project's record, and the figures are read from its result files rather than retyped."
       />
 
       <section className="grid gap-8 sm:grid-cols-3">
@@ -49,7 +53,10 @@ export default function CaseStudy() {
       </section>
 
       <section className="mt-14">
-        <h2 className="text-[20px]">What each check caught</h2>
+        <h2 className="text-[20px]">What each check found</h2>
+        <p className="prose-measure mt-2 text-[13.5px] text-muted">
+          Plain summary first; the measured figure is one click away.
+        </p>
         <div className="mt-2">
           {checks.map((c, i) => (
             <motion.div
@@ -61,13 +68,19 @@ export default function CaseStudy() {
             >
               <div className="flex flex-wrap items-baseline justify-between gap-3">
                 <div className="flex items-baseline gap-3">
-                  <span className="text-[16px]">{c.check_id}</span>
+                  <span className="text-[16px]">
+                    {content?.checks.find((k) => k.check_id === c.check_id)?.title_plain ?? c.check_id}
+                  </span>
                   <span className="num text-[11px] text-faint">{c.phase}</span>
                 </div>
                 <VerdictMark v={c.verdict} />
               </div>
-              <p className="num mt-2 text-[13.5px]">{c.measured}</p>
-              <p className="prose-measure mt-2 text-[13.5px]">{c.what_it_caught}</p>
+              <p className="prose-measure mt-2 text-[14px]">{c.what_it_caught}</p>
+              <div className="mt-2">
+                <Reveal label="Measured figure">
+                  <p className="num text-[13px]">{c.measured}</p>
+                </Reveal>
+              </div>
             </motion.div>
           ))}
         </div>

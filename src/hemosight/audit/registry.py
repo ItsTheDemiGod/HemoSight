@@ -174,7 +174,8 @@ def run_audit(inp: AuditInput, checks: list[str] | None = None,
     if progress:
         progress(1.0, "done")
 
-    dicts = [r.to_dict() for r in results]
+    from .content import enrich
+    dicts = [enrich(r.to_dict()) for r in results]
     counts = {
         "total": len(dicts),
         PASS: sum(1 for r in dicts if r["verdict"] == PASS),

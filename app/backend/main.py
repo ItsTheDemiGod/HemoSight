@@ -63,6 +63,27 @@ def list_checks() -> list[dict]:
     return catalogue()
 
 
+@app.get("/api/content")
+def content() -> dict:
+    """The content model: plain and technical layers per check, the what-to-do
+    categories, and the glossary. One source (`hemosight.audit.content`), read by
+    every page, so wording cannot drift between screens."""
+    from hemosight.audit.content import CATEGORIES, CATEGORY_PLAIN, GLOSSARY, catalogue
+    return {"checks": catalogue(), "glossary": GLOSSARY,
+            "categories": [{"id": c, "plain": CATEGORY_PLAIN[c]} for c in CATEGORIES]}
+
+
+@app.get("/api/sample/{name}")
+def sample_file(name: str):
+    """One of the synthetic sample submissions, for download from the upload page."""
+    from fastapi.responses import FileResponse
+    root = Path(__file__).resolve().parent / "sample_data"
+    f = root / name
+    if not f.is_file() or f.suffix != ".csv" or f.resolve().parent != root.resolve():
+        raise HTTPException(404, "no such sample")
+    return FileResponse(str(f), media_type="text/csv", filename=name)
+
+
 @app.get("/api/health")
 def health() -> dict:
     return {"status": "ok", "checks": len(ALL_IDS)}
