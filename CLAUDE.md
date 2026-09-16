@@ -805,6 +805,89 @@ own aggregate results.
 - [x] Task 6: verified at 1440 / 834 / 390 in both motion modes on every page - 48 page states, 0 with a problem - and `reports/phase8b_design.md` with palette, ratios, motion inventory, measurements and what was cut *(ticked 2026-09-13)*
 
 
+### Phase 9A: The screening reframe — re-evaluating both arms as a TRIAGE task (2026-09-17)
+
+**Why this phase exists.** Every gate in this project was built around mean absolute
+error in g/dL. But the product a screening tool delivers is a **binary referral
+decision** — should this person get a blood test — not a haemoglobin estimate. Those
+are different tasks with different metrics, and the project made the regression task
+its primary outcome. Its own Phase 6.5 result records **WHO-band AUROC 0.875 within
+site** for the image CNN, which is not a negligible number for triage. A reviewer can
+reasonably say the imaging arm was refuted on a metric the deployed product would not
+use. **This phase tests the refutation on the product's own terms. It is not an attempt
+to rescue it.** If the screening framing changes a verdict, that is reported as a
+changed verdict and logged as a correction — not softened and not buried.
+
+**A methodological note fixed in advance.** Phase 7 reported PPG screening
+`sensitivity 0.00` using a **plug-in** rule: refer if the *predicted* Hb falls below
+the diagnostic threshold. That is not the operating point a screening tool would
+choose — a regression model shrinks its predictions toward the mean, so the plug-in
+rule is systematically insensitive. Both operating points are reported here: the
+plug-in point (what is on record, and what a naive deployment would do) and the
+screening point defined below.
+
+#### PRE-DECLARED, 2026-09-17, before any Phase 9A script was run
+
+**1. WHO thresholds, and which subjects they apply to.** Every subject in both
+datasets is an adult — Eyes-Defy ages 19-88, Hb-PPG ages 21-90, **no subject under
+19** — so only the adult thresholds apply and no child threshold (6-59 mo 11.0;
+5-11 y 11.5; 12-14 y 12.0) is used on anyone. Applied: **men ≥15 y, Hb < 13.0 g/dL;
+non-pregnant women ≥15 y, Hb < 12.0 g/dL.** Resulting prevalence: Eyes-Defy
+**91 of 216 (42.1%)**, Hb-PPG **18 of 252 (7.1%)**.
+*Limitation, stated before running:* **pregnancy status is not recorded in either
+dataset.** The non-pregnant threshold is applied to all women. A pregnant woman's
+threshold is 11.0 g/dL, so any pregnant subject is over-called anaemic here. This
+cannot be corrected from the available data and is carried into every result.
+
+**2. The operating point, declared before it is computed.** For a referral triage the
+costly error is a missed anaemic case, so: **the threshold with the highest
+specificity subject to sensitivity ≥ 0.90.** It is chosen **on the training folds
+only**, inside each CV fold, and applied to the held-out fold — nested selection, so
+no operating point is ever picked after seeing the test data it is scored on. If no
+training-fold threshold reaches sensitivity 0.90, the most sensitive available
+threshold is used and the failure to reach the criterion is reported.
+
+**3. What counts as clinically meaningful, declared before it is measured.** At
+**matched specificity**, the model must improve sensitivity over the best demographic
+baseline by **≥ 0.10 (10 percentage points)**, AND the lower bound of the 95%
+subject-level bootstrap CI on the paired difference must be **> 0**.
+*Justification.* At Eyes-Defy's prevalence, +0.10 sensitivity is ~9 more anaemic
+subjects referred per 216 screened — about **1 per 24 people screened**. At Hb-PPG's
+prevalence it is 1.8 more cases per 252, about **1 per 140 screened**. Ten points is
+the smallest sensitivity gain that could plausibly change a referral policy, given
+that the added cost is one photograph or one PPG capture per person screened. A point
+estimate whose CI includes zero is not evidence of improvement, whatever its size.
+The symmetric test is also reported: at **matched sensitivity**, a specificity gain
+≥ 0.10 with CI lower bound > 0 counts equally.
+
+**4. Screening verdict bands, declared before any number is seen.**
+- **USEFUL** — sensitivity ≥ 0.90 **and** specificity ≥ 0.50 at the chosen point,
+  **and** the margin in item 3 is cleared. The specificity floor is there because a
+  tool that refers almost everyone has perfect sensitivity and no value.
+- **MARGINAL** — meets the sensitivity and specificity floors but does not clear the
+  margin over the demographic baseline, or clears it with a CI that includes zero.
+- **NOT USEFUL** — fails either floor, or does not reduce the referral rate against
+  referring everybody.
+
+**5. Uncertainty.** 2,000 subject-level bootstrap resamples, seed 20260911, percentile
+95% CIs. Differences between models are **paired**: both are recomputed on the same
+resample. Number needed to screen = 1 / (prevalence x sensitivity); false-referral
+rate = 1 − PPV; referral rate = (TP+FP)/n, reported always so "refers everyone" is
+visible.
+
+**6. Within-site and cross-site are reported separately for the imaging arm and never
+pooled into one headline number.**
+
+- [ ] Task 1: screening metrics (sens, spec, PPV, NPV, AUROC, AUPRC, ROC, NNS, false-referral and referral rate) for every model AND every baseline on identical folds, bootstrap CIs
+- [ ] Task 1: regenerate any per-subject baseline predictions not already on disk, with the recorded seeds and folds, and report that they were regenerated
+- [ ] Task 1: within-site and cross-site reported separately for the imaging arm
+- [ ] Task 2: model vs best demographic baseline at identical operating points, paired bootstrap CI on the difference, against the pre-declared ≥ 0.10 margin
+- [ ] Task 2: how many anaemic subjects each model actually flags at its chosen operating point, in the headline comparison
+- [ ] Task 3: a table placing every model's recorded regression verdict beside its new screening verdict
+- [ ] Task 3: state per arm whether the screening framing CONFIRMS, WEAKENS or OVERTURNS the recorded verdict; if any verdict moves, stop and report before anything else
+- [ ] Task 4: `reports/phase9a_screening_metrics.md`, leading with model-vs-baseline, not AUROC alone
+- [ ] Task 4: CLAUDE.md updated; results logged including any that weaken the project's own conclusions
+
 ### Phase 6 (original plan): Conformal prediction and abstention (N4)
 
 > WARNING: **NOT APPLICABLE as written, and not started.** N4 wraps a haemoglobin
