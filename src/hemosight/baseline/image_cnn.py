@@ -166,4 +166,8 @@ def cross_site(X: np.ndarray, y: np.ndarray, site: np.ndarray, train_site: str,
     del model
     free(dev)
     return {"preds": p, "test_idx": te, "train_mae": float(np.mean(np.abs(ptr - y[tr]))),
-            "train_mean_hb": mu}
+            "train_mean_hb": mu,
+            # Added for Phase 9A: a screening operating point must be chosen on the
+            # TRAINING site and applied to the test site, which needs the train-site
+            # predictions. Additive only - no existing key changes.
+            "train_preds": ptr, "train_idx": tr}

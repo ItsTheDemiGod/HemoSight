@@ -135,6 +135,14 @@ STAGES = [
     # Lighthouse and the 48-state browser verification need node + Chrome and are run from
     # app/frontend (tools/verify_8b.mjs); their outputs are read by the report stage.
     Stage("Phase 8B design report", "phase8b_report.py", 0.1),
+    Stage("Phase 9A cross-site predictions", "phase9a_cross_site_preds.py", 0.8,
+          note="GPU; regenerates what Phase 6.5 never saved. NOT deterministic: two "
+               "runs differ by 0.05-0.10 g/dL on the seed average, up to 0.17 per seed "
+               "(single-site training, no fold averaging). No verdict depends on it"),
+    Stage("Phase 9A screening metrics", "phase9a_screening.py", 6, slow=True,
+          note="CPU; 2,000-resample subject-level bootstraps. Thresholds, operating "
+               "point and margin pre-declared in CLAUDE.md and committed before it ran"),
+    Stage("Phase 9A report", "phase9a_report.py", 0.1),
 ]
 
 

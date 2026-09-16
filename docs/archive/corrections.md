@@ -254,3 +254,25 @@ retained verbatim where it stands.
 
 A twelve-item corrections table covering the same ground from the results side is in
 `reports/final_results.md`.
+
+## 8. "Moves no clinical threshold" (Phase 7, 2026-09-12) — corrected 2026-09-17 by Phase 9A
+
+*Corrects: the Phase 7 DECISION LOG entry "The controlled-capture hypothesis was tested; outcome B" (2026-09-12), retained verbatim in `docs/archive/decision_log.md`. The full correction entry is in that file under PHASE 9A DECISIONS and is reproduced below.*
+
+**Original text, preserved verbatim.** *"(2) from controlled capture it reaches the MARGINAL band only - screening bands at best - does not beat site + sex + age, and moves no clinical threshold."*
+
+**What was wrong.** Only the final clause. The project evaluated its imaging arm on mean absolute error in g/dL and concluded no clinical threshold moved. Evaluated as the referral decision the product actually makes — at an operating point pre-declared and committed before the run, and chosen on training folds only — a threshold does move: at matched sensitivity (~0.90) the image reduces the referral rate from 0.634 to 0.519 against site+sex+age, a specificity gain of **+0.192, CI [+0.114,+0.276]** for the mean-CIELAB model and **+0.096, CI [+0.017,+0.179]** for the CNN. AUROC over the same baseline: **+0.057** and **+0.059**, both with CIs excluding zero.
+
+**What did not change, and why.** The arm is still not deployable, but the binding reason is now the cross-site collapse — `italy_to_india` **sensitivity 0.397**, flagging 27 of 68 anaemic subjects; `india_to_italy` **specificity 0.418** — and no longer the absence of a within-site effect. Two boundary misses are reported as unresolved rather than decisive: the 0.90 sensitivity floor by **0.010** and the CNN's margin by **0.004**, both inside the bootstrap noise at 91 anaemic subjects.
+
+**Prevention.** The phrase "moves no clinical threshold" is retired. `reports/phase9a_screening_metrics.md` leads with the model-versus-baseline screening comparison, and `tests/test_phase9a.py` fails if the report states an AUROC without a baseline beside it or if the retired phrase reappears in the claim set.
+
+**Lesson.** The project criticised the literature for reporting a score without a cheap baseline. Its own mirror-image error was reporting a *baseline comparison* on a metric the product does not use. Both are failures to evaluate the deployed decision; this one took a reframe rather than a new model to expose.
+
+---
+
+## 9. Phase 7's PPG "sensitivity 0.00" — qualified 2026-09-17, not withdrawn
+
+*The figure is correct as computed and is retained. See the entry of 2026-09-17 in `docs/archive/decision_log.md`.*
+
+The 0.000 comes from a **plug-in** rule — refer if the *predicted* haemoglobin is below the diagnostic threshold. A regression model shrinks toward the mean, so that rule is systematically insensitive and 0.000 measures the rule as much as the model: at an operating point chosen for screening the same PPG models reach **sensitivity 0.889**. The qualification travels with the number from here on. It does not rescue the arm — at that point specificity is **0.098**, the referral rate **90.1%**, and NNS **15.8 against 14.0 for referring everybody**.

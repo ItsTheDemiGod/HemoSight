@@ -20,18 +20,24 @@ write-up.**
 
 | | |
 | --- | --- |
-| Phases complete | 0, 1, 1.5, 2, 2.5, 3 (closed at gate), 3.5 (closed at gate), 4, 4.5, 5, 6, 6.5, 7, 8A, 8B |
+| Phases complete | 0, 1, 1.5, 2, 2.5, 3 (closed at gate), 3.5 (closed at gate), 4, 4.5, 5, 6, 6.5, 7, 8A, 8B, 9A |
 | Open plan items | **0** — every unticked box is classified 🔴 SUPERSEDED or ⛔ BLOCKED, with its gate or blocker cited inline |
-| Imaging arm | 🔴 **CLOSED, FINAL** — four representations refuted, each with a measured mechanism |
-| PPG arm | 🔴 **NOT VIABLE** — negative R²; sex alone beats it by 30% |
+| Imaging arm | 🔴 **CLOSED, FINAL** — four representations refuted, each with a measured mechanism. **Phase 9A: as a screening task it beats site+sex+age within site (+0.192 specificity at matched sensitivity, CI excludes zero) but collapses cross-site (sensitivity 0.397). Not deployable, for the cross-site reason** |
+| PPG arm | 🔴 **NOT VIABLE** — negative R²; sex alone beats it by 30%. **Phase 9A confirms as a screening task**: AUROC diff vs demographics −0.000 (CI [−0.195,+0.189]); NNS 15.8 vs 14.0 for referring everybody |
 | Conventional CNN baseline (§3 hard constraint) | ✅ built, Phase 6.5 — MAE 1.301, MARGINAL; site + sex + age alone 1.273 |
 | Shipped software | **HemoSight Audit** — the methodological audit harness, `src/hemosight/audit/` + `app/` |
-| The benchmark nothing beat | **sex alone, MAE 0.831 g/dL** |
+| The benchmark nothing beat | **sex alone, MAE 0.831 g/dL** (PPG). On the imaging screening task the benchmark to beat is **site + sex + age**, AUROC 0.816 |
 | The one positive claim | raw-PPG spectrogram CNN, z = −4.96, empirical p ≤ 0.0041 (a **floor**, not a measurement) — and clinically useless: ~0.05 g/dL better than a constant |
 
 **What is outstanding.** The write-up, and nothing else. Section 6 records no open
 work. The project's contribution is the body of negative results and their
 mechanisms; **nothing further should be built.**
+
+**One thing the write-up must not repeat.** Phase 9A retired the phrase "moves no
+clinical threshold" (`docs/archive/corrections.md` §8). Within site the image does
+move a referral threshold; what fails is transfer to another site. If any future
+imaging work is ever started, it should begin from **three mean palpebral CIELAB
+numbers**, which match the CNN on AUROC and beat it on specificity — not from a CNN.
 
 **Before adding anything to this file, read the WORKING PROTOCOL (section 9).** New
 decisions, results and corrections go to `docs/archive/`, not here.
@@ -98,7 +104,7 @@ These drive every design decision.
 
 | rank | claim | status |
 | --- | --- | --- |
-| ~~**CO-PRIMARY (imaging arm)**~~ | N3 + N4 from photographs | 🔴 **CLOSED, FINAL (Phase 3.5)** — four approaches refuted, each with a mechanism |
+| ~~**CO-PRIMARY (imaging arm)**~~ | N3 + N4 from photographs | 🔴 **CLOSED, FINAL (Phase 3.5)** — four approaches refuted, each with a mechanism. **Phase 9A (screening reframe) WEAKENED this within site and CONFIRMED it cross-site**: the image does move a referral threshold within site; it collapses across sites |
 | ~~**CO-PRIMARY (PPG arm)**~~ | N3 + N4 from four-wavelength PPG | 🔴 **NOT VIABLE (Phase 4)** — negative R², loses to the population mean; sex alone beats it by 30% |
 | **SECONDARY** | **N1** — as a **negative result plus a practical recommendation** | REFUTED as a method; the diagnosis stands |
 | supporting | **N2** — Monte Carlo forward model | unchanged in substance (Phase 3) |
@@ -120,6 +126,24 @@ These drive every design decision.
 > | 6 | PPG | Raw waveform, 3 deep architectures | 4.5 | **NOT VIABLE** | best MAE 1.113; **sex alone 0.831** |
 > | 7 | Imaging | **Conventional CNN baseline** (ResNet-18, Eyes-Defy, the §3 comparison arm) | 6.5 | **MARGINAL** | MAE 1.301; site+sex+age alone 1.273; image adds +0.08; cross-site italy_to_india 1.96, india_to_italy 1.99 |
 > | 8 | Imaging | **Controlled capture** (studio residual 1.06 dE2000 vs 3.94 uncontrolled) | 7 | **MARGINAL** | gate MAE 1.04 g/dL at the measured studio residual; VIABLE needs < 0.99; Eyes-Defy (fixed LED) colour model 1.34 - refutation restated in two parts |
+> | 9 | Both | **The SCREENING reframe** — the same models re-scored as a referral decision, not a g/dL estimate | 9A | **imaging WEAKENED within site, CONFIRMED cross-site; PPG CONFIRMED** | within site the image beats site+sex+age by **+0.192 specificity at matched sensitivity, CI [+0.114,+0.276]** (mean-CIELAB) — margin cleared; cross-site **sensitivity 0.397**, flagging 27 of 68 anaemic. PPG: AUROC diff **−0.000, CI [−0.195,+0.189]**, NNS **15.8 vs 14.0 for referring everybody** |
+>
+> ### 🔴 One recorded claim did NOT survive the reframe (Phase 9A, 2026-09-17)
+>
+> Phase 7 wrote that controlled capture "does not beat site + sex + age, and **moves
+> no clinical threshold**". The first clause stands on MAE. **The second is
+> contradicted and is corrected**: evaluated as the referral decision the product
+> actually makes, at an operating point pre-declared before the run, the image cuts
+> the referral rate from 0.634 to 0.519 at the same ~0.90 detection rate. The phrase
+> is retired. **The arm is still not deployable — but the binding reason is now the
+> cross-site collapse, not the absence of a within-site effect.** "CLOSED, FINAL" for
+> the imaging arm remains a decision not to build further; it is **not** a claim that
+> the image carries no decision-relevant information, because it demonstrably does
+> within site. See `docs/archive/corrections.md` §8.
+>
+> **The strongest within-site screening model is not the CNN**: three mean palpebral
+> CIELAB numbers plus a ridge match it on AUROC (0.874 vs 0.875) and beat it on
+> specificity at matched sensitivity (0.752 vs 0.656).
 >
 > **The one positive claim survived Phase 5 hardening** (selection-aware permutation, **empirical p <= 0.0041 at n=240**, z=-4.96, 11.9x the seed SD) and remains clinically useless: ~0.05 g/dL better than a constant. The p is still the FLOOR 1/(n+1) - zero of 240 permutations reached the real value - so it is a bound, not a measurement.
 >
@@ -450,13 +474,17 @@ and its output exists on disk.
 > | 7 Additions | ✅ COMPLETE | Task 1 outcome B; external audit: 0 of 3 candidates auditable | 0 |
 > | 8A Language for a dual audience | ✅ COMPLETE | — | 0 |
 > | 8B Visual redesign | ✅ COMPLETE | — | 0 (Lighthouse 97-100 / 100 / 100; 48 page states verified) |
+> | 9A Screening reframe | ✅ COMPLETE — imaging **WEAKENED** within site, **CONFIRMED** cross-site; PPG **CONFIRMED** | — | 0 (one recorded claim corrected) |
 > | 6 (orig) Conformal (N4) | 🔴 SUPERSEDED | no estimator | 0 |
 > | 7 Fairness (N5) | 🔴 SUPERSEDED | no estimator; mechanism measured in Phase 3 Task 4 | 0 |
 > | 8 Fusion (N6) | 🔴 SUPERSEDED | no g/dL estimate from any modality | 0 (2 items found done, ticked) |
 > | 9 Web app | 🔴 SUPERSEDED | replaced by Phase 6 audit app | 0 (2 scaffold items ticked, with caveat) |
 > | 10 Flutter | 🔴 SUPERSEDED | no estimator | 0 |
 >
-> **Open work in the whole plan: none (Phase 6.5, 2026-09-12).** What remains is the write-up.
+> **Open work in the whole plan: none (Phase 9A, 2026-09-17).** What remains is the write-up.
+>
+> ⚠️ **The write-up must carry the Phase 9A correction**: the imaging arm's refutation is
+> about **cross-site transfer**, not about the absence of a within-site screening effect.
 ### Phase 0: Scaffold
 - [x] Create the repository directory structure
 - [x] Write `pyproject.toml` pinning Python 3.12 and the core dependencies
@@ -878,15 +906,15 @@ visible.
 **6. Within-site and cross-site are reported separately for the imaging arm and never
 pooled into one headline number.**
 
-- [ ] Task 1: screening metrics (sens, spec, PPV, NPV, AUROC, AUPRC, ROC, NNS, false-referral and referral rate) for every model AND every baseline on identical folds, bootstrap CIs
-- [ ] Task 1: regenerate any per-subject baseline predictions not already on disk, with the recorded seeds and folds, and report that they were regenerated
-- [ ] Task 1: within-site and cross-site reported separately for the imaging arm
-- [ ] Task 2: model vs best demographic baseline at identical operating points, paired bootstrap CI on the difference, against the pre-declared ≥ 0.10 margin
-- [ ] Task 2: how many anaemic subjects each model actually flags at its chosen operating point, in the headline comparison
-- [ ] Task 3: a table placing every model's recorded regression verdict beside its new screening verdict
-- [ ] Task 3: state per arm whether the screening framing CONFIRMS, WEAKENS or OVERTURNS the recorded verdict; if any verdict moves, stop and report before anything else
-- [ ] Task 4: `reports/phase9a_screening_metrics.md`, leading with model-vs-baseline, not AUROC alone
-- [ ] Task 4: CLAUDE.md updated; results logged including any that weaken the project's own conclusions
+- [x] Task 1: screening metrics (sens, spec, PPV, NPV, AUROC, AUPRC, ROC, NNS, false-referral and referral rate) for every model AND every baseline on identical folds, bootstrap CIs *(ticked 2026-09-17: `scripts/phase9a_screening.py` -> `screening.json`; 9 imaging and 9 PPG models/baselines, 2,000-resample subject-level CIs)*
+- [x] Task 1: regenerate any per-subject baseline predictions not already on disk, with the recorded seeds and folds, and report that they were regenerated *(ticked 2026-09-17: ALL baseline predictions regenerated — Phase 4 Gate B and Phase 6.5 Task 2 stored only summary metrics — plus the cross-site CNN predictions (`scripts/phase9a_cross_site_preds.py`); folds verified identical, reused PPG predictions reproduce the recorded MAEs to 0.0000)*
+- [x] Task 1: within-site and cross-site reported separately for the imaging arm *(ticked 2026-09-17: never pooled into a headline; the recorded AUROC 0.875 is shown to be a POOLED figure — within site India **0.688**, Italy **0.909**)*
+- [x] Task 2: model vs best demographic baseline at identical operating points, paired bootstrap CI on the difference, against the pre-declared ≥ 0.10 margin *(ticked 2026-09-17: both directions; margin cleared by the mean-CIELAB model pooled (+0.192, CI [+0.114,+0.276]) and by the CNN within Italy; no model earns USEFUL)*
+- [x] Task 2: how many anaemic subjects each model actually flags at its chosen operating point, in the headline comparison *(ticked 2026-09-17: in the section-2 table of the report; PPG plug-in flags **0 of 18**, reproducing Phase 7 exactly, now labelled a plug-in artefact)*
+- [x] Task 3: a table placing every model's recorded regression verdict beside its new screening verdict *(ticked 2026-09-17: `reports/phase9a_screening_metrics.md` section 4, 9 rows)*
+- [x] Task 3: state per arm whether the screening framing CONFIRMS, WEAKENS or OVERTURNS the recorded verdict; if any verdict moves, stop and report before anything else *(ticked 2026-09-17: imaging **WEAKENED** within site / **CONFIRMED** cross-site; PPG **CONFIRMED**, strengthened. Nothing OVERTURNED. Logged as a correction with the original text preserved)*
+- [x] Task 4: `reports/phase9a_screening_metrics.md`, leading with model-vs-baseline, not AUROC alone *(ticked 2026-09-17)*
+- [x] Task 4: CLAUDE.md updated; results logged including any that weaken the project's own conclusions *(ticked 2026-09-17: 3 RESULTS LOG entries, 3 DECISION LOG entries, 2 corrections — including the one that weakens the project's own recorded claim)*
 
 ### Phase 6 (original plan): Conformal prediction and abstention (N4)
 
