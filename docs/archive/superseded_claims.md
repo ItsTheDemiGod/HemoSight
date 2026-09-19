@@ -131,3 +131,30 @@ copying it would separate it from the tasks or entries it annotates.
 | Phase 9 web-application task list — SUPERSEDED except two scaffold items | `CLAUDE.md` section 6 | replaced by the Phase 6 audit app |
 | Phase 10 Flutter task list — SUPERSEDED IN FULL | `CLAUDE.md` section 6 | no estimator |
 | N1 as the headline claim in the CLAIM HIERARCHY | `CLAUDE.md` section 2 | Phase 2.5 refutation; hierarchy restructured 2026-09-11 |
+
+---
+
+## 6. "A literature that frequently omits it" (Phase 4.5 wording, CLAUDE.md section 2) — NARROWED 2026-09-20 by Phase 9B
+
+*Source: `CLAUDE.md` section 2, the FINAL STATUS block, retained there in full under a
+banner. Narrowed 2026-09-20; see `docs/archive/decision_log.md`, entry 2026-09-20 "the
+claim 'a literature that frequently omits it' is NARROWED to what the counts support".*
+
+**Original wording, preserved verbatim.** *"The project's contribution is the body of
+negative results and their mechanisms — six refutations, thresholds declared before every
+experiment, cross-device and cross-subject validation throughout, and a demographic
+baseline that exposes how easily an apparently working estimator is really a sex
+classifier. That last point alone is a contribution to a literature that frequently omits
+it."*
+
+**What replaced the last clause.** *None of the seven anaemia-estimation papers whose full
+text this project read reports a demographics-only baseline — a statement about those
+seven, from a convenience sample of accessible papers, not about the field.*
+
+**Why.** "Frequently" is a rate with the field as its denominator. Phase 9B's denominator
+is seven papers obtained without a search strategy or inclusion criteria. The count
+(0 of 7, complete, no UNKNOWN) is consistent with the original sentence and cannot
+establish it. The claim follows the counts. The same standard was applied in Phase 5
+(`reports/literature_gap.md`: "a sample this small supports no claim about the field")
+when the sample was five; the wording in section 2 had not been brought into line with it
+until now.

@@ -251,6 +251,8 @@ retained verbatim where it stands.
 | `**Corrected during verification, recorded rather than hidden.**` — five Phase 8B defects | `docs/archive/decision_log.md`, entry 2026-09-13 "The visual system" |
 | Zhivov 2006 journal attribution corrected to *The Ocular Surface* | `docs/archive/decision_log.md`, entry 2026-09-12 "Licences verified, constants banner narrowed" |
 | The probe artefacts disclosed rather than quietly fixed (localStorage re-seeding; queue saturation) | `docs/archive/decision_log.md`, entry 2026-09-12 "INVESTIGATION: the Overview page is idle" |
+| `reports/final_results.md` §6 read "5 applicable sources" while `literature_counts.json` had 6 since 2026-09-13 — a stale generated report, regenerated 2026-09-20 with no other line changed | `docs/archive/results_log.md`, entry 2026-09-20 "one item on the record is corrected in passing" |
+| The Phase 3 gate point estimate appearing without its Phase 9C interval — corrected in place in CLAUDE.md, `final_results.md`, `phase3_simulation.md`, `phase7.md` and the front end; the point estimate is retained in every case | `reports/phase9c_uncertainty.md` §7; `docs/archive/decision_log.md`, 2026-09-20 |
 
 A twelve-item corrections table covering the same ground from the results side is in
 `reports/final_results.md`.
@@ -276,3 +278,36 @@ A twelve-item corrections table covering the same ground from the results side i
 *The figure is correct as computed and is retained. See the entry of 2026-09-17 in `docs/archive/decision_log.md`.*
 
 The 0.000 comes from a **plug-in** rule — refer if the *predicted* haemoglobin is below the diagnostic threshold. A regression model shrinks toward the mean, so that rule is systematically insensitive and 0.000 measures the rule as much as the model: at an operating point chosen for screening the same PPG models reach **sensitivity 0.889**. The qualification travels with the number from here on. It does not rescue the arm — at that point specificity is **0.098**, the referral rate **90.1%**, and NNS **15.8 against 14.0 for referring everybody**.
+
+---
+
+## 10. Efron 2009's thicknesses (Phase 3, banner since 2026-09-11) — source obtained 2026-09-20 and does NOT contain them
+
+*Full entry: `docs/archive/decision_log.md`, 2026-09-20 "CORRECTION: Efron 2009 was obtained and
+does NOT contain the thicknesses attributed to it". The banner it corrects stands in
+`src/hemosight/simulation/constants.py`.*
+
+**What was recorded (2026-09-12, Phase 6.5).** "Re-checked 2026-09-12 (network available): the
+abstracts of [5] and [6] contain NO numeric thicknesses and both full texts are subscription-only,
+so the values attributed to them **could not be verified against the source**."
+
+**What is now known.** The Efron 2009 study **was** obtained — not the paywalled paper but the
+same study as a chapter of the open-access QUT thesis it came from (Al Dossari M., QUT ePrints
+18316; same 11 participants, same instrument, matching abstract), read in full. It reports **no
+palpebral thickness in micrometres for any layer**: the epithelium "appears to be only two or
+three cell-layers deep", the stroma is "thin", the tarsal plate "dark and amorphous". Its one
+thickness figure, **32.9 +/- 1.1 um, is BULBAR epithelium** — a different tissue. It states that
+"it is therefore not possible to determine the overall thickness of the conjunctiva using this (or
+any other) technique with any degree of certainty". **No blood volume fraction appears in it.**
+
+**The correction.** "Could not be verified" understated it. For [5] the source **was** read and
+**does not contain** the stromal thickness (200 um), the tarsal-plate thickness (800 um) or any
+blood volume fraction. Zhivov 2006 [6] remains unobtainable (OpenAlex `oa_status: closed`).
+The banner is **kept and strengthened**, not lifted; the citation is **not removed**, because [5]
+is still the source of the qualitative layer structure. The 32 um epithelial thickness keeps its
+lifted status on Li et al. 2015 alone (OCT, 34.0 +/- 5.8 um, palpebral).
+
+**No verdict changes.** Phase 9C ranks stroma thickness 7th and tarsal-plate thickness 14th of 14
+by Sobol total index, so sourcing them would have moved the gate interval very little. What
+dominates is unsourced in a different way: a modelling constant (the 0.6 deep-layer weight) and
+the epithelial blood volume fraction.

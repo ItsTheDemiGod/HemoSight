@@ -66,7 +66,8 @@ def main() -> int:
            "7.821 dE2000; vs sclera p=0.29", "**REFUTED**"]))
     A(row(["3", "Imaging", "Absolute colorimetric Hb inversion", "simulation + Eyes-Defy",
            "error propagation", "<1.0 g/dL viable, >2.0 not recoverable",
-           f"{p3['residuals']['3.935']['mae_g_dl']:.3f} g/dL MAE" if p3 else "3.893 g/dL",
+           (f"{p3['residuals']['3.935']['mae_g_dl']:.3f} g/dL MAE" if p3 else "3.893 g/dL")
+           + " (95% CI [2.37, 8.02] over the parameter prior, Phase 9C)",
            "**NOT RECOVERABLE**"]))
     A(row(["4", "Imaging", "Illuminant-free within-image ratio", "MOBIUS 100 subj",
            "subject-grouped, held-out iris", "<1.0 g/dL equivalent",
@@ -345,6 +346,29 @@ def main() -> int:
           "not read. See `reports/literature_gap.md` for the full caveats. What it does "
           "support: in 3 of these sources this project *measured* duplicate or overlap "
           "problems that a duplicate check would have caught.\n")
+
+    # Phase 9B (2026-09-20): the widened audit - seven full texts, six criteria.
+    lit9b = load("phase9b/literature_audit.json")
+    if lit9b:
+        n = lit9b["n_full_text"]
+        c = lit9b["counts"]
+        ob = lit9b["obtainability"]
+        A(f"\n**Phase 9B widened this to {n} full texts read against six criteria** "
+          f"(a convenience sample of accessible papers, not a systematic review; "
+          f"{ob['identified']} papers identified, {ob['full_text_obtained']} obtained). "
+          "Counts over those papers, YES / NOT REPORTED / UNKNOWN / NOT APPLICABLE:\n\n")
+        A(row(["criterion", "YES", "NOT REPORTED", "UNKNOWN", "NOT APPLICABLE"]))
+        A(row(["---"] * 5))
+        for k, label in lit9b["criteria"].items():
+            v = c[k]
+            A(row([label, v["YES"], v["NOT REPORTED"], v["UNKNOWN"], v["NOT APPLICABLE"]]))
+        A(f"\nNone of the {n} reports a demographics-only baseline; of the "
+          f"{lit9b['n_multi_site']} multi-site papers, none reports a per-site result. "
+          "Both are statements about these papers, not about the field, and no paper is "
+          "recorded as failing a check: the audit measures what is reported. The "
+          "project's earlier wording that a demographic baseline is 'a contribution to a "
+          "literature that frequently omits it' is narrowed accordingly "
+          "(`reports/literature_gap.md`, section 9B.4).\n")
 
     A("\n---\n\n## 7. Reproducibility\n\n")
     A("* `scripts/reproduce_all.py` runs every stage end to end (~12 h full, ~22 min "

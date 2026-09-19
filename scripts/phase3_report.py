@@ -47,6 +47,12 @@ def main() -> int:
         m = gate["residuals"]["3.935"]
         A("## 0. GATE RESULT - stated first because it decides everything after it\n\n")
         A(f"> ## ⛔ **{m['band']}**\n")
+        A("> **Phase 9C (2026-09-20) propagated the forward model's own parameter "
+          "uncertainty through this number.** The point estimate below is retained; over a "
+          "declared prior on the 14 fixed tissue parameters the gate MAE at this residual is "
+          "**median 4.67 g/dL, 95% interval [2.37, 8.02]**, with 99.5% of the prior above the "
+          "2.0 g/dL threshold. The interval lies entirely above 2.0, so this verdict is "
+          "**ROBUST to parameter uncertainty**. See `reports/phase9c_uncertainty.md`.\n>\n")
         A(f"> **Haemoglobin MAE = {m['mae_g_dl']:.3f} g/dL** at the residual colour error "
           f"this project's own recommended normalisation actually leaves "
           f"(3.935 dE2000, grey-world on a tight periocular crop, measured in Phase 2.5).\n")

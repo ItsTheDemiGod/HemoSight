@@ -83,6 +83,8 @@ export default function PreRegPage() {
           2.0 g/dL would mean the photograph approach was not recoverable. The experiment
           then returned 3.9 g/dL. Because the line had been drawn first, that was a refutation
           and the work stopped; drawn afterwards, it would have been a number to argue about.
+          That 3.9 was later re-reported with the uncertainty of the assumptions behind it —
+          a 95% interval of 2.4 to 8.0 g/dL, still entirely past the line that had been drawn.
           Two of the project's own hypotheses were refuted this way, and both refutations
           held up.
         </p>

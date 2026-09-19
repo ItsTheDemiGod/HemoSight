@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 
+from hemosight.audit import literature as lit9b
 from hemosight.io import paths
 
 # --------------------------------------------------------------------------- #
@@ -98,14 +99,18 @@ PAPERS = [
      "cross_device_or_site": "UNKNOWN", "duplicate_or_leakage_check": "NO",
      "evidence": "2,015 unique images among 4,262 files (52.7% redundant); 419 MD5 "
                  "hashes shared with CP-AnemiC, which is distributed as a separate "
-                 "dataset."},
+                 "dataset. Phase 9B read Asare et al. 2023, which names this collection "
+                 "in its Data Availability Statement; that paper is scored in the Phase "
+                 "9B table, and this dataset row is unchanged."},
     {"key": "Ghana fingernails (Mendeley 2xx4j3kjg2)",
      "cited_in": "phase1_data_audit.md", "type": "anemia imaging dataset",
      "demographic_baseline": "UNKNOWN", "subject_level_splits": "UNKNOWN",
      "cross_device_or_site": "UNKNOWN", "duplicate_or_leakage_check": "NO",
      "evidence": "2,097 unique among 4,260 files (50.8% redundant); shares a "
                  "participant numbering roster with the conjunctiva set "
-                 "(non-anemic Jaccard 1.000)."},
+                 "(non-anemic Jaccard 1.000). Phase 9B read Asare et al. 2023, which "
+                 "names this collection in its Data Availability Statement; that paper is "
+                 "scored in the Phase 9B table, and this dataset row is unchanged."},
     {"key": "Eyes-Defy-Anemia",
      "cited_in": "phase1_data_audit.md", "type": "anemia imaging dataset",
      "demographic_baseline": "UNKNOWN", "subject_level_splits": "YES",
@@ -237,7 +242,10 @@ def main() -> int:
          f"> This table covers **only the {len(PAPERS)} sources already cited in this "
          "project's own reports**, of which only "
          f"**{len(predictive)} are predictive studies or datasets** where these "
-         "attributes apply. No new literature was read.\n>\n",
+         "attributes apply. No new literature was read for it (Phase 5). **Phase 9B "
+         f"(2026-09-20) read {len(lit9b.obtained())} full texts against six criteria; "
+         "that audit is the section at the end of this file**, and its counts, not "
+         "these, are the ones to cite.\n>\n",
          "> **The sample is far too small to support any general claim about the "
          "anemia-estimation literature.** It cannot support statements of the form "
          "'most papers do not report X'. What it can support is a statement about "
@@ -305,6 +313,8 @@ def main() -> int:
     M.append("The caveats above stand unchanged: UNKNOWN is not evidence of absence, NOT REPORTED "
              "is not evidence of malpractice, and a sample this small supports no claim about "
              "the field.\n")
+    # ---- Phase 9B (2026-09-20): the widened audit, rendered from hemosight.audit.literature
+    M.append(lit9b.render_markdown())
 
     (paths.REPORTS / "literature_gap.md").write_text("".join(M), encoding="utf-8")
     print(f"wrote {paths.REPORTS / 'literature_gap.md'}")

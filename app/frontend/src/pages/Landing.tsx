@@ -32,7 +32,7 @@ const STEPS: { k: string; kicker: string; title: string; text: string; visual: "
   {
     k: "4", kicker: "The verdict", visual: "breakeven",
     title: "Not recoverable, then marginal, never viable.",
-    text: "The pre-declared gate returns 3.5 g/dL of error for uncontrolled capture and 1.04 for a studio rig. The one controlled dataset with blood tests lands at 1.3 g/dL — the same band a form asking sex, age and site reaches at 1.27.",
+    text: "The pre-declared gate returns 3.5 g/dL of error for uncontrolled capture and 1.04 for a studio rig. The one controlled dataset with blood tests lands at 1.3 g/dL — the same band a form asking sex, age and site reaches at 1.27. Propagating the model's own parameter uncertainty leaves the uncontrolled verdict intact (95% interval 2.1–7.9 g/dL, entirely past the 2.0 line) and the studio number spanning every band (0.6–4.9).",
   },
   {
     k: "5", kicker: "The pulse", visual: "null",

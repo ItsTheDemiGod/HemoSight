@@ -209,6 +209,15 @@ def write_phase7(cc: dict, svc: dict) -> None:
                    ("reference_2.0", "reference 2.0"), ("reference_1.0", "reference 1.0")):
         g = gate[k]
         A(row([lab, f"{g['residual_dE2000']:.3f}", f"{g['mae_g_dl']:.3f}", f"{g['p90_g_dl']:.2f}", g["band"]]))
+    A("\n> **Phase 9C (2026-09-20): these are point estimates, and the studio one is "
+      "FRAGILE.** Propagating the forward model's own parameter uncertainty (declared prior "
+      "over its 14 fixed tissue parameters) gives, at the three measured residuals: "
+      "uncontrolled 3.456 -> median 4.28, 95% [2.09, 7.90] (ROBUST, entirely above 2.0); "
+      "Phase 3 reference 3.935 -> median 4.67, 95% [2.37, 8.02] (ROBUST); "
+      "**studio 1.062 -> median 1.52, 95% [0.60, 4.90] - spanning VIABLE, MARGINAL and NOT "
+      "RECOVERABLE, so its MARGINAL label is not robust to parameter uncertainty** "
+      "(27.1% of the prior VIABLE, 37.0% NOT RECOVERABLE). "
+      "See `reports/phase9c_uncertainty.md`.\n\n")
     A(f"\n**Residual required for VIABLE (< 1.0 g/dL): < {be['residual_for_viable_1.0']:.2f} dE2000; "
       f"for MARGINAL (< 2.0): < {be['residual_for_marginal_2.0']:.2f}.** Measured conditions that "
       "reach the VIABLE residual: " +
@@ -235,7 +244,10 @@ def write_phase7(cc: dict, svc: dict) -> None:
           "term of ~4.5 dE2000 remains. **The boundary reading matters and is stated plainly:** "
           f"at the studio residual the gate returns {gate['sbvpi_studio']['mae_g_dl']:.2f} g/dL, "
           f"{gate['sbvpi_studio']['mae_g_dl'] - 1.0:+.2f} from the VIABLE line - studio-grade control "
-          "brings the CALIBRATION term to the edge of viable. What keeps the empirical result in "
+          "brings the CALIBRATION term to the edge of viable. **Phase 9C shows that edge sits "
+          "inside the model's own parameter uncertainty:** over the declared prior the same "
+          "residual gives median 1.52 g/dL, 95% [0.60, 4.90], spanning all three bands, so this "
+          "number must not be quoted as 1.04 alone. What keeps the empirical result in "
           "MARGINAL is the other term: between-subject conjunctival colour at fixed haemoglobin, "
           "which no amount of capture control removes and which the gate model never contained. "
           "In the controlled regime the limiting factor shifts from calibration to tissue. "

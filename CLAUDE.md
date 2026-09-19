@@ -12,7 +12,7 @@ below. Nothing was summarised away in moving it.
 
 ## CURRENT STATE
 
-*Updated 2026-09-17. This section is the one-screen answer to "where is the
+*Updated 2026-09-20. This section is the one-screen answer to "where is the
 project?". The evidence behind every statement here is in `docs/archive/`.*
 
 **Active phase: none. Every phase in section 6 is closed. What remains is the
@@ -20,7 +20,7 @@ write-up.**
 
 | | |
 | --- | --- |
-| Phases complete | 0, 1, 1.5, 2, 2.5, 3 (closed at gate), 3.5 (closed at gate), 4, 4.5, 5, 6, 6.5, 7, 8A, 8B, 9A |
+| Phases complete | 0, 1, 1.5, 2, 2.5, 3 (closed at gate), 3.5 (closed at gate), 4, 4.5, 5, 6, 6.5, 7, 8A, 8B, 9A, 9B, 9C |
 | Open plan items | **0** — every unticked box is classified 🔴 SUPERSEDED or ⛔ BLOCKED, with its gate or blocker cited inline |
 | Imaging arm | 🔴 **CLOSED, FINAL** — four representations refuted, each with a measured mechanism. **Phase 9A: as a screening task it beats site+sex+age within site (+0.192 specificity at matched sensitivity, CI excludes zero) but collapses cross-site (sensitivity 0.397). Not deployable, for the cross-site reason** |
 | PPG arm | 🔴 **NOT VIABLE** — negative R²; sex alone beats it by 30%. **Phase 9A confirms as a screening task**: AUROC diff vs demographics −0.000 (CI [−0.195,+0.189]); NNS 15.8 vs 14.0 for referring everybody |
@@ -28,6 +28,8 @@ write-up.**
 | Shipped software | **HemoSight Audit** — the methodological audit harness, `src/hemosight/audit/` + `app/` |
 | The benchmark nothing beat | **sex alone, MAE 0.831 g/dL** (PPG). On the imaging screening task the benchmark to beat is **site + sex + age**, AUROC 0.816 |
 | The one positive claim | raw-PPG spectrogram CNN, z = −4.96, empirical p ≤ 0.0041 (a **floor**, not a measurement) — and clinically useless: ~0.05 g/dL better than a constant |
+| Gate result, with uncertainty (Phase 9C) | **median 4.67 g/dL, 95% [2.37, 8.02]** at the 3.935 dE2000 residual over a declared prior on the 14 fixed tissue parameters — point estimate 3.893 retained. 99.5% of the prior is > 2.0, and the whole interval is, so the imaging refutation is **ROBUST to parameter uncertainty**. The **studio** number (1.040) is **FRAGILE**: 95% [0.60, 4.90], spanning all three bands (`reports/phase9c_uncertainty.md`) |
+| Literature audit (Phase 9B) | **7 full texts read, 12 identified**; a convenience sample, not a review. Demographic baseline reported by **0 of 7**; per-site results by **0 of the 3 multi-site papers**; deduplication mentioned by 0 of 7. **No paper is recorded as failing a check.** The claim "a literature that frequently omits it" was **narrowed** to a statement about these seven (`reports/literature_gap.md` §9B) |
 
 **What is outstanding.** The write-up, and nothing else. Section 6 records no open
 work. The project's contribution is the body of negative results and their
@@ -120,12 +122,12 @@ These drive every design decision.
 > | --- | --- | --- | --- | --- | --- |
 > | 1 | Imaging | Sclera as absolute white reference | 2 | **REFUTED** | loses to grey-world, p~3e-8 |
 > | 2 | Imaging | Corneal specular highlight | 2.5 | **REFUTED** | no better than sclera, p=0.29 |
-> | 3 | Imaging | Absolute colorimetric Hb inversion | 3 | **NOT RECOVERABLE** | signal 0.45 (sim) / **0.84** (measured, CI 0.57-1.17) vs 3.9 dE2000 noise = 4.7x *(corrected 2026-09-12; was "0.45-0.70")* |
+> | 3 | Imaging | Absolute colorimetric Hb inversion | 3 | **NOT RECOVERABLE** | signal 0.45 (sim) / **0.84** (measured, CI 0.57-1.17) vs 3.9 dE2000 noise = 4.7x *(corrected 2026-09-12; was "0.45-0.70")*; gate MAE **3.893 g/dL, 95% [2.37, 8.02]** over the parameter prior — **ROBUST** (Phase 9C) |
 > | 4 | Imaging | Illuminant-free within-image ratio | 3.5 | **REFUTED** | reference within/between = 1.447 |
 > | 5 | PPG | AC/DC + ratio-of-ratios features | 4 | **NOT VIABLE** | R² **-0.025**; permutation **p=0.978** |
 > | 6 | PPG | Raw waveform, 3 deep architectures | 4.5 | **NOT VIABLE** | best MAE 1.113; **sex alone 0.831** |
 > | 7 | Imaging | **Conventional CNN baseline** (ResNet-18, Eyes-Defy, the §3 comparison arm) | 6.5 | **MARGINAL** | MAE 1.301; site+sex+age alone 1.273; image adds +0.08; cross-site italy_to_india 1.96, india_to_italy 1.99 |
-> | 8 | Imaging | **Controlled capture** (studio residual 1.06 dE2000 vs 3.94 uncontrolled) | 7 | **MARGINAL** | gate MAE 1.04 g/dL at the measured studio residual; VIABLE needs < 0.99; Eyes-Defy (fixed LED) colour model 1.34 - refutation restated in two parts |
+> | 8 | Imaging | **Controlled capture** (studio residual 1.06 dE2000 vs 3.94 uncontrolled) | 7 | **MARGINAL**, and **FRAGILE** under parameter uncertainty (Phase 9C) | gate MAE 1.04 g/dL at the measured studio residual, **95% [0.60, 4.90] over the parameter prior — spanning VIABLE, MARGINAL and NOT RECOVERABLE**; VIABLE needs < 0.99; Eyes-Defy (fixed LED) colour model 1.34 - refutation restated in two parts |
 > | 9 | Both | **The SCREENING reframe** — the same models re-scored as a referral decision, not a g/dL estimate | 9A | **imaging WEAKENED within site, CONFIRMED cross-site; PPG CONFIRMED** | within site the image beats site+sex+age by **+0.192 specificity at matched sensitivity, CI [+0.114,+0.276]** (mean-CIELAB) — margin cleared; cross-site **sensitivity 0.397**, flagging 27 of 68 anaemic. PPG: AUROC diff **−0.000, CI [−0.195,+0.189]**, NNS **15.8 vs 14.0 for referring everybody** |
 >
 > ### 🔴 One recorded claim did NOT survive the reframe (Phase 9A, 2026-09-17)
@@ -140,6 +142,14 @@ These drive every design decision.
 > the imaging arm remains a decision not to build further; it is **not** a claim that
 > the image carries no decision-relevant information, because it demonstrably does
 > within site. See `docs/archive/corrections.md` §8.
+>
+> ### 🟢 Phase 9C (2026-09-20): the gate result now carries an interval, and it survives
+>
+> The number that closed the imaging arm was a point estimate from a forward model whose oxygenation, blood volume fractions, melanin and layer thicknesses were **fixed and known**, 13 of 14 of them unsourced. Propagated over a deliberately generous declared prior: at the 3.935 dE2000 residual **median 4.67 g/dL, 95% [2.37, 8.02]**, with the point estimate 3.893 at percentile 32 and **99.5% of the prior above the 2.0 threshold**. The entire interval is above 2.0, so by the rule declared before running, **the refutation is ROBUST to parameter uncertainty** — and the most favourable single draw in 2,048 still lands at 1.75 g/dL, MARGINAL, never VIABLE.
+>
+> **One recorded number is weakened: the studio condition.** Phase 7's 1.040 g/dL MARGINAL becomes **median 1.52, 95% [0.60, 4.90]** — 27.1% of the prior VIABLE, 35.9% MARGINAL, 37.0% NOT RECOVERABLE. **Its band is a property of the nominal parameter choice as much as of the capture condition, and it must never again be quoted as 1.04 alone.**
+>
+> **The sensitivity ranking did not confirm the expected story.** Phase 3 called melanin the model's most consequential assumption; in the self-consistent setting it ranks **3rd** at the gate residual (behind the **deep-layer contribution weight**, an uncited modelling constant, and the epithelial blood volume fraction) and **1st** at the studio residual. Melanin's +9.6 g/dL result stands but belongs to the *mismatch* setting, reported separately. A measured melanin curve is the most valuable future *spectroscopic* measurement; at the uncontrolled residual two unsourced structural quantities matter as much, and one of them is not a tissue property at all.
 >
 > **The strongest within-site screening model is not the CNN**: three mean palpebral
 > CIELAB numbers plus a ridge match it on AUROC (0.874 vs 0.875) and beat it on
@@ -161,7 +171,11 @@ These drive every design decision.
 > six refutations, thresholds declared before every experiment, cross-device and
 > cross-subject validation throughout, and a demographic baseline that exposes how
 > easily an apparently working estimator is really a sex classifier. That last point
-> alone is a contribution to a literature that frequently omits it.
+> alone is a contribution to ~~a literature that frequently omits it~~ *(wording
+> **narrowed 2026-09-20**, Phase 9B: none of the **seven** anaemia-estimation papers whose
+> full text this project read reports a demographics-only baseline — a statement about
+> those seven, from a convenience sample, not about the field; original wording kept in
+> `docs/archive/superseded_claims.md` §6)*.
 >
 > **Nothing further should be built. What remains is the write-up.**
 
@@ -462,7 +476,7 @@ and its output exists on disk.
 > | 1.5 Remediation | ✅ COMPLETE | — | 0 |
 > | 2 Sclera / illuminant (N1) | ✅ COMPLETE — N1 **REFUTED** | — | 0 (one ⚠️ reduced artefact) |
 > | 2.5 Specular rescue | ✅ COMPLETE — **REFUTED** | — | 0 |
-> | 3 Simulator (N2) | 🔴 CLOSED AT GATE | Task 0: 3.893 g/dL vs >2.0 | 0 (empirical signal now measured, Phase 6.5) |
+> | 3 Simulator (N2) | 🔴 CLOSED AT GATE | Task 0: 3.893 g/dL vs >2.0, 95% [2.37, 8.02] (Phase 9C) | 0 (empirical signal now measured, Phase 6.5) |
 > | 3.5 Ratio reformulation | 🔴 CLOSED AT GATE | Task 1: 10.04 g/dL vs >2.0 | 0 |
 > | 4 Imaging (N3) | 🔴 SUPERSEDED | imaging arm CLOSED, FINAL | 0 |
 > | 4 PPG gates | ✅ COMPLETE — **NOT VIABLE** | — | 0 |
@@ -475,13 +489,15 @@ and its output exists on disk.
 > | 8A Language for a dual audience | ✅ COMPLETE | — | 0 |
 > | 8B Visual redesign | ✅ COMPLETE | — | 0 (Lighthouse 97-100 / 100 / 100; 48 page states verified) |
 > | 9A Screening reframe | ✅ COMPLETE — imaging **WEAKENED** within site, **CONFIRMED** cross-site; PPG **CONFIRMED** | — | 0 (one recorded claim corrected) |
+> | 9B Literature audit widened | ✅ COMPLETE — 7 full texts, 6 criteria; one claim **NARROWED** | — | 0 |
+> | 9C Parameter uncertainty | ✅ COMPLETE — imaging refutation **ROBUST**; the studio number **FRAGILE**; one banner kept and strengthened | — | 0 |
 > | 6 (orig) Conformal (N4) | 🔴 SUPERSEDED | no estimator | 0 |
 > | 7 Fairness (N5) | 🔴 SUPERSEDED | no estimator; mechanism measured in Phase 3 Task 4 | 0 |
 > | 8 Fusion (N6) | 🔴 SUPERSEDED | no g/dL estimate from any modality | 0 (2 items found done, ticked) |
 > | 9 Web app | 🔴 SUPERSEDED | replaced by Phase 6 audit app | 0 (2 scaffold items ticked, with caveat) |
 > | 10 Flutter | 🔴 SUPERSEDED | no estimator | 0 |
 >
-> **Open work in the whole plan: none (Phase 9A, 2026-09-17).** What remains is the write-up.
+> **Open work in the whole plan: none (Phase 9C, 2026-09-20).** What remains is the write-up.
 >
 > ⚠️ **The write-up must carry the Phase 9A correction**: the imaging arm's refutation is
 > about **cross-site transfer**, not about the absence of a within-site screening effect.
@@ -915,6 +931,103 @@ pooled into one headline number.**
 - [x] Task 3: state per arm whether the screening framing CONFIRMS, WEAKENS or OVERTURNS the recorded verdict; if any verdict moves, stop and report before anything else *(ticked 2026-09-17: imaging **WEAKENED** within site / **CONFIRMED** cross-site; PPG **CONFIRMED**, strengthened. Nothing OVERTURNED. Logged as a correction with the original text preserved)*
 - [x] Task 4: `reports/phase9a_screening_metrics.md`, leading with model-vs-baseline, not AUROC alone *(ticked 2026-09-17)*
 - [x] Task 4: CLAUDE.md updated; results logged including any that weaken the project's own conclusions *(ticked 2026-09-17: 3 RESULTS LOG entries, 3 DECISION LOG entries, 2 corrections — including the one that weakens the project's own recorded claim)*
+
+### Phase 9B: The literature methodology audit, widened to every full text obtained (2026-09-20)
+
+**Why this phase exists.** The project's loudest rhetorical claim — that this field
+publishes accuracy figures without the checks that would make them meaningful — rested
+on 5 sources with most fields UNKNOWN and a single measured NO. Too thin for the claim
+being made. This phase reads every full text available (seven PDFs in
+`data/raw/literature/`) against six criteria so the claim either becomes defensible or
+is narrowed to what the counts support. **Rules fixed before scoring:** five answer
+categories (YES / NOT REPORTED / UNKNOWN / NOT APPLICABLE / FULL TEXT UNAVAILABLE), never
+collapsed; **no paper is ever recorded as failing a check** — the audit measures what is
+reported; the single measured NO (Phase 1, Ghana duplicates) stays on the dataset rows.
+Scoring is data in `hemosight.audit.literature`; the report is `reports/literature_gap.md`
+§9B; the counts are in `data/interim/phase9b/literature_audit.json`.
+
+- [x] Task 1: score each of the 7 PDFs on six criteria — demographic baseline; split level *and* augmentation-before/after-split; cross-site or cross-device; duplicate *and* leakage statement; pooled versus per-site; dataset used *(ticked 2026-09-20: 7 papers x 8 recorded fields, every value cites its section)*
+- [x] Task 2: five answer categories kept strictly distinct; single-site status recorded as NOT APPLICABLE, never as a failure *(ticked 2026-09-20; test-enforced: no paper value may begin NO or FAIL)*
+- [x] Task 3: the dataset-overlap consequence — how many audited papers use the Ghana collections; any paper treating overlapping collections as independent recorded factually, no conclusion drawn *(ticked 2026-09-20: **1 of 7** uses them (Asare 2023, as three modalities of the same 710 children); **1** cannot be determined (Sehar 2025); **0 of 7** treat two overlapping collections as independent or validate across them)*
+- [x] Task 4: `reports/literature_gap.md` extended with the full table, counts per criterion, the obtainability count, and what the sample can and cannot support *(ticked 2026-09-20: **12 identified, 7 obtained**; demographic baseline **0 of 7**; per-site results **0 of 3** multi-site papers; dedup **0 of 7**; leakage statement 3 of 7; a convenience sample, not a review)*
+- [x] Task 5: the claim follows the counts — narrowed *(ticked 2026-09-20: "a literature that frequently omits it" is **not supported at the rate it implies** and is narrowed to a statement about the seven papers read; the pooled-reporting point is licensed only as a worked example. Original wording kept in `docs/archive/superseded_claims.md` §6; DECISION LOG entry of this date)*
+- [x] CLAUDE.md updated; decisions and results logged to `docs/archive/`; `tests/test_phase9b.py`; reproduce stage added
+
+### Phase 9C: Parameter uncertainty propagated into the gate result (2026-09-20)
+
+**Why this phase exists.** The number that closed the imaging arm — Hb MAE **3.893 g/dL**
+at the 3.935 dE2000 residual (Phase 3 Task 0 on sourced constants; 3.471 at the
+uncontrolled 3.456 and 1.040 at the studio 1.062 residual, Phase 7) — is a point
+estimate from a forward model whose oxygenation, blood volume fractions, melanin and
+layer thicknesses were held **fixed and known**. Several are unsourced (VERIFICATION
+REQUIRED banner on thicknesses and BVFs; melanin a fitted power law). The gate result
+inherits uncertainty the project documented but never propagated. **This phase
+propagates it; it does not rebuild the forward model.**
+
+#### PRE-DECLARED, 2026-09-20, before any Phase 9C script was run
+
+**1. Interpretation rule.** The verdict at a residual is **ROBUST** to parameter
+uncertainty if the **entire 95% interval** of the gate MAE over the parameter prior
+falls on one side of the pre-declared **2.0 g/dL** threshold, and **FRAGILE** if the
+interval spans it. For the studio condition the same rule is applied at the **1.0 g/dL**
+VIABLE boundary as well. The rule is applied whichever way it falls; **ranges are not
+adjusted after seeing results.**
+
+**2. The propagation.** Self-consistent: for every draw of the parameter vector θ the
+forward model, the inversion LUT and the truth all use θ, and the residual colour error
+is applied exactly as in Phase 3 Task 0 (same perturbation generator, same Hb grid 4-18,
+same 240 trials per Hb, same LUT 2-24 step 0.05). The perturbation banks are regenerated
+in the original RNG order so that θ = nominal must reproduce **3.893 / 3.471 / 1.040
+exactly**; that reproduction is reported first, and if it fails the run is invalid. A
+second, separately labelled variant — LUT at nominal, truth at θ (the Phase 3 Task 4
+mismatch question) — is reported after the main result and never pooled with it.
+
+**3. Parameter prior, fixed before running.** Each parameter is labelled SOURCED (backed
+by a downloaded file or an independent measurement) or UNSOURCED (transcribed, assumed
+or fitted). Where no source exists the range is deliberately generous. The Phase 3 Task 4
+tolerances (BVF ±30%, thickness scale 0.8-2.0, oxygenation benign across 0.60-1.00) are
+the starting envelope and each range below is at least as wide.
+
+| parameter | nominal (gate) | prior | status |
+| --- | --- | --- | --- |
+| oxygenation StO2 | 0.75 | U[0.60, 1.00] | UNSOURCED — physiological assumption (`OXYGENATION_RANGE`) |
+| stromal blood volume fraction | 0.060 | U[0.01, 0.15] | UNSOURCED — Jacques 2013 soft-tissue range, transcribed (`BVF_RANGE`) |
+| epithelial melanin volume fraction | 0.0 | log-U[1e-4, 5e-2] | UNSOURCED — top of `MELANIN_RANGE`; conjunctiva is a sparsely pigmented mucosa, so results are also reported conditional on ≤ 0.005 |
+| melanin power-law exponent k | 3.33 (spectralLIB fit) | U[3.0, 4.0] | UNSOURCED — a fit, not a measurement; Jacques 1998 gives 3.48 |
+| melanin amplitude scale at 500 nm | 1.0 | log-U[0.5, 2.0] | UNSOURCED — inter-individual amplitude variation |
+| epithelium thickness | 32 µm | U[22, 46] µm | **SOURCED** — Li 2015 OCT 34 ± 5.8 µm, ±2 SD |
+| stroma thickness | 200 µm | U[100, 400] µm | UNSOURCED — VERIFICATION REQUIRED banner; 0.5-2× |
+| tarsal plate thickness | 800 µm | U[400, 1600] µm | UNSOURCED — VERIFICATION REQUIRED banner; 0.5-2× |
+| epithelium BVF | 0.002 | U[0, 0.01] | UNSOURCED |
+| tarsal plate BVF | 0.010 | U[0.002, 0.03] | UNSOURCED |
+| water fraction shift (all layers) | 0 | U[−0.10, +0.10] | UNSOURCED — assumed 0.70/0.75/0.60 |
+| reduced-scattering scale | 1.0 | log-U[0.5, 2.0] | SOURCED-GENERIC — spectralLIB soft tissue, not conjunctiva-specific |
+| deep-layer contribution weight | 0.6 | U[0.3, 1.0] | UNSOURCED — modelling constant in `forward.layered_reflectance` |
+| tissue refractive index n_rel | 1.40 | U[1.33, 1.45] | UNSOURCED — typical soft tissue |
+
+Held fixed and out of scope, stated: the D65 illuminant and the CIE 1931 observer as
+camera proxy (a capture-side limitation already logged, addressed by the measured
+residuals, not a tissue constant); the haemoglobin extinction and water spectra (sourced
+from downloaded files, Phase 3.5 Task 0).
+
+**4. Sampling and sensitivity.** Sobol quasi-random Saltelli design, base N = 1024, so
+the plain Monte Carlo sample is the 2,048 rows of the A and B matrices and the
+first-order and total Sobol indices come from the (d + 2) × 1024 evaluations; Jansen
+estimators; seed 20260911. Percentile 95% intervals. Reported for the three measured
+residuals 3.935, 3.456 and 1.062 dE2000. Sensitivity is ranked by total index; if
+melanin dominates, the report says so and names a measured melanin absorption curve as
+the single most valuable future measurement.
+
+**5. Task 4.** Efron 2009 and Zhivov 2006 are sought with network access. If obtained,
+the thickness and BVF values are replaced with sourced ones, the priors narrowed, and
+Tasks 1-3 re-run and reported side by side with the assumed-range results. If not, the
+attempt is recorded and the banner stays.
+
+- [x] Task 1: parameter prior declared with SOURCED / UNSOURCED status and justification per parameter; nominal reproduces the three point estimates exactly; gate MAE reported as a distribution (median, 95% interval, histogram) at 3.935, 3.456 and 1.062 dE2000 *(ticked 2026-09-20: 14 parameters, **13 UNSOURCED**; nominal reproduces 3.892987 / 3.470951 / 1.039592 to 1e-12; medians 4.67 / 4.28 / 1.52, 95% [2.37,8.02] / [2.09,7.90] / [0.60,4.90]; `hemosight.simulation.uncertainty`, `scripts/phase9c_uncertainty.py`)*
+- [x] Task 2: fraction of the prior above 2.0 g/dL per residual; the interpretation rule applied; any combination below 2.0 identified with its plausibility; the studio condition against 1.0 g/dL *(ticked 2026-09-20: 99.5% / 98.4% / 37.0% above 2.0; **ROBUST, ROBUST, FRAGILE**; 10 of 2,048 draws below 2.0 at the gate residual, needing 5 of 14 parameters simultaneously in the outer quarter of their ranges, best draw 1.75 g/dL — MARGINAL, never VIABLE; studio 27.1% VIABLE / 35.9% MARGINAL / 37.0% NOT RECOVERABLE)*
+- [x] Task 3: Sobol first-order and total indices, ranked; one-at-a-time swing per parameter; the melanin recommendation stated if supported *(ticked 2026-09-20: at 3.935 the ranking is deep-layer weight 0.303, epithelial BVF 0.284, **melanin 0.258**, stromal BVF 0.187 — melanin is 3rd here and 1st at the studio residual; the expected "melanin dominates" is only partly supported and is reported as such; mechanism measured: rank correlation between gate MAE and colour-per-g/dL span **-0.96**)*
+- [x] Task 4: Efron 2009 and Zhivov 2006 sought; outcome recorded; banner lifted or kept *(ticked 2026-09-20: **Efron 2009 OBTAINED** via the open-access QUT thesis that carries the same study — and it contains **no palpebral thickness in µm at all**, only "two or three cell-layers deep"; its 32.9 µm is **BULBAR**, a different tissue. **Zhivov 2006 NOT OBTAINED** (closed access, no repository copy). **Banner KEPT and strengthened** from "could not be verified" to "the source was read and does not contain them"; correction logged)*
+- [x] Task 5: `reports/phase9c_uncertainty.md`; the interval placed beside the point estimate in CLAUDE.md, `final_results.md`, the audit package provenance and the case study, the point estimate retained with a pointer; CLAUDE.md, logs, tests, reproduce stage *(ticked 2026-09-20: report written; interval added to CLAUDE.md (CURRENT STATE, section 2 rows 3 and 8, the Phase 3 row), `final_results.md` master table, `phase3_simulation.md` headline box, `phase7.md` gate table and outcome-B verdict, and the front end's case study and pre-registration pages; **no point estimate deleted anywhere**; `tests/test_phase9c.py`; reproduce stage added)*
 
 ### Phase 6 (original plan): Conformal prediction and abstention (N4)
 

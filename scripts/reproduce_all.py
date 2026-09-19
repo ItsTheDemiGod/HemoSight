@@ -143,6 +143,15 @@ STAGES = [
           note="CPU; 2,000-resample subject-level bootstraps. Thresholds, operating "
                "point and margin pre-declared in CLAUDE.md and committed before it ran"),
     Stage("Phase 9A report", "phase9a_report.py", 0.1),
+    Stage("Phase 9B literature audit", "phase9b_literature_audit.py", 0.1,
+          note="CPU; scoring is data in hemosight.audit.literature (7 full texts in "
+               "data/raw/literature/, read 2026-09-20); regenerates literature_gap.md"),
+    Stage("Phase 9C parameter uncertainty", "phase9c_uncertainty.py", 25, slow=True,
+          note="CPU, MEASURED 1,070 s for 16,384 Saltelli evaluations x 3 residuals plus "
+               "290 s of banks and mismatch. DETERMINISTIC: nominal theta must reproduce "
+               "3.892987 / 3.470951 / 1.039592 to 1e-12 or the run aborts. --reuse-design "
+               "reruns the summaries from the cached design in ~3 min"),
+    Stage("Phase 9C report", "phase9c_report.py", 0.1),
 ]
 
 
