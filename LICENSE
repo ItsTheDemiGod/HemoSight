@@ -1,0 +1,65 @@
+MIT License
+
+Copyright (c) 2026 HemoSight contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+================================================================================
+SCOPE: THIS LICENCE COVERS THIS PROJECT'S CODE ONLY
+================================================================================
+
+The MIT terms above apply to the source code, scripts, tests, configuration and
+documentation authored in this repository. They do NOT apply to any dataset.
+
+NO DATASET IS REDISTRIBUTED HERE. `data/` is excluded from version control in
+full, and a test (`tests/test_phase5.py::test_no_dataset_files_are_tracked_by_git`)
+fails the suite if a dataset file is ever staged. Figures rendered from dataset
+imagery are likewise excluded (`reports/figures/` is gitignored) and are
+regenerable from `scripts/`.
+
+Each of the ten data sources this project used remains under its own terms, and
+those terms were verified from each provider's landing page or access form on
+2026-09-12. NONE of the ten ships a licence file. In summary:
+
+  * CC BY 4.0 (4 sources) - CP-AnemiC; Ghana conjunctiva (Mendeley nt7r8hv2pz);
+    Ghana fingernails (Mendeley 2xx4j3kjg2); the four-wavelength Hb-PPG dataset.
+
+  * CUSTOM NON-COMMERCIAL AGREEMENT, REDISTRIBUTION FORBIDDEN (2 sources) -
+    SBVPI and MOBIUS (University of Ljubljana). Both require a signed Data Access
+    and Processing Agreement obtained directly from the provider, permit
+    non-commercial research use only, and mandate specific acknowledgements and
+    citations. MOBIUS alone permits scaled-down or watermarked figures; SBVPI
+    makes no such allowance.
+
+  * NO LICENCE STATED AT ALL (2 sources) - the NUS 8-camera colour constancy
+    benchmark and Eyes-Defy-Anemia. Used under the customary research-use
+    expectation their pages imply, with the citations their authors request.
+    Their redistribution terms are UNVERIFIED because none are published.
+
+  * PUBLIC RESEARCH RESOURCES (2 sources) - the OMLC/Prahl and mcxyz spectralLIB
+    optical constants, and the Jiang et al. camspec camera spectral sensitivities.
+
+Obtaining any dataset is the user's responsibility and is subject to that
+provider's terms, not to this licence. Per-source URLs, licence status and
+obtaining instructions are in `reports/dataset_manifest.md`; the full licence
+audit is in `reports/phase1_dataset_licences.md`.
+
+NOT A MEDICAL DEVICE. This software is a research artefact. It is not a
+diagnostic device, it has never been clinically validated, and all of its
+evaluation is retrospective on public datasets.
