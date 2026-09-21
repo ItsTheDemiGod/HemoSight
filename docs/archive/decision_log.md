@@ -1729,3 +1729,91 @@ document**, and nothing was checking it. The Phase 9E tests are that check.
 
 **No verdict changes.** The Phase 7 outcome is still B; the imaging arm is still CLOSED,
 FINAL.
+
+### 2026-09-21 — Phase 9F: housekeeping after 9E — both required-n figures, and a rule to stop CLAUDE.md overflowing
+
+**Decision.** A housekeeping phase with **no new analysis**. No script was run, no number
+was recomputed, no artefact under `data/interim/` changed, and **no result or verdict
+moved**. Two durable fixes.
+
+**Task 1 — both italy→india figures, side by side, everywhere.** Phase 9E added an **R²
+floor of 0.50** mid-run to decide whether the measured SE-scaling slope or the 1/√n
+reference becomes the headline required-n figure. For `italy_to_india` that selected
+**266** non-anaemic subjects over the measured slope's **778**.
+
+> **The rule was sound and was logged, and that is not sufficient.** It keys on R² and
+> never on the size of the answer; a test asserts the headline tracks R² and that both
+> bases stay on the record; and the deviation was recorded in the DECISION LOG rather
+> than applied silently. But three facts stand together: the two answers differ **2.9×**,
+> the rule was **added after the analysis began**, and it **happened to select the more
+> optimistic figure in both comparisons it touched**. A skeptical reader should not have
+> to go looking for the other number, and under Phase 9E's own bullet list they did —
+> the alternative sat in a footnote under the table while the headline appeared in four
+> documents alone.
+
+Both figures are now in the same cell or the same sentence wherever the requirement
+appears: `reports/phase9e_boundaries.md` (required-n table, composition table, headline
+box, the consolidated study specification, and a new boxed side-by-side section stating
+the rule, the R² that triggered it and when it was fixed), `reports/final_results.md`,
+`reports/phase9d_power.md` and CLAUDE.md (CURRENT STATE, the section 2 Phase 9E box, and
+the Phase 9E Task 2 tick). The **PPG AUROC** comparison, the other one the floor decided,
+gets identical treatment: **131 / 202** at R² 0.23.
+
+**The headline did not change, deliberately.** The instruction was to make the
+alternative equally visible, not to swap which figure leads, and swapping it would have
+been the same error in reverse — choosing by size rather than by the stated rule. What
+the reports now add is a recommendation a study designer can act on: **size against the
+larger figure unless you can measure the scaling on your own pilot.** That is the
+conservative reading, it is stated as a recommendation rather than as the headline, and
+it is separated from the rule-derived number.
+
+**Task 2 — the pre-declaration rule.** The 2026-09-17 split cut CLAUDE.md to about 76,000
+characters; it was back at **120,380** four phases later, over its test-enforced limit.
+The logs already route to `docs/archive/`, so essentially all of the regrowth was
+**per-phase pre-declaration blocks accumulating inline**. Section 9 now says: **a
+pre-declaration stays inline only while its phase is active; when the phase closes the
+block moves verbatim to `docs/archive/predeclarations.md`, and section 6 keeps the
+heading, one line of summary and a pointer.**
+
+**Rationale.** A pre-declaration is the one kind of content that is load-bearing while a
+phase runs and pure evidence once it ends. What stops a threshold being chosen after the
+result is known is that it was fixed in advance; once the phase closes, the reader
+checking that goes to the evidence, not to the working document. **And the protocol
+states explicitly why moving one cannot weaken it:** what makes a declaration a
+*pre*-declaration is **not which file it sits in** but that it was **committed before the
+run**, which git records permanently and no later edit can forge. Phase 9E's block is in
+`f4a3fc0`, whose message says it pre-declares the phase; its results landed in `cc4767f`.
+The commit is the evidence; the archive is the readable copy.
+
+**Applied retroactively to all 10 closed-phase blocks** — Phases 2.5, 3, 3.5, 4, 4.5, 7,
+9A, 9C, 9D and 9E — consolidating the two single-phase files (`phase9d_predeclaration.md`,
+`phase9e_predeclaration.md`) that Phase 9E had created the previous day into the one file
+the protocol now names. Those two files were removed from the working tree; they remain in
+git history and every character of them is in `predeclarations.md`.
+
+**Verification, because "nothing was lost" is a claim and not an assurance.** Each block
+was checked individually to be **present byte-identical in the archive and absent from
+CLAUDE.md**: 10 blocks, **20,304 characters**, all verbatim. **CLAUDE.md 117,415 →
+112,441 characters** before the Phase 9F record was added, 114,795 after.
+
+**Enforced by test, not by discipline.** `tests/test_docs.py` gains
+`test_closed_phase_predeclarations_are_not_inline` (every pre-declaration opener in
+CLAUDE.md must have a pointer to the archive within six lines, while CURRENT STATE says
+no phase is active) and `test_every_predeclaration_pointer_resolves` (every cited section
+number must exist, and the archive must hold at least as many blocks as section 6 has
+headings). Both were **confirmed to fail on an injected regression** — a pre-declaration
+body pasted back inline — and to pass once it was removed. `predeclarations.md` was also
+added to the archive-file existence check.
+
+**Alternatives considered.** *Raising the 120,000-character limit* — rejected: the limit
+exists because the file is loaded in full every session, and raising it each time it is
+hit is how the file reached 233,820 characters before the first split. *Deleting closed
+phases' pre-declarations outright* — rejected, and forbidden by the never-delete rule;
+they are the evidence that the thresholds predate the results. *Making 778 the headline
+because it is more conservative* — rejected: that is selection by size, which is the very
+thing the R² rule exists to avoid, and it would have been the same error in reverse.
+
+**Consequences.** Five generating scripts touched and their reports regenerated; section
+9 amended; `docs/archive/predeclarations.md` created; `docs/archive/README.md` and the
+CLAUDE.md archive table updated; three tests added (235 passing). **Nothing under
+`data/interim/` was touched and no recorded result, interval, band or verdict changed.**

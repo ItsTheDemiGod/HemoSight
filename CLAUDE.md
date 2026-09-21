@@ -31,7 +31,7 @@ write-up.**
 | Gate result, with uncertainty (Phase 9C) | **median 4.67 g/dL, 95% [2.37, 8.02]** at the 3.935 dE2000 residual over a declared prior on the 14 fixed tissue parameters — point estimate 3.893 retained. 99.5% of the prior is > 2.0, and the whole interval is, so the imaging refutation is **ROBUST to parameter uncertainty**. The **studio** number (1.040) is **FRAGILE**: 95% [0.60, 4.90], spanning all three bands (`reports/phase9c_uncertainty.md`) |
 
 | The one regime nobody measured (Phase 9E) | **THE GUIDED-CAPTURE GAP — named, not closed, and the project's primary future-work item.** A deployed app captures with one phone in one session behind a framing overlay and a quality gate: between the 1.981 and 1.062 dE2000 measured conditions, which is exactly where the gate crosses bands. **Interpolated** (not measured) at the geometric mean 1.450 → **1.44 g/dL MARGINAL** at nominal parameters, **median 2.06, 95% [0.83, 5.73]** over the prior. **VIABLE needs < 0.986, below the best measured condition in the project**, so no point in the interval reaches VIABLE (`reports/phase9e_boundaries.md`) |
-| What a confirmatory study would need (Phase 9E) | Every UNDERPOWERED comparison converted to a specification, stated for the group that **carries** the metric. **italy→india: 27 non-anaemic subjects now, 266 needed** (10×, a ~936-person test site at that prevalence, 532 if balanced); india→italy 98 → 311; within site 125 → 166 non-anaemic and 91 → 120 anaemic; PPG AUROC 18 → 131 anaemic. The SE scaling was **measured by subsampling**, not assumed |
+| What a confirmatory study would need (Phase 9E) | Every UNDERPOWERED comparison converted to a specification, stated for the group that **carries** the metric. **italy→india: 27 non-anaemic subjects now; 266 needed on the 1/√n reference, 778 on the measured slope** (test sites of ~936 and ~2,736 at that prevalence; 532 and 1,555 if balanced) — an **R² floor added mid-run** makes the first the headline because that fit's R² is 0.25, and **both are reported everywhere**. india→italy 98 → 311; within site 125 → 166 non-anaemic and 91 → 120 anaemic; PPG AUROC 18 → 131 (202 measured). **Size against the larger unless the scaling is measured on a pilot** |
 | Statistical power (Phase 9D) | MDE at 80% power on each arm's **deciding** comparison. **ADEQUATELY POWERED:** imaging regression (0.18 g/dL vs a 1.0 g/dL clinical yardstick) and PPG regression (0.14 g/dL) — both negative results are informative. **UNDERPOWERED:** imaging screening within site (0.116 vs the 0.10 margin, 67% power), **imaging cross-site (italy→india 0.314 — 3.1× the margin, 14% power, specificity on 27 non-anaemic subjects)** and PPG screening AUROC (0.27 on 18 anaemic subjects). Retrospective power deliberately NOT computed (`reports/phase9d_power.md`) |
 
 | Literature audit (Phase 9B) | **7 full texts read, 12 identified**; a convenience sample, not a review. Demographic baseline reported by **0 of 7**; per-site results by **0 of the 3 multi-site papers**; deduplication mentioned by 0 of 7. **No paper is recorded as failing a check.** The claim "a literature that frequently omits it" was **narrowed** to a statement about these seven (`reports/literature_gap.md` §9B) |
@@ -88,7 +88,7 @@ text; it changed none. The pre-split file is recoverable from the git tag
 | `docs/archive/results_log.md` | **Section 8, RESULTS LOG** — the 48 entries that stood in this file, in date order, verbatim, plus everything appended since. Every metric produced, including failures and negative results. |
 | `docs/archive/superseded_claims.md` | Every original claim wording retained under a refuted or superseded banner (N1 headline, N1 pre-restructure, N2 justification, N5 method), plus a register of the 10 other superseded banners and where each is retained. |
 | `docs/archive/corrections.md` | All 7 standalone correction entries verbatim, each with the entry it corrects, plus a register of 9 in-place correction banners. |
-| `docs/archive/phase9d_predeclaration.md`, `docs/archive/phase9e_predeclaration.md` | The **PRE-DECLARED blocks of Phases 9D and 9E**, verbatim, moved out of section 6 on 2026-09-21 under section 9's splitting rule when this file hit 120,380 characters. Each also stands in the commit that first carried it — `f4a3fc0` for 9E — which is what makes it a pre-declaration rather than a summary written afterwards. |
+| `docs/archive/predeclarations.md` | **Every pre-declaration this project made, verbatim** — all 10 threshold-and-gate blocks, in phase order, moved out of section 6 on 2026-09-21 under section 9's pre-declaration rule. Section 6 keeps each heading, a one-line summary and a pointer. **Moving them does not weaken them:** what makes a declaration a *pre*-declaration is that it was committed before the run, and git records that permanently. |
 | `docs/archive/README.md` | The index, the split's verification numbers, and the append rules. |
 
 `superseded_claims.md` and `corrections.md` are **cross-cutting collections**: every
@@ -191,7 +191,7 @@ These drive every design decision.
 >
 > **The regime a real product operates in is the one regime this project did not measure.** A deployed app's guided capture — one phone, one session, a live framing and distance overlay, a quality gate before the shutter — sits between the 1.981 and 1.062 dE2000 measured conditions, which is exactly where the gate crosses bands and where Phase 9C found the verdict fragile. **It cannot be closed here** (section 3 forbids collecting data, permanently), so it is recorded as a **named boundary of the claim and the project's primary future-work item**, bounded by an interpolation between the two measured points: **1.450 dE2000 → 1.44 g/dL MARGINAL** at nominal parameters, **median 2.06, 95% [0.83, 5.73]** over the prior. Labelled an interpolation everywhere it appears. **No point in the interval reaches VIABLE, including its most favourable end.**
 >
-> **Every UNDERPOWERED verdict is now a study specification, stated by the group that carries the metric.** The cross-site failure is a **composition** problem, not a raw-n one: `italy→india` estimates specificity on **27 non-anaemic subjects and needs about 266** — 10× more, a ~936-person test site at that prevalence, or 532 recruited to a balanced one. `india→italy` 98 → 311; within site 125 → 166 non-anaemic and 91 → 120 anaemic; PPG AUROC 18 → 131 anaemic. **The SE scaling was measured by subsampling rather than assumed**, and where the fit itself failed — on the two smallest carrier groups, which is the same problem showing up twice — the 1/√n reference is the headline and the measured slope is reported beside it.
+> **Every UNDERPOWERED verdict is now a study specification, stated by the group that carries the metric.** The cross-site failure is a **composition** problem, not a raw-n one: `italy→india` estimates specificity on **27 non-anaemic subjects and needs 266 on the 1/√n reference or 778 on the measured slope** — 10× or 29× more, test sites of ~936 or ~2,736 at that prevalence, 532 or 1,555 recruited to a balanced one. `india→italy` 98 → 311; within site 125 → 166 non-anaemic and 91 → 120 anaemic; PPG AUROC 18 → 131 (202 on the measured slope). **The SE scaling was measured by subsampling rather than assumed**, and where the fit itself failed — on the two smallest carrier groups, which is the same problem showing up twice — an **R² floor of 0.50, added mid-run and logged as a deviation**, makes the 1/√n reference the headline. **It selected the more optimistic figure in both cases, so both are stated side by side wherever the requirement appears, and a study designer should size against the larger.**
 >
 > **A language pass bounded three overstatements and weakened nothing that the evidence supports.** Cross-site counts now lead and no rate is quoted without its interval; underpowered nulls are stated as bounds; the studio 1.040 never appears without its [0.60, 4.90]. **The two regression arms stay at full strength.** One stale correction was found and fixed: `reports/phase7.md` still carried the phrase Phase 9A retired in 2026-09-17. **No verdict changed.**
 >
@@ -539,6 +539,7 @@ and its output exists on disk.
 > | 9C Parameter uncertainty | ✅ COMPLETE — imaging refutation **ROBUST**; the studio number **FRAGILE**; one banner kept and strengthened | — | 0 |
 > | 9D Power analysis | ✅ COMPLETE — 2 arms **ADEQUATELY POWERED**, 3 comparisons **UNDERPOWERED**; the most load-bearing finding is the least powered | — | 0 |
 > | 9E Boundaries | ✅ COMPLETE — the guided-capture gap **NAMED** (not closed); every underpowered comparison converted to a **required n**; three overstatements corrected, **no verdict changed** | — | 0 |
+> | 9F Housekeeping | ✅ COMPLETE — **no new analysis.** Both italy→india required-n figures now reported side by side; pre-declarations routed out of this file by protocol and test | — | 0 |
 > | 6 (orig) Conformal (N4) | 🔴 SUPERSEDED | no estimator | 0 |
 > | 7 Fairness (N5) | 🔴 SUPERSEDED | no estimator; mechanism measured in Phase 3 Task 4 | 0 |
 > | 8 Fusion (N6) | 🔴 SUPERSEDED | no g/dL estimate from any modality | 0 (2 items found done, ticked) |
@@ -599,13 +600,7 @@ direct sample of the scene illuminant and carries **no per-subject reflectance t
 precisely the variance that defeated the sclera in Phase 2. This is a hypothesis to
 test, not a claim to confirm.
 
-**Thresholds declared BEFORE running (2026-09-11):**
-- **Feasibility gate:** if fewer than **30%** of images yield a detectable AND
-  unsaturated corneal highlight, STOP at Task 1 and report non-viability.
-- **SUPPORTED:** specular beats grey-world on held-out-iris within-subject dE2000
-  spread, paired Wilcoxon p < 0.05.
-- **PARTIALLY SUPPORTED:** specular beats no-correction (p < 0.05) but not grey-world.
-- **REFUTED:** specular fails to beat no-correction.
+**Thresholds declared BEFORE running (2026-09-11).** ➡️ Verbatim in `docs/archive/predeclarations.md` §1. In summary: a **30% feasibility gate** on detectable, unsaturated corneal highlights; then SUPPORTED if specular beats grey-world on the held-out-iris protocol (paired Wilcoxon p < 0.05), PARTIALLY SUPPORTED if it beats only no-correction, REFUTED otherwise.
 
 - [x] Task 1: feasibility census — highlight detection rate, saturation distribution, area, by phone and lighting
 - [x] Apply the 30% feasibility gate and report the number before proceeding
@@ -618,17 +613,7 @@ test, not a claim to confirm.
 
 ### Phase 3: Monte Carlo tissue simulator (N2)
 
-**TASK 0 GATE — interpretation thresholds declared BEFORE running (2026-09-11):**
-Propagate the residual colour error that grey-world actually leaves through the
-forward model and measure the resulting haemoglobin error.
-- **Under +/-1.0 g/dL** -> the approach is VIABLE; proceed.
-- **1.0 to 2.0 g/dL** -> MARGINAL; viable only for coarse screening bands, not point
-  estimates. Report which WHO severity boundaries remain distinguishable.
-- **Over +/-2.0 g/dL** -> the colour-to-haemoglobin inversion is NOT RECOVERABLE under
-  realistic calibration error. STOP and report as a major finding.
-Residual errors tested: **3.935** dE2000 (grey-world at 25% FOV, the recommended
-normalisation), **6.076** (grey-world full frame), and **1.0** (best case).
-The result is reported before any further work, whatever it shows.
+**TASK 0 GATE — interpretation thresholds declared BEFORE running (2026-09-11).** ➡️ Verbatim in `docs/archive/predeclarations.md` §2. In summary: propagate the residual colour error grey-world actually leaves through the forward model and measure the resulting haemoglobin error — **< 1.0 g/dL VIABLE, 1.0–2.0 MARGINAL, > 2.0 NOT RECOVERABLE, stop and report as a major finding**. Residuals tested 3.935, 6.076 and 1.0 dE2000; the result reported before any further work, whatever it showed.
 
 - [x] Task 0: minimal forward model plus error propagation; report the gate result first
 - [x] Task 0: report whether Hb error is uniform or worse at low Hb, where screening decisions are made
@@ -665,12 +650,7 @@ was demanding the reference yield the ABSOLUTE illuminant, which needs its refle
 known. A ratio needs only that the reference be STABLE PER SUBJECT, which Phase 2
 demonstrated it is. **This is a hypothesis to test, not to confirm.**
 
-**Thresholds declared BEFORE running (2026-09-11), in the equivalent-Hb units of the
-Phase 3 gate so the comparison is direct:**
-- **Equivalent residual < 1.0 g/dL** -> the illuminant cancels; proceed to Task 2.
-- **1.0 to 2.0 g/dL** -> partial cancellation; MARGINAL.
-- **> 2.0 g/dL** -> von Kries diagonality or region stability is failing; the
-  reformulation does NOT rescue the claim. STOP, do not proceed to Task 2.
+**Thresholds declared BEFORE running (2026-09-11).** ➡️ Verbatim in `docs/archive/predeclarations.md` §3. In summary: the same bands in the **equivalent-Hb units of the Phase 3 gate**, so the comparison is direct — **< 1.0 g/dL the illuminant cancels** and Task 2 proceeds, 1.0–2.0 partial cancellation, **> 2.0 the reformulation does not rescue the claim: stop, do not proceed to Task 2.**
 
 - [x] Task 0: replace transcribed constants with the downloaded sourced files; report disagreements
 - [x] Task 1: cancellation test on the unchanged MOBIUS protocol; report before proceeding
@@ -710,22 +690,7 @@ by construction in the TIME domain, not the spatial domain that failed in Phase 
 It is the principle under which pulse oximetry already works clinically without
 per-subject calibration. **It must still be gated, not assumed.**
 
-**GATE A thresholds, declared BEFORE running (2026-09-11):**
-- Nuisance variance reduction **>= 50%** AND signal exceeding non-Hb variation -> PASS.
-- Reduction present but signal comparable to noise -> MARGINAL, stop for a decision.
-- No meaningful reduction -> FAIL, the normalisation does not cancel on real data.
-
-**GATE B thresholds (same bands as the Phase 3 gate), applied SEPARATELY to each of
-three conditions:**
-- **< 1.0 g/dL MAE** -> viable. **1.0-2.0** -> marginal, screening bands only.
-  **> 2.0** -> not viable.
-- Conditions: (1) all four wavelengths = the physics ceiling; (2) 660 nm only = the one
-  channel a phone shares; (3) simulated phone-RGB = what is actually deployable.
-- If (1) passes and (3) fails, that is the honest finding and is reported as such.
-
-⚠️ **Phase 3.5 showed exact algebraic cancellation on synthetic data and 139x that
-residual on real captures. Cancellation is verified ON REAL DATA; any synthetic check is
-an implementation test only.**
+**GATE A and GATE B thresholds, declared BEFORE running (2026-09-11).** ➡️ Verbatim in `docs/archive/predeclarations.md` §4. In summary: **Gate A** passes on a nuisance variance reduction **≥ 50%** with signal exceeding non-Hb variation. **Gate B** applies the Phase 3 bands (< 1.0 viable, 1.0–2.0 marginal, > 2.0 not viable) **separately** to four-wavelength, 660-nm-only and simulated phone-RGB — and if the physics ceiling passes while the deployable condition fails, that is the honest finding and is reported as such. Cancellation is verified on **real** data; any synthetic check is an implementation test only.
 
 - [x] Task 0 / GATE A: AC-DC extraction documented precisely; cancellation verified on real data
 - [x] Task 0 / GATE A: nuisance variance reduction and signal-to-noise in per-g/dL units; report before proceeding
@@ -744,14 +709,7 @@ reader of a negative-results paper will ask whether it was. It is answered with 
 rather than omission. **The expected outcome is failure, and failure is the useful
 result.**
 
-**Same pre-declared thresholds as Phase 4 Gate B:** <1.0 g/dL viable, 1.0-2.0 marginal,
->2.0 not viable. Same baselines: population mean, sex alone, full demographics. Same
-grouped leave-subject-out splits.
-
-⚠️ **With 252 subjects a deep model can trivially memorise.** Subject-disjoint folds are
-verified explicitly, the train-test gap is reported, and **if any model beats the
-demographic baseline a sex probe is run on its learned representation FIRST** — Phase 4
-Task 3 showed how easily an apparent Hb model is really a sex classifier.
+**Same pre-declared thresholds as Phase 4 Gate B.** ➡️ Verbatim in `docs/archive/predeclarations.md` §5. In summary: Gate B's bands, baselines (population mean, sex alone, full demographics) and grouped leave-subject-out splits, all unchanged; subject-disjoint folds **verified explicitly**, the train–test gap reported, and **a sex probe run FIRST on the learned representation of any model that beats the demographic baseline** — because Phase 4 Task 3 showed how easily an apparent Hb model is really a sex classifier.
 
 - [x] Task 1: 1D CNN and a sequence model over raw waveforms; 4-channel and 660-nm-only
 - [x] Task 1: verify subject-disjoint folds explicitly; report train-test gap
@@ -835,24 +793,7 @@ phones, 0.924 in studio) and Phase 6.5 (under Eyes-Defy's controlled illuminant,
 conjunctival colour correlates with Hb within site, r 0.54-0.63). The untested question is
 whether the refutation is about PHOTOGRAPHS or about UNCONTROLLED photographs.
 
-**Thresholds declared BEFORE running (2026-09-12).** The Phase 3 gate is re-run at
-MEASURED residuals, never assumed ones: the within-subject sclera colour spread (dE2000)
-under each capture condition, with the best of {no correction, grey-world full frame,
-grey-world 25% crop} applied per condition. Conditions, from least to most controlled:
-MOBIUS across 3 phones x 3 lighting (the Phase 3.5 figure); MOBIUS same phone, same
-lighting, gaze varying (geometry only); SBVPI studio. Bands as Phase 3: **< 1.0 g/dL
-VIABLE, 1.0-2.0 MARGINAL, > 2.0 NOT RECOVERABLE.** Outcomes:
-- **A - closes the gap:** gate MAE at the studio residual < 1.0 AND the Eyes-Defy empirical
-  colour model (Phase 6.5, measured under a fixed LED) < 1.0 -> the refutation is about
-  uncontrolled capture specifically and is restated narrowly.
-- **B - partial:** either lands in 1.0-2.0 -> controlled capture moves the inversion from
-  NOT RECOVERABLE to MARGINAL only; the refutation is restated as two-part (not recoverable
-  uncontrolled; screening bands at best controlled).
-- **C - generalises:** both stay > 2.0 -> the refutation is stronger, not narrower.
-The residual needed to reach VIABLE is read off the gate model and compared with every
-measured condition. Eyes-Defy has one image per subject, so its within-subject residual
-is NOT measurable and is reported as such; its empirical MAE is the controlled-capture
-measurement it does support. Reported whichever way it falls.
+**Thresholds declared BEFORE running (2026-09-12).** ➡️ Verbatim in `docs/archive/predeclarations.md` §6. In summary: the Phase 3 gate is re-run at **MEASURED** within-subject residuals, never assumed ones, across three capture conditions from least to most controlled, under the Phase 3 bands; outcomes **A** (closes the gap — restate the refutation narrowly), **B** (partial — controlled capture reaches MARGINAL only) and **C** (generalises — the refutation is stronger) were fixed in advance, and reported whichever way it fell.
 
 - [x] Task 1: measure within-subject residuals per capture condition (MOBIUS across conditions, MOBIUS within condition, SBVPI studio), with and without grey-world *(ticked 2026-09-12: `scripts/phase7_controlled_capture.py`; best residuals MOBIUS across phones x lighting 3.46, MOBIUS same phone + lighting 1.98, SBVPI studio 1.06 dE2000)*
 - [x] Task 1: re-run the Phase 3 gate at each measured residual; report MAE against the bands *(ticked 2026-09-12: studio residual -> MAE 1.04 g/dL, MARGINAL; across-phone 3.47, NOT RECOVERABLE)*
@@ -920,55 +861,7 @@ screening point defined below.
 
 #### PRE-DECLARED, 2026-09-17, before any Phase 9A script was run
 
-**1. WHO thresholds, and which subjects they apply to.** Every subject in both
-datasets is an adult — Eyes-Defy ages 19-88, Hb-PPG ages 21-90, **no subject under
-19** — so only the adult thresholds apply and no child threshold (6-59 mo 11.0;
-5-11 y 11.5; 12-14 y 12.0) is used on anyone. Applied: **men ≥15 y, Hb < 13.0 g/dL;
-non-pregnant women ≥15 y, Hb < 12.0 g/dL.** Resulting prevalence: Eyes-Defy
-**91 of 216 (42.1%)**, Hb-PPG **18 of 252 (7.1%)**.
-*Limitation, stated before running:* **pregnancy status is not recorded in either
-dataset.** The non-pregnant threshold is applied to all women. A pregnant woman's
-threshold is 11.0 g/dL, so any pregnant subject is over-called anaemic here. This
-cannot be corrected from the available data and is carried into every result.
-
-**2. The operating point, declared before it is computed.** For a referral triage the
-costly error is a missed anaemic case, so: **the threshold with the highest
-specificity subject to sensitivity ≥ 0.90.** It is chosen **on the training folds
-only**, inside each CV fold, and applied to the held-out fold — nested selection, so
-no operating point is ever picked after seeing the test data it is scored on. If no
-training-fold threshold reaches sensitivity 0.90, the most sensitive available
-threshold is used and the failure to reach the criterion is reported.
-
-**3. What counts as clinically meaningful, declared before it is measured.** At
-**matched specificity**, the model must improve sensitivity over the best demographic
-baseline by **≥ 0.10 (10 percentage points)**, AND the lower bound of the 95%
-subject-level bootstrap CI on the paired difference must be **> 0**.
-*Justification.* At Eyes-Defy's prevalence, +0.10 sensitivity is ~9 more anaemic
-subjects referred per 216 screened — about **1 per 24 people screened**. At Hb-PPG's
-prevalence it is 1.8 more cases per 252, about **1 per 140 screened**. Ten points is
-the smallest sensitivity gain that could plausibly change a referral policy, given
-that the added cost is one photograph or one PPG capture per person screened. A point
-estimate whose CI includes zero is not evidence of improvement, whatever its size.
-The symmetric test is also reported: at **matched sensitivity**, a specificity gain
-≥ 0.10 with CI lower bound > 0 counts equally.
-
-**4. Screening verdict bands, declared before any number is seen.**
-- **USEFUL** — sensitivity ≥ 0.90 **and** specificity ≥ 0.50 at the chosen point,
-  **and** the margin in item 3 is cleared. The specificity floor is there because a
-  tool that refers almost everyone has perfect sensitivity and no value.
-- **MARGINAL** — meets the sensitivity and specificity floors but does not clear the
-  margin over the demographic baseline, or clears it with a CI that includes zero.
-- **NOT USEFUL** — fails either floor, or does not reduce the referral rate against
-  referring everybody.
-
-**5. Uncertainty.** 2,000 subject-level bootstrap resamples, seed 20260911, percentile
-95% CIs. Differences between models are **paired**: both are recomputed on the same
-resample. Number needed to screen = 1 / (prevalence x sensitivity); false-referral
-rate = 1 − PPV; referral rate = (TP+FP)/n, reported always so "refers everyone" is
-visible.
-
-**6. Within-site and cross-site are reported separately for the imaging arm and never
-pooled into one headline number.**
+➡️ **Verbatim in `docs/archive/predeclarations.md` §7.** In summary: **adult WHO thresholds only** (men < 13.0, non-pregnant women < 12.0; no subject under 19 in either dataset), with pregnancy status unrecorded and carried as a limitation into every result; the operating point is **the highest specificity subject to sensitivity ≥ 0.90, chosen on the training folds only** and applied to the held-out fold; clinically meaningful is **≥ 0.10** improvement with a **bootstrap CI lower bound above zero**, in either direction (both count equally); bands **USEFUL / MARGINAL / NOT USEFUL** with a 0.50 specificity floor, so a tool that refers almost everybody cannot pass; 2,000 subject-level **paired** resamples, seed 20260911; and **within site and cross site are reported separately and never pooled into one headline.**
 
 - [x] Task 1: screening metrics (sens, spec, PPV, NPV, AUROC, AUPRC, ROC, NNS, false-referral and referral rate) for every model AND every baseline on identical folds, bootstrap CIs *(ticked 2026-09-17: `scripts/phase9a_screening.py` -> `screening.json`; 9 imaging and 9 PPG models/baselines, 2,000-resample subject-level CIs)*
 - [x] Task 1: regenerate any per-subject baseline predictions not already on disk, with the recorded seeds and folds, and report that they were regenerated *(ticked 2026-09-17: ALL baseline predictions regenerated — Phase 4 Gate B and Phase 6.5 Task 2 stored only summary metrics — plus the cross-site CNN predictions (`scripts/phase9a_cross_site_preds.py`); folds verified identical, reused PPG predictions reproduce the recorded MAEs to 0.0000)*
@@ -1014,62 +907,7 @@ propagates it; it does not rebuild the forward model.**
 
 #### PRE-DECLARED, 2026-09-20, before any Phase 9C script was run
 
-**1. Interpretation rule.** The verdict at a residual is **ROBUST** to parameter
-uncertainty if the **entire 95% interval** of the gate MAE over the parameter prior
-falls on one side of the pre-declared **2.0 g/dL** threshold, and **FRAGILE** if the
-interval spans it. For the studio condition the same rule is applied at the **1.0 g/dL**
-VIABLE boundary as well. The rule is applied whichever way it falls; **ranges are not
-adjusted after seeing results.**
-
-**2. The propagation.** Self-consistent: for every draw of the parameter vector θ the
-forward model, the inversion LUT and the truth all use θ, and the residual colour error
-is applied exactly as in Phase 3 Task 0 (same perturbation generator, same Hb grid 4-18,
-same 240 trials per Hb, same LUT 2-24 step 0.05). The perturbation banks are regenerated
-in the original RNG order so that θ = nominal must reproduce **3.893 / 3.471 / 1.040
-exactly**; that reproduction is reported first, and if it fails the run is invalid. A
-second, separately labelled variant — LUT at nominal, truth at θ (the Phase 3 Task 4
-mismatch question) — is reported after the main result and never pooled with it.
-
-**3. Parameter prior, fixed before running.** Each parameter is labelled SOURCED (backed
-by a downloaded file or an independent measurement) or UNSOURCED (transcribed, assumed
-or fitted). Where no source exists the range is deliberately generous. The Phase 3 Task 4
-tolerances (BVF ±30%, thickness scale 0.8-2.0, oxygenation benign across 0.60-1.00) are
-the starting envelope and each range below is at least as wide.
-
-| parameter | nominal (gate) | prior | status |
-| --- | --- | --- | --- |
-| oxygenation StO2 | 0.75 | U[0.60, 1.00] | UNSOURCED — physiological assumption (`OXYGENATION_RANGE`) |
-| stromal blood volume fraction | 0.060 | U[0.01, 0.15] | UNSOURCED — Jacques 2013 soft-tissue range, transcribed (`BVF_RANGE`) |
-| epithelial melanin volume fraction | 0.0 | log-U[1e-4, 5e-2] | UNSOURCED — top of `MELANIN_RANGE`; conjunctiva is a sparsely pigmented mucosa, so results are also reported conditional on ≤ 0.005 |
-| melanin power-law exponent k | 3.33 (spectralLIB fit) | U[3.0, 4.0] | UNSOURCED — a fit, not a measurement; Jacques 1998 gives 3.48 |
-| melanin amplitude scale at 500 nm | 1.0 | log-U[0.5, 2.0] | UNSOURCED — inter-individual amplitude variation |
-| epithelium thickness | 32 µm | U[22, 46] µm | **SOURCED** — Li 2015 OCT 34 ± 5.8 µm, ±2 SD |
-| stroma thickness | 200 µm | U[100, 400] µm | UNSOURCED — VERIFICATION REQUIRED banner; 0.5-2× |
-| tarsal plate thickness | 800 µm | U[400, 1600] µm | UNSOURCED — VERIFICATION REQUIRED banner; 0.5-2× |
-| epithelium BVF | 0.002 | U[0, 0.01] | UNSOURCED |
-| tarsal plate BVF | 0.010 | U[0.002, 0.03] | UNSOURCED |
-| water fraction shift (all layers) | 0 | U[−0.10, +0.10] | UNSOURCED — assumed 0.70/0.75/0.60 |
-| reduced-scattering scale | 1.0 | log-U[0.5, 2.0] | SOURCED-GENERIC — spectralLIB soft tissue, not conjunctiva-specific |
-| deep-layer contribution weight | 0.6 | U[0.3, 1.0] | UNSOURCED — modelling constant in `forward.layered_reflectance` |
-| tissue refractive index n_rel | 1.40 | U[1.33, 1.45] | UNSOURCED — typical soft tissue |
-
-Held fixed and out of scope, stated: the D65 illuminant and the CIE 1931 observer as
-camera proxy (a capture-side limitation already logged, addressed by the measured
-residuals, not a tissue constant); the haemoglobin extinction and water spectra (sourced
-from downloaded files, Phase 3.5 Task 0).
-
-**4. Sampling and sensitivity.** Sobol quasi-random Saltelli design, base N = 1024, so
-the plain Monte Carlo sample is the 2,048 rows of the A and B matrices and the
-first-order and total Sobol indices come from the (d + 2) × 1024 evaluations; Jansen
-estimators; seed 20260911. Percentile 95% intervals. Reported for the three measured
-residuals 3.935, 3.456 and 1.062 dE2000. Sensitivity is ranked by total index; if
-melanin dominates, the report says so and names a measured melanin absorption curve as
-the single most valuable future measurement.
-
-**5. Task 4.** Efron 2009 and Zhivov 2006 are sought with network access. If obtained,
-the thickness and BVF values are replaced with sourced ones, the priors narrowed, and
-Tasks 1-3 re-run and reported side by side with the assumed-range results. If not, the
-attempt is recorded and the banner stays.
+➡️ **Verbatim in `docs/archive/predeclarations.md` §8**, including the full 14-parameter prior table with each range's SOURCED / UNSOURCED status and its justification. In summary: the verdict at a residual is **ROBUST** if the entire 95% interval of the gate MAE over the prior falls on one side of the pre-declared **2.0 g/dL** threshold and **FRAGILE** if it spans it, with the same rule applied at the **1.0** boundary for the studio condition; the propagation is **self-consistent** and θ = nominal **must reproduce 3.893 / 3.471 / 1.040 exactly or the run is invalid**; ranges are deliberately generous wherever no source exists; Sobol–Saltelli base N = 1024, Jansen estimators, seed 20260911. **Ranges are not adjusted after seeing results.**
 
 - [x] Task 1: parameter prior declared with SOURCED / UNSOURCED status and justification per parameter; nominal reproduces the three point estimates exactly; gate MAE reported as a distribution (median, 95% interval, histogram) at 3.935, 3.456 and 1.062 dE2000 *(ticked 2026-09-20: 14 parameters, **13 UNSOURCED**; nominal reproduces 3.892987 / 3.470951 / 1.039592 to 1e-12; medians 4.67 / 4.28 / 1.52, 95% [2.37,8.02] / [2.09,7.90] / [0.60,4.90]; `hemosight.simulation.uncertainty`, `scripts/phase9c_uncertainty.py`)*
 - [x] Task 2: fraction of the prior above 2.0 g/dL per residual; the interpretation rule applied; any combination below 2.0 identified with its plausibility; the studio condition against 1.0 g/dL *(ticked 2026-09-20: 99.5% / 98.4% / 37.0% above 2.0; **ROBUST, ROBUST, FRAGILE**; 10 of 2,048 draws below 2.0 at the gate residual, needing 5 of 14 parameters simultaneously in the outer quarter of their ranges, best draw 1.75 g/dL — MARGINAL, never VIABLE; studio 27.1% VIABLE / 35.9% MARGINAL / 37.0% NOT RECOVERABLE)*
@@ -1087,8 +925,8 @@ anywhere else changes on the strength of it.
 
 #### PRE-DECLARED, 2026-09-20, before any Phase 9D number was computed
 
-➡️ **Verbatim in `docs/archive/phase9d_predeclaration.md`** (moved 2026-09-21 under
-section 9's splitting rule; nothing summarised). In summary: the quantity computed is
+➡️ **Verbatim in `docs/archive/predeclarations.md` §9** (moved 2026-09-21 under
+section 9's pre-declaration rule; nothing summarised). In summary: the quantity computed is
 the **minimum detectable effect**, never observed/retrospective power; **one comparison
 per arm, and only the one that actually decided it**, every difference **paired**; the
 clinical yardsticks are ones earlier phases already declared (the 0.10 screening margin,
@@ -1116,8 +954,8 @@ data, and is not permitted to change any verdict.**
 
 #### PRE-DECLARED, 2026-09-21, before any Phase 9E script was run
 
-➡️ **Verbatim in `docs/archive/phase9e_predeclaration.md`**, moved there the day it was
-written under section 9's splitting rule; committed to CLAUDE.md as `f4a3fc0` **before
+➡️ **Verbatim in `docs/archive/predeclarations.md` §10**, moved there the day it was
+written under section 9's pre-declaration rule; committed to CLAUDE.md as `f4a3fc0` **before
 any Phase 9E script ran**, which is what makes it a pre-declaration. In summary: the
 guided-capture gap is **named, not closed** (closing it needs data, which section 3
 forbids) and bounded by an **interpolation** between the two measured residuals that
@@ -1129,9 +967,20 @@ while being **forbidden to weaken a supported conclusion** — the two regressio
 ADEQUATELY POWERED and keep their full strength. **No verdict may change in this phase.**
 
 - [x] Task 1 (Part A): the guided-capture gap named as a boundary in CLAUDE.md, `final_results.md` and `reports/phase7.md`; the evidence that would settle it specified (protocol, measurement, sample, result in either direction); the interpolation run and labelled; recorded as the primary future-work item *(ticked 2026-09-21: `scripts/phase9e_guided_capture.py`. Headline interpolation **1.450 dE2000 → 1.44 g/dL, MARGINAL** at nominal parameters; over the Phase 9C prior **median 2.06, 95% [0.83, 5.73]** — 9% VIABLE / 39% MARGINAL / 52% NOT RECOVERABLE, **FRAGILE at both thresholds**. The two measured anchors re-run on the same fresh banks land within **0.018 g/dL** of their recorded values. **VIABLE needs < 0.986 dE2000, below the best measured condition in the project, so no point in the interval reaches VIABLE — including its most favourable end.** The 1.981 bracket also gained the interval it never had: median 2.76, 95% [1.17, 6.48])*
-- [x] Task 2 (Part B): required n at 80% and 90% power for all three underpowered comparisons, with the SE scaling measured by subsampling; reported as a minimum count in the group that carries the metric, then as totals; minimum non-anaemic count stated per cross-site direction *(ticked 2026-09-21: `scripts/phase9e_required_n.py`, Phase 9D's MDEs reproduced first. **Minimum non-anaemic counts: italy→india 27 → 266 (10×), india→italy 98 → 311.** Within site 125 → 166 specificity and 91 → 120 anaemic for sensitivity; PPG AUROC 18 → 131 anaemic. Cohorts at the observed prevalence 936 / 384 / 286 / 284 / 1,839. **The SE scaling was measured, not assumed** — slope 0.538 (R² 0.91) and 0.480 (R² 0.75) where the carrier group is large, bracketing the 1/√n rate; on the two smallest carrier groups the fit itself fails (R² 0.25 and 0.23), so the 1/√n reference is the headline there and the measured figure is reported beside it)*
+- [x] Task 2 (Part B): required n at 80% and 90% power for all three underpowered comparisons, with the SE scaling measured by subsampling; reported as a minimum count in the group that carries the metric, then as totals; minimum non-anaemic count stated per cross-site direction *(ticked 2026-09-21: `scripts/phase9e_required_n.py`, Phase 9D's MDEs reproduced first. **Minimum non-anaemic counts: italy→india 27 → 266 on the 1/√n reference / 778 on the measured slope, india→italy 98 → 311.** Within site 125 → 166 specificity and 91 → 120 anaemic for sensitivity; PPG AUROC 18 → 131 anaemic. Cohorts at the observed prevalence 936 / 384 / 286 / 284 / 1,839. **The SE scaling was measured, not assumed** — slope 0.538 (R² 0.91) and 0.480 (R² 0.75) where the carrier group is large, bracketing the 1/√n rate; on the two smallest carrier groups the fit itself fails (R² 0.25 and 0.23), so the 1/√n reference is the headline there and the measured figure is reported beside it)*
 - [x] Task 3 (Part C): the three overstatements corrected everywhere they appear; generating scripts edited and reports regenerated, never hand-patched; supported conclusions verified unweakened *(ticked 2026-09-21: five generating scripts edited and their reports regenerated. `scripts/phase9e_intervals.py` supplies the cross-site specificity/PPV/referral intervals Phase 9A never stored. **One further find, fixed:** `reports/phase7.md` still carried the phrase "moves no clinical threshold" that Phase 9A retired on 2026-09-17 — the correction had not been propagated into the Phase 7 generator. **The audit content model and the case-study endpoint carried none of the three overstatements** (neither quotes a cross-site rate, an underpowered null or the studio figure); what they lacked was any statement of the boundaries, so `/api/case-study` now serves one. The two ADEQUATELY POWERED regression arms were checked and are unweakened)*
 - [x] Task 4 (Part D): `reports/phase9e_boundaries.md` with all three parts and a consolidated "what a confirmatory study would need" section; CLAUDE.md updated; `tests/test_phase9e.py`; reproduce stages; decisions and results logged to `docs/archive/` *(ticked 2026-09-21)*
+
+### Phase 9F: Housekeeping after 9E — no new analysis (2026-09-21)
+
+**No script was run, no number was recomputed, and no result or verdict changed.** Two
+things were made durable: a figure that could be read as more favourable than the
+evidence warrants, and the growth pattern that has now pushed this file over its limit
+twice.
+
+- [x] Task 1: report **both** italy→india required-n figures side by side wherever the requirement appears, with the rule that selected between them, the R² that triggered it, and the fact that the rule was added mid-run; same treatment for every other comparison the floor decided *(ticked 2026-09-21: **266 on the 1/√n reference, 778 on the measured slope** — a 2.9× spread — now appear in the same cell or sentence in `reports/phase9e_boundaries.md`, `reports/final_results.md`, `reports/phase9d_power.md` and CLAUDE.md, with a boxed side-by-side section in the 9E report. The **PPG AUROC** comparison got the same treatment (**131 / 202**, R² 0.23). **The headline did not change**, and the reports now say plainly that the mid-run rule **selected the more optimistic figure in both cases** and that a study designer should **size against the larger** unless they can measure the scaling on their own pilot)*
+- [x] Task 2: amend the WORKING PROTOCOL so a pre-declaration stays inline only while its phase is active, and moves verbatim to `docs/archive/predeclarations.md` when the phase closes; apply retroactively; verify nothing was lost; enforce by test *(ticked 2026-09-21: rule added to section 9 with the reason moving one **cannot** weaken it — what makes a declaration a *pre*-declaration is the **commit that carried it**, which git records permanently. Applied to all **10** closed-phase blocks (2.5, 3, 3.5, 4, 4.5, 7, 9A, 9C, 9D, 9E), consolidating the two single-phase files 9E created. **Verified block by block: 20,304 characters, every block byte-identical in the archive and absent from CLAUDE.md.** CLAUDE.md **117,415 → 112,441 characters**. Enforced by `test_closed_phase_predeclarations_are_not_inline` and `test_every_predeclaration_pointer_resolves`, both confirmed to fail on an injected regression)*
+
 
 ### Phase 6 (original plan): Conformal prediction and abstention (N4)
 
@@ -1263,7 +1112,7 @@ After completing any task:
 5. **Never silently change a phase plan item.** Editing or removing a task requires a
    DECISION LOG entry saying what changed and why.
 
-### Where each kind of writing goes (amended 2026-09-17; see the split entry in the DECISION LOG)
+### Where each kind of writing goes (amended 2026-09-17 and 2026-09-21; see the DECISION LOG)
 
 | what you are writing | where it goes |
 | --- | --- |
@@ -1274,12 +1123,44 @@ After completing any task:
 | A phase plan change, a tick, a classification | **CLAUDE.md section 6** |
 | A change to what is done / outstanding / active | **CLAUDE.md, CURRENT STATE** |
 | A change to the claim set or a verdict | **CLAUDE.md section 2** |
+| A pre-declaration for a phase that is **active** | inline in **CLAUDE.md section 6**, under that phase |
+| A pre-declaration for a phase that has **closed** | the block moves verbatim to `docs/archive/predeclarations.md`; section 6 keeps the heading, **one line** of summary and a pointer |
 
 **CLAUDE.md itself records only the claim set, the constraints, the inventory, the
 tech stack, the phase plan, the current state and this protocol.** It must stay
 small enough to load in full: a test fails the suite if it exceeds **120,000
 characters** (`tests/test_docs.py::test_claude_md_fits_in_context`). If it grows
 past that, split again — move content to `docs/archive/`, never delete it.
+
+### The pre-declaration rule (added 2026-09-21)
+
+**A pre-declaration stays inline only while its phase is active. When the phase closes,
+its block moves verbatim to `docs/archive/predeclarations.md`, and section 6 keeps the
+heading, a one-line summary and a pointer.**
+
+*Why the rule exists.* The 2026-09-17 split cut this file to about 76,000 characters, and
+it was back at **120,380** four phases later — over the limit. The logs already route to
+`docs/archive/`, so essentially all of that regrowth was per-phase pre-declaration blocks
+accumulating inline. They are the one kind of content that is **load-bearing while a
+phase runs and pure evidence once it ends**: what stops a threshold being chosen after
+the result is known is that it was fixed in advance, and once the phase is closed the
+reader who wants to check that goes to the evidence, not to the working document.
+
+> **Moving a pre-declaration does not weaken it, and it must never be described as
+> doing so.** What makes a declaration a *pre*-declaration is **not which file it sits
+> in** — it is that it was **committed before the run**, which git records permanently
+> and no later edit can forge. Phase 9E's block is in commit `f4a3fc0`, whose message
+> says it pre-declares the phase; its results landed in `cc4767f`. The commit is the
+> evidence; `predeclarations.md` is the readable copy. **Nothing in a moved block may be
+> summarised, condensed or reworded** — only the copy in section 6 is a summary, and it
+> is one line, and it always carries the pointer.
+
+**Enforced:** `tests/test_docs.py::test_closed_phase_predeclarations_are_not_inline`
+fails the suite if a pre-declaration block is found inline in section 6 without a pointer
+to `docs/archive/predeclarations.md` beside it, and
+`test_every_predeclaration_pointer_resolves` fails if a pointer names a section that does
+not exist. Applied retroactively on 2026-09-21 to all **10** closed-phase blocks (2.5, 3,
+3.5, 4, 4.5, 7, 9A, 9C, 9D, 9E), verified block by block as byte-identical.
 
 Additional standing rules:
 

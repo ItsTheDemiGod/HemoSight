@@ -276,6 +276,15 @@ def main() -> int:
           "counts are stated for the group that **carries** the metric - non-anaemic "
           "subjects for a specificity, anaemic for a sensitivity - because that, not the "
           "cohort size, is what failed here.\n\n")
+        A("**Two comparisons carry two figures, and both are shown.** Required n scales "
+          "as (observed MDE / 0.10) raised to 1/slope, and the slope was measured by "
+          "subsampling rather than assumed. Where the subsample fit was itself too weak "
+          "to trust (R2 below 0.50 - which happened on exactly the two smallest carrier "
+          "groups) the 1/sqrt(n) reference is the headline and the measured-slope figure "
+          "follows it in brackets. **That R2 floor was added mid-run, after the "
+          "subsampling** (logged as a deviation, DECISION LOG 2026-09-21), **and it "
+          "happened to select the more optimistic figure in both cases** - so neither is "
+          "reported without the other.\n\n")
         A(row(["comparison", "carrier group", "now", "needed at 80%", "needed at 90%",
                "cohort at the observed prevalence"]))
         A(row(["---"] * 6))
@@ -284,29 +293,40 @@ def main() -> int:
                  ("cross_site_italy_to_india", "cross-site italy->india, specificity"),
                  ("cross_site_india_to_italy", "cross-site india->italy, specificity"),
                  ("ppg_auroc", "PPG screening, AUROC")]
+
+        def both(v, field, bold=False):
+            """Headline first, alternative basis beside it wherever the floor applied."""
+            h = v[f"headline_{field}"]
+            s = f"**{h:.0f}**" if bold else f"{h:.0f}"
+            if v["slope_fit_is_trustworthy"]:
+                return s
+            return f"{s} *(measured slope: {v[f'measured_{field}']:.0f})*"
+
         for k, lab in order:
             v = reqn["required"].get(k)
             if not v:
                 continue
             A(row([lab, v["carrier_group"].replace("_", "-"), v["n_carrier_observed"],
-                   f"**{v['headline_required_carrier_80']:.0f}**",
-                   f"{v['headline_required_carrier_90']:.0f}",
-                   f"{v['headline_required_total_at_observed_prevalence_80']:.0f}"]))
+                   both(v, "required_carrier_80", bold=True),
+                   both(v, "required_carrier_90"),
+                   both(v, "required_total_at_observed_prevalence_80")]))
         it = reqn["required"]["cross_site_italy_to_india"]
         A(f"\n**The composition point, which matters more than any total here.** "
           f"`italy_to_india` estimated specificity on {it['n_carrier_observed']} "
-          f"non-anaemic subjects. It needs **{it['headline_required_carrier_80']:.0f}** - "
-          f"{it['headline_required_carrier_80'] / it['n_carrier_observed']:.0f}x more - "
-          f"and at that direction's "
-          f"observed prevalence that means a test site of roughly "
-          f"{it['headline_required_total_at_observed_prevalence_80']:.0f} people, against "
-          f"{it['n_test_observed']} here. Recruiting to a balanced 50% prevalence instead "
-          f"cuts it to about "
-          f"{it['headline_required_total_at_balanced_prevalence_80']:.0f}. **The SE "
-          "scaling behind these figures was measured by subsampling, not assumed**; where "
-          "the fit was too weak to trust - which happened on exactly the smallest carrier "
-          "groups - the ordinary 1/sqrt(n) rate is used and the measured one reported "
-          "beside it. Full derivation, caveats and both figures: "
+          f"non-anaemic subjects. It needs "
+          f"**{it['headline_required_carrier_80']:.0f}** on the 1/sqrt(n) reference "
+          f"({it['headline_required_carrier_80'] / it['n_carrier_observed']:.0f}x more) "
+          f"or **{it['measured_required_carrier_80']:.0f}** on the measured slope "
+          f"({it['measured_required_carrier_80'] / it['n_carrier_observed']:.0f}x) - "
+          f"the R2 floor (fit R2 {it['slope_fit_r2']:.2f}) makes the first the headline. "
+          f"At that direction's observed prevalence those are test sites of roughly "
+          f"{it['headline_required_total_at_observed_prevalence_80']:.0f} and "
+          f"{it['measured_required_total_at_observed_prevalence_80']:.0f} people, against "
+          f"{it['n_test_observed']} here; recruited to a balanced 50% prevalence, about "
+          f"{it['headline_required_total_at_balanced_prevalence_80']:.0f} and "
+          f"{it['measured_required_total_at_balanced_prevalence_80']:.0f}. **A study "
+          "designer should size against the larger unless they can measure the scaling "
+          "on their own pilot.** Full derivation, the rule, and the R2 that triggered it: "
           "`reports/phase9e_boundaries.md`.\n")
     A("\n### Method and scope\n\n")
     A("* **The imaging arm's conjunctiva datasets have no sclera** - they are "

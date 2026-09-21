@@ -268,10 +268,15 @@ def main() -> int:
       "also its least precisely estimated, and the *size* of the cross-site penalty is "
       "correspondingly uncertain even though its *direction* is not. Anyone continuing this "
       "line of work should treat the cross-site magnitude as poorly pinned down and collect "
-      "more sites before quoting it. **Phase 9E says how many:** specificity in that "
-      "direction rests on 27 non-anaemic subjects and needs about 266 to reach 80% power "
-      "at the 0.10 margin - roughly a 936-person test site at that direction's prevalence, "
-      "or 532 if recruited to a balanced one. See `reports/phase9e_boundaries.md`.\n\n")
+      "more sites before quoting it. **Phase 9E says how many, and reports two figures "
+      "rather than one:** specificity in that direction rests on 27 non-anaemic subjects "
+      "and needs **266** to reach 80% power at the 0.10 margin on the 1/sqrt(n) "
+      "reference, or **778** on the slope measured by subsampling - roughly a 936- or "
+      "2,736-person test site at that direction's prevalence, 532 or 1,555 recruited to "
+      "a balanced one. The reference is the headline because that subsample fit is weak "
+      "(R2 0.25), by a floor added mid-run and logged as a deviation; **size against the "
+      "larger unless the scaling is measured on a pilot**. See "
+      "`reports/phase9e_boundaries.md`.\n\n")
 
     A("### 3.4 PPG - ADEQUATELY POWERED on MAE, UNDERPOWERED on screening AUROC\n\n")
     A(f"n = {ppg['n']} subjects with venous HemoCue reference, "

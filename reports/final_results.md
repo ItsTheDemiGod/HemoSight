@@ -81,15 +81,17 @@ Minimum detectable effect at 80% power, alpha 0.05, two-sided, on the comparison
 
 Each UNDERPOWERED verdict above, converted into a specification. Required counts are stated for the group that **carries** the metric - non-anaemic subjects for a specificity, anaemic for a sensitivity - because that, not the cohort size, is what failed here.
 
+**Two comparisons carry two figures, and both are shown.** Required n scales as (observed MDE / 0.10) raised to 1/slope, and the slope was measured by subsampling rather than assumed. Where the subsample fit was itself too weak to trust (R2 below 0.50 - which happened on exactly the two smallest carrier groups) the 1/sqrt(n) reference is the headline and the measured-slope figure follows it in brackets. **That R2 floor was added mid-run, after the subsampling** (logged as a deviation, DECISION LOG 2026-09-21), **and it happened to select the more optimistic figure in both cases** - so neither is reported without the other.
+
 | comparison | carrier group | now | needed at 80% | needed at 90% | cohort at the observed prevalence |
 | --- | --- | --- | --- | --- | --- |
 | imaging within site, specificity | non-anaemic | 125 | **166** | 217 | 286 |
 | imaging within site, sensitivity | anaemic | 91 | **120** | 162 | 284 |
-| cross-site italy->india, specificity | non-anaemic | 27 | **266** | 356 | 936 |
+| cross-site italy->india, specificity | non-anaemic | 27 | **266** *(measured slope: 778)* | 356 *(measured slope: 1193)* | 936 *(measured slope: 2736)* |
 | cross-site india->italy, specificity | non-anaemic | 98 | **311** | 435 | 384 |
-| PPG screening, AUROC | anaemic | 18 | **131** | 176 | 1839 |
+| PPG screening, AUROC | anaemic | 18 | **131** *(measured slope: 202)* | 176 *(measured slope: 288)* | 1839 *(measured slope: 2831)* |
 
-**The composition point, which matters more than any total here.** `italy_to_india` estimated specificity on 27 non-anaemic subjects. It needs **266** - 10x more - and at that direction's observed prevalence that means a test site of roughly 936 people, against 95 here. Recruiting to a balanced 50% prevalence instead cuts it to about 532. **The SE scaling behind these figures was measured by subsampling, not assumed**; where the fit was too weak to trust - which happened on exactly the smallest carrier groups - the ordinary 1/sqrt(n) rate is used and the measured one reported beside it. Full derivation, caveats and both figures: `reports/phase9e_boundaries.md`.
+**The composition point, which matters more than any total here.** `italy_to_india` estimated specificity on 27 non-anaemic subjects. It needs **266** on the 1/sqrt(n) reference (10x more) or **778** on the measured slope (29x) - the R2 floor (fit R2 0.25) makes the first the headline. At that direction's observed prevalence those are test sites of roughly 936 and 2736 people, against 95 here; recruited to a balanced 50% prevalence, about 532 and 1555. **A study designer should size against the larger unless they can measure the scaling on their own pilot.** Full derivation, the rule, and the R2 that triggered it: `reports/phase9e_boundaries.md`.
 
 ### Method and scope
 

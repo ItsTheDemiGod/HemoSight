@@ -357,3 +357,53 @@ files carried that claim, and were they regenerated?
 
 **No verdict changes.** The Phase 7 outcome is still B; the imaging arm is still CLOSED,
 FINAL; §8 itself is unchanged and stands.
+
+## 12. The italy→india required-n figure was reported as one number where there are two (reporting corrected 2026-09-21, Phase 9F)
+
+**Nothing here is numerically wrong, and the headline figure does not change.** This is a
+correction to how a figure was *presented*, recorded in this file because the presentation
+made a result look better supported than it is — which is the failure mode this file
+exists to catch.
+
+**What was on the record.** Phase 9E (2026-09-21) reported the cross-site `italy_to_india`
+requirement as **266 non-anaemic subjects** at 80% power, with the measured-slope
+alternative of **778** given once, in a bullet list beneath the table. CLAUDE.md,
+`reports/final_results.md` and `reports/phase9d_power.md` carried **266 alone**.
+
+**Why that is not good enough.** Three facts hold at once:
+
+1. The two candidate answers differ by **2.9×** — 266 against 778 non-anaemic subjects,
+   or test sites of roughly 936 against 2,736 at that direction's prevalence.
+2. The rule that chose between them — an **R² floor of 0.50** on the subsample scaling
+   fit, below which the 1/√n reference replaces the measured slope — was **added
+   mid-run**, after the subsampling had been done. Phase 9E's pre-declaration
+   (`predeclarations.md` §10) anticipated a slope *departing* from 0.5, not the fit
+   *failing*.
+3. The rule **happened to select the more optimistic figure**, here and on the only other
+   comparison it touched (PPG AUROC: 131 chosen over 202, R² 0.23).
+
+Each is defensible alone. Together they mean a reader who sees only **266** has been shown
+the most favourable of two numbers, chosen by a rule invented after the fact, without
+being told. The rule itself is sound — it keys on R² and never on the size of the answer,
+a test asserts the headline tracks R² and that both bases stay on the record, and the
+deviation was logged — but soundness of the rule is not the same as adequacy of the
+reporting.
+
+**What changed.** Both figures now appear **in the same cell or the same sentence**
+wherever the requirement appears — `reports/phase9e_boundaries.md` (required-n table,
+composition table, headline box, consolidated study specification, and a new boxed
+side-by-side section giving the rule, the R² that triggered it, and when it was fixed),
+`reports/final_results.md`, `reports/phase9d_power.md` and CLAUDE.md. The same treatment
+was applied to the PPG AUROC comparison. A recommendation was added and kept separate
+from the rule-derived number: **size against the larger figure unless the scaling can be
+measured on your own pilot.**
+
+**What did NOT change.** The headline is still **266**, by the stated rule. Making 778 the
+headline because it is more conservative would be selection by size — exactly what the R²
+rule exists to prevent — and would be the same error in the opposite direction. No MDE, no
+power figure, no verdict and no other recorded number moved.
+
+**The generalisable lesson.** A decision rule fixed after the data is seen is not
+neutralised by logging it. It has to be **visible at the point of use**, with its trigger
+value and its timing, next to the number it produced — because the reader who needs it
+most is the one reading the number, not the one reading the log.
