@@ -1110,6 +1110,69 @@ the cohort.
 - [x] Task 3: retrospective power explicitly NOT computed, and the distinction stated in the report *(ticked 2026-09-20: stated in report section 1 with the reason — observed power is a deterministic function of the observed p-value and is low by construction after a null result; `hemosight.evaluation.power` has no such function and `test_retrospective_power_is_absent_from_the_module` enforces it. `power_at()` exists but takes a **pre-declared** yardstick, never an observed effect)*
 - [x] Task 4: `reports/phase9d_power.md` with the single summary table; ADEQUATELY POWERED / UNDERPOWERED per arm; the statements added to `final_results.md` limitations and to CLAUDE.md; logs, tests, reproduce stage *(ticked 2026-09-20: 8-row summary table with a power-at-the-yardstick column; **ADEQUATELY POWERED** imaging regression, PPG regression, PPG specificity; **UNDERPOWERED** imaging screening within site, both cross-site directions, PPG AUROC; new limitations subsection in `final_results.md`; `tests/test_phase9d.py` (14 tests); two reproduce stages)*
 
+### Phase 9E: The project's boundaries, stated precisely (2026-09-21)
+
+**Why this phase exists.** Three boundaries are implicit in the record and none is
+named. (A) Phase 7 measured three capture regimes and a deployed screening app operates
+in none of them — its guided capture sits between the two most controlled, which is
+exactly where the gate crosses bands and where Phase 9C found the verdict fragile.
+(B) Phase 9D called three comparisons UNDERPOWERED without saying what sample would fix
+them. (C) Several statements on the record are more precise, or more absolute, than the
+evidence behind them. **This phase names all three. It builds no new model, collects no
+data, and is not permitted to change any verdict.**
+
+#### PRE-DECLARED, 2026-09-21, before any Phase 9E script was run
+
+**1. The guided-capture gap is a named boundary, not a gap to be closed.** It cannot be
+closed without collecting data, which section 3 forbids permanently. What is produced is
+a statement of the gap, a specification of the evidence that would settle it, and an
+**interpolation** between the two measured residuals that bracket it (1.981 dE2000,
+MOBIUS one phone + one lighting cell, gaze varying; 1.062, SBVPI studio). The
+interpolation is labelled as such everywhere it appears and **is never called a
+measurement**. Its headline point is the geometric mean of the two bracketing residuals,
+**1.450 dE2000**, chosen before the gate was run at it; the whole bracketing interval is
+reported beside it, and the Phase 9C prior is propagated at the headline point so the
+interpolated number carries an interval from the start. Fresh perturbation banks are
+drawn for the interpolation grid (no original RNG order exists at a residual nobody
+measured); the two bracketing anchors are re-run on those same fresh banks and reported
+beside their recorded values, so the bank draw is visibly not doing the work.
+
+**2. Required n is computed from the SE scaling, and the scaling is MEASURED, not
+assumed.** For a target MDE of the pre-declared **0.10** margin at 80% and 90% power,
+required group size = observed group size × (observed MDE / 0.10)². That step assumes
+SE ∝ 1/√n at fixed per-subject variance. **The assumption is checked by subsampling this
+project's own data** at several fractions, re-running the whole nested-operating-point
+and paired-bootstrap pipeline at each, and fitting log SE against log n: the fitted slope
+is reported, and if it departs materially from −0.5 the required-n figures are reported
+as approximate with the measured slope stated. Phase 9D's MDEs are asserted to reproduce
+before any new number is computed, exactly as Phase 9D asserted Phase 9A's.
+
+**3. Required n is reported by the group that carries the metric, not as a total alone.**
+Specificity is a proportion over **non-anaemic** subjects and sensitivity over **anaemic**
+subjects, so each required n is stated first as a **minimum count in that group**, then
+converted to a total at the observed prevalence and at a balanced 50%. Phase 9D
+established that italy→india's 14% power is a composition problem — 68 of 95 test
+subjects anaemic, leaving specificity on 27 people — so the composition figure is the
+one a study designer acts on and is reported first.
+
+**4. The language pass is calibration in both directions, and may not weaken a supported
+conclusion.** Three specific overstatements are corrected wherever they appear in
+CLAUDE.md, the reports, `hemosight.audit.content` and the case-study endpoint:
+*(i)* a cross-site **rate** quoted without its interval — observed **counts** are
+preferred where both exist, and a CI is attached wherever a rate is quoted; *(ii)* an
+**underpowered null stated as absence** — restated as bounded ("no gain of 0.10 or larger
+was detected; the study could have detected 0.116"); *(iii)* the **studio result quoted
+without its Phase 9C interval**. **The two regression arms are ADEQUATELY POWERED and
+their negative results keep their full strength**; hedging them would be the same error in
+the opposite direction and is forbidden here. **No verdict changes in this phase** — the
+cross-site collapse was directly observed and a power analysis constrains null
+conclusions, not observed ones; only the precision claimed for its magnitude changes.
+
+- [ ] Task 1 (Part A): the guided-capture gap named as a boundary in CLAUDE.md, `final_results.md` and `reports/phase7.md`; the evidence that would settle it specified (protocol, measurement, sample, result in either direction); the interpolation run and labelled; recorded as the primary future-work item
+- [ ] Task 2 (Part B): required n at 80% and 90% power for all three underpowered comparisons, with the SE scaling measured by subsampling; reported as a minimum count in the group that carries the metric, then as totals; minimum non-anaemic count stated per cross-site direction
+- [ ] Task 3 (Part C): the three overstatements corrected everywhere they appear; generating scripts edited and reports regenerated, never hand-patched; supported conclusions verified unweakened
+- [ ] Task 4 (Part D): `reports/phase9e_boundaries.md` with all three parts and a consolidated "what a confirmatory study would need" section; CLAUDE.md updated; `tests/test_phase9e.py`; reproduce stages; decisions and results logged to `docs/archive/`
+
 ### Phase 6 (original plan): Conformal prediction and abstention (N4)
 
 > WARNING: **NOT APPLICABLE as written, and not started.** N4 wraps a haemoglobin
