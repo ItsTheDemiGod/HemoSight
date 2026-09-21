@@ -26,6 +26,83 @@ def pct(x):
     return f"{100 * x:.0f}%"
 
 
+def _p9c_intervals() -> dict:
+    """Phase 9C's 95% interval per residual, keyed by this report's condition names.
+
+    Read from `phase9c/uncertainty.json`, never retyped. Phase 9E's rule: no gate MAE is
+    quoted in this report without the interval beside it.
+    """
+    u = load("phase9c/uncertainty.json") or {}
+    res = u.get("residuals", {})
+
+    def fmt(de):
+        for k, v in res.items():
+            if abs(float(k) - de) < 1e-6:
+                return f"median {v['median']:.2f}, [{v['p2.5']:.2f}, {v['p97.5']:.2f}]"
+        return "-"
+    # Phase 9C propagated three residuals. Phase 9E added the gaze-only bracket, which
+    # the table would otherwise have had to quote bare.
+    g = load("phase9e/guided_capture.json") or {}
+    res = {**res, **{k: v for k, v in g.get("uncertainty", {}).items()
+                     if v.get("is_measured_residual")}}
+    cc = load("phase7/controlled_capture.json") or {}
+    best = cc.get("best_residual_per_condition", {})
+    out = {k: fmt(v["residual_dE2000"]) for k, v in best.items()}
+    out["reference_3.935"] = fmt(3.935)
+    return out
+
+
+P9C_INTERVAL = _p9c_intervals()
+GUIDED = load("phase9e/guided_capture.json")
+
+
+def guided_row(A, gate: dict) -> None:
+    """The interpolated guided-capture row, and the boundary it names (Phase 9E).
+
+    Italicised and labelled INTERPOLATED in the row itself, because it is the only row in
+    the table that is not a measurement and must never be read as one.
+    """
+    if not GUIDED:
+        return
+    g = GUIDED
+    u = g["headline_uncertainty"]
+    pt = next(r for r in g["gate_curve"] if r["is_headline"])
+    lo = g["bracketing_measurements"]["lower"]["residual_dE2000"]
+    hi = g["bracketing_measurements"]["upper"]["residual_dE2000"]
+    A(row(["*guided capture - INTERPOLATED, not measured (Phase 9E)*",
+           f"*{g['headline_point']['residual_dE2000']:.3f}*", f"*{pt['mae_g_dl']:.3f}*",
+           f"*median {u['median']:.2f}, [{u['p2.5']:.2f}, {u['p97.5']:.2f}]*", "*-*",
+           f"*{pt['band']}*"]))
+    A("\n> ### \U0001F7E1 THE REGIME THIS PROJECT DID NOT MEASURE (Phase 9E, 2026-09-21)\n>\n"
+      "> **A deployed screening app operates in none of the three measured conditions "
+      "above.** Its guided capture is one phone in one session, with a live overlay "
+      "enforcing framing and distance and a quality gate rejecting blurred or badly "
+      "exposed frames before the shutter - more controlled than the gaze-only condition, "
+      f"less than a studio rig. That places it between **{lo:.3f} and {hi:.3f} dE2000**, "
+      "which is exactly the interval in which this gate crosses bands, and exactly where "
+      "Phase 9C found the verdict fragile.\n>\n"
+      "> **The italicised row above is an INTERPOLATION between two measured points** - "
+      "the geometric mean of the bracketing pair, declared before the gate was run at it "
+      "- and is not a measurement of anything. No guided-capture image exists in this "
+      "project and none ever will: section 3 of CLAUDE.md forbids collecting data, "
+      "permanently. The two measured anchors were re-run on the same fresh perturbation "
+      f"banks and land within {g['bank_draw_check']['max_abs_difference_from_recorded']:.3f} g/dL of their recorded values, so the "
+      "interpolated points are not an artefact of a different random draw.\n>\n"
+      f"> **What it says.** At nominal parameters the bracketing interval is MARGINAL "
+      "throughout and tips into NOT RECOVERABLE at its uncontrolled end. Under the Phase "
+      f"9C prior the headline point is median {u['median']:.2f}, 95% "
+      f"[{u['p2.5']:.2f}, {u['p97.5']:.2f}]: {pct(u['fraction_below_1.0'])} VIABLE, "
+      f"{pct(u['fraction_in_1_2'])} MARGINAL, {pct(u['fraction_above_2.0'])} NOT "
+      f"RECOVERABLE - {u['rule']}. **VIABLE needs a residual below "
+      f"{g['interval_verdict']['residual_required_for_VIABLE']:.3f} dE2000, which is "
+      "below the best measured condition in the whole project. No point in the "
+      "guided-capture interval reaches VIABLE, including its most favourable end.**\n>\n"
+      "> **This is the project's primary future-work item, and it is a named boundary of "
+      "the claim rather than an open question to be closed here.** What evidence would "
+      "settle it - capture protocol, measurement, sample and the result in either "
+      "direction - is specified in `reports/phase9e_boundaries.md`.\n\n")
+
+
 def write_statistical_vs_clinical(svc: dict) -> None:
     P, Cj = svc["ppg_waveform"], svc["conjunctival_colour"]
     pu, cu = P["utility"], Cj["utility"]
@@ -41,8 +118,9 @@ def write_statistical_vs_clinical(svc: dict) -> None:
       "shuffled labels produce, with a permutation p at the floor of what the sample "
       "allows - and at the same time **worth nothing to a decision**: it improves on "
       "predicting a constant by a fraction of a gram per decilitre, it loses to or barely "
-      "matches the cheapest available baseline on the same folds, and it moves no "
-      "screening threshold. The two properties are separable, and a result reported "
+      "matches the cheapest available baseline on the same folds, and the threshold it "
+      "moves - if it moves one at all - does not survive a change of site. The two "
+      "properties are separable, and a result reported "
       "with only the first looks like a working estimator.\n\n")
     A("This project produced the pattern twice, independently, in two modalities that "
       "share nothing but the target molecule. Neither result is wrong. Both are real. "
@@ -200,15 +278,24 @@ def write_phase7(cc: dict, svc: dict) -> None:
     A(f"\nNoise over the measured empirical signal ({sig:.2f} dE2000/g/dL): " +
       "; ".join(f"{names[k].split(',')[0]} {v['over_empirical_signal']:.1f}x" for k, v in cc["noise_over_signal"].items()) + ".\n\n")
     A("### The Phase 3 gate at each measured residual\n\n")
-    A(row(["residual (measured)", "dE2000", "Hb MAE g/dL", "p90", "band"]))
-    A(row(["---"] * 5))
+    A("Every MAE below is a POINT ESTIMATE from a forward model whose 14 tissue parameters "
+      "were held fixed and known. The column beside it is Phase 9C's propagation of the "
+      "declared prior over those parameters. **No measured or interpolated row here may "
+      "be quoted without its interval, least of all the studio row.** The two bare "
+      "reference rows are points on the curve by construction, not results.\n\n")
+    A(row(["residual (measured)", "dE2000", "Hb MAE g/dL",
+           "95% over the parameter prior (9C)", "p90", "band"]))
+    A(row(["---"] * 6))
     for k in conds:
         g = gate[k]
-        A(row([names[k], f"{g['residual_dE2000']:.3f}", f"**{g['mae_g_dl']:.3f}**", f"{g['p90_g_dl']:.2f}", f"**{g['band']}**"]))
+        A(row([names[k], f"{g['residual_dE2000']:.3f}", f"**{g['mae_g_dl']:.3f}**",
+               P9C_INTERVAL.get(k, "-"), f"{g['p90_g_dl']:.2f}", f"**{g['band']}**"]))
     for k, lab in (("reference_3.935", "Phase 3 reference: grey-world 25% FOV, MOBIUS iris"),
                    ("reference_2.0", "reference 2.0"), ("reference_1.0", "reference 1.0")):
         g = gate[k]
-        A(row([lab, f"{g['residual_dE2000']:.3f}", f"{g['mae_g_dl']:.3f}", f"{g['p90_g_dl']:.2f}", g["band"]]))
+        A(row([lab, f"{g['residual_dE2000']:.3f}", f"{g['mae_g_dl']:.3f}",
+               P9C_INTERVAL.get(k, "-"), f"{g['p90_g_dl']:.2f}", g["band"]]))
+    guided_row(A, gate)
     A("\n> **Phase 9C (2026-09-20): these are point estimates, and the studio one is "
       "FRAGILE.** Propagating the forward model's own parameter uncertainty (declared prior "
       "over its 14 fixed tissue parameters) gives, at the three measured residuals: "
@@ -241,20 +328,29 @@ def write_phase7(cc: dict, svc: dict) -> None:
           f"({eyes['colour_model_mae_pooled']:.2f}). It does not reach VIABLE: the studio residual is "
           f"{best['sbvpi_studio']['residual_dE2000'] / be['residual_for_viable_1.0']:.1f}x the residual VIABLE needs, and "
           "Eyes-Defy shows that even at zero calibration residual a between-subject tissue "
-          "term of ~4.5 dE2000 remains. **The boundary reading matters and is stated plainly:** "
-          f"at the studio residual the gate returns {gate['sbvpi_studio']['mae_g_dl']:.2f} g/dL, "
-          f"{gate['sbvpi_studio']['mae_g_dl'] - 1.0:+.2f} from the VIABLE line - studio-grade control "
-          "brings the CALIBRATION term to the edge of viable. **Phase 9C shows that edge sits "
-          "inside the model's own parameter uncertainty:** over the declared prior the same "
-          "residual gives median 1.52 g/dL, 95% [0.60, 4.90], spanning all three bands, so this "
-          "number must not be quoted as 1.04 alone. What keeps the empirical result in "
+          "term of ~4.5 dE2000 remains. **The boundary reading is the most fragile number in "
+          "this project, and it is never stated without its interval:** at the studio residual "
+          f"the gate returns {gate['sbvpi_studio']['mae_g_dl']:.2f} g/dL at NOMINAL PARAMETERS, "
+          f"{gate['sbvpi_studio']['mae_g_dl'] - 1.0:+.2f} from the VIABLE line - a residual "
+          f"{best['sbvpi_studio']['residual_dE2000'] / be['residual_for_viable_1.0']:.2f}x what "
+          "VIABLE needs, which reads as 'within 8% of viable'. **That reading survives only at "
+          "the nominal parameter choice. Over the declared prior the same residual gives median "
+          "1.52 g/dL, 95% [0.60, 4.90], spanning VIABLE, MARGINAL and NOT RECOVERABLE (27.1% / "
+          "35.9% / 37.0%), so the band is a property of the parameter choice as much as of the "
+          "capture condition and the figure must never be quoted as 1.04 alone.** What keeps "
+          "the empirical result in "
           "MARGINAL is the other term: between-subject conjunctival colour at fixed haemoglobin, "
           "which no amount of capture control removes and which the gate model never contained. "
           "In the controlled regime the limiting factor shifts from calibration to tissue. "
           "**The refutation is restated in two parts:** from "
           "uncontrolled photographs the inversion is NOT RECOVERABLE; from controlled capture "
-          "it reaches screening bands at best, does not beat site + sex + age, and moves no "
-          "clinical threshold. The distinction a reviewer would raise is real and is now "
+          "it reaches screening bands at best and does not beat site + sex + age. "
+          "**The clause \"and moves no clinical threshold\" stood here until Phase 9A "
+          "retired it, and it is removed:** re-scored as the referral decision the product "
+          "actually makes, the image cuts the referral rate from 0.634 to 0.519 at the same "
+          "~0.90 detection rate within site - a margin the colour model clears with a CI "
+          "excluding zero. What controlled capture does not rescue is transfer between "
+          "sites. The distinction a reviewer would raise is real and is now "
           "measured, and it does not rescue the claim.\n\n")
     elif cc["outcome"] == "A":
         A("Controlled capture closes the gap. The refutation must be restated as being about "

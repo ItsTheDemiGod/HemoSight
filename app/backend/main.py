@@ -408,6 +408,64 @@ def case_study() -> dict:
     }
     out["harness_validation"] = validation.get("summary", {})
 
+    # ---- the project's own boundaries (Phase 9D/9E), shown with the results.
+    # Audited in Phase 9E: none of the three overstatements it looked for appears in
+    # this endpoint or in `hemosight.audit.content`, because neither quotes a cross-site
+    # rate, an underpowered null or the studio gate figure. What was missing was any
+    # statement of the boundaries at all, so they are stated here, read from disk.
+    guided = read(paths.INTERIM / "phase9e" / "guided_capture.json") or {}
+    reqn = read(paths.INTERIM / "phase9e" / "required_n.json") or {}
+    power = (read(paths.INTERIM / "phase9d" / "power.json") or {}).get("arms", {})
+    b: dict = {"why": ("A worked example that shows only what a project found, and never "
+                       "what it could not have found, teaches half the lesson.")}
+    if power:
+        b["adequately_powered"] = [
+            {"comparison": "imaging regression vs site + sex + age",
+             "mde_80_g_dl": power["imaging_regression"]["mde_80"],
+             "clinical_yardstick_g_dl": power["imaging_regression"]["clinical_yardstick"],
+             "reading": ("the negative result is informative evidence of absence: an "
+                         "improvement large enough to matter clinically would have been "
+                         "detected")},
+            {"comparison": "PPG regression vs sex alone",
+             "mde_80_g_dl": power["ppg"]["mae_vs_sex_alone"]["mde_80"],
+             "clinical_yardstick_g_dl": 1.0,
+             "reading": "same, and the best-powered comparison in the project"}]
+        b["underpowered_nulls_stated_as_bounds"] = [
+            {"comparison": "imaging screening within site, specificity at matched "
+                           "sensitivity",
+             "bound": ("no gain of 0.10 or larger was detected; this design could have "
+                       f"detected {power['imaging_screening']['image_cnn']['specificity_at_matched_sensitivity']['mde_80']:.3f}")},
+            {"comparison": "PPG screening AUROC",
+             "bound": ("uninformative on its own - MDE "
+                       f"{power['ppg']['auroc']['mde_80']:.2f} on 18 anaemic subjects. "
+                       "The PPG verdict rests on its MAE and NNS figures, not on this.")}]
+        b["observed_not_estimated"] = {
+            "statement": ("cross-site, the model flagged 27 of 68 anaemic subjects and "
+                          "missed 41 - a count, not an estimate"),
+            "rate_with_interval": "sensitivity 0.397, 95% CI [0.278, 0.514]",
+            "reading": ("the collapse is observed and the verdict stands; its MAGNITUDE "
+                        "is poorly pinned down and must not be quoted as precise")}
+    if guided:
+        u = guided.get("headline_uncertainty", {})
+        b["unmeasured_regime"] = {
+            "name": guided["boundary_statement"]["named"],
+            "what": guided["boundary_statement"]["what_is_unmeasured"],
+            "bracketed_by_dE2000": guided["boundary_statement"]["bracketed_by"],
+            "interpolated_not_measured": True,
+            "interpolated_gate_mae_g_dl": next(
+                r["mae_g_dl"] for r in guided["gate_curve"] if r["is_headline"]),
+            "interval_over_the_parameter_prior": [u.get("p2.5"), u.get("p97.5")],
+            "reading": guided["interval_verdict"]["reading"]}
+    if reqn:
+        b["what_a_confirmatory_study_would_need"] = {
+            k: {"carrier_group": v["carrier_group"],
+                "observed": v["n_carrier_observed"],
+                "required_at_80_power": round(v["headline_required_carrier_80"]),
+                "cohort_at_the_observed_prevalence": round(
+                    v["headline_required_total_at_observed_prevalence_80"])}
+            for k, v in reqn["required"].items()}
+    out["boundaries"] = b
+
     # Live status of the extended permutation run. Reported, never consolidated here.
     jl = paths.INTERIM / "phase5" / "perm_selection_aware.jsonl"
     if jl.exists():

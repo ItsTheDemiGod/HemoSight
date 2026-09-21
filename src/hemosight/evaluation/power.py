@@ -126,3 +126,53 @@ def verdict(mde_80: float, yardstick: float) -> str:
     if not np.isfinite(mde_80) or not np.isfinite(yardstick):
         return "INDETERMINATE"
     return "ADEQUATELY POWERED" if mde_80 <= yardstick else "UNDERPOWERED"
+
+
+# --------------------------------------------------------------------------- #
+# Phase 9E - turning an UNDERPOWERED verdict into a study specification
+# --------------------------------------------------------------------------- #
+def required_group_n(n_observed: int, mde_observed: float, target: float,
+                     slope: float = 0.5) -> float:
+    """Group size at which the MDE falls to `target`, under SE proportional to n**-slope.
+
+    `n_observed` is the size of the group the metric is actually estimated on - the
+    non-anaemic subjects for a specificity, the anaemic ones for a sensitivity - not the
+    cohort. Quoting a total hides the composition problem that Phase 9D found: a cohort
+    can be large and still estimate specificity on 27 people.
+
+    `slope` defaults to the 1/sqrt(n) rate but is a parameter because Phase 9E measures
+    it by subsampling rather than assuming it. Feed the measured slope in.
+    """
+    if not (np.isfinite(mde_observed) and np.isfinite(target)) or target <= 0 or slope <= 0:
+        return float("nan")
+    return float(n_observed * (mde_observed / target) ** (1.0 / slope))
+
+
+def total_n_for_group(n_group: float, prevalence: float, group: str) -> float:
+    """Cohort size that yields `n_group` subjects in the named group at `prevalence`."""
+    if group not in ("anaemic", "non_anaemic"):
+        raise ValueError(f"group must be anaemic or non_anaemic, not {group!r}")
+    share = prevalence if group == "anaemic" else 1.0 - prevalence
+    if not np.isfinite(share) or share <= 0:
+        return float("inf")
+    return float(n_group / share)
+
+
+def scaling_slope(ns: np.ndarray, ses: np.ndarray) -> dict:
+    """Fit log(SE) = c - slope * log(n); returns the slope and its fit quality.
+
+    Reported so the required-n figures rest on a measured rate rather than a textbook
+    one. A slope near 0.5 is the ordinary 1/sqrt(n); a materially different slope is
+    reported and used, not corrected away.
+    """
+    n = np.asarray(ns, float)
+    s = np.asarray(ses, float)
+    ok = np.isfinite(n) & np.isfinite(s) & (n > 0) & (s > 0)
+    if ok.sum() < 3:
+        return {"slope": float("nan"), "r2": float("nan"), "n_points": int(ok.sum())}
+    x, y = np.log(n[ok]), np.log(s[ok])
+    b, a = np.polyfit(x, y, 1)
+    resid = y - (a + b * x)
+    ss_tot = float(((y - y.mean()) ** 2).sum())
+    return {"slope": float(-b), "intercept": float(a), "n_points": int(ok.sum()),
+            "r2": float(1.0 - (resid ** 2).sum() / ss_tot) if ss_tot > 0 else float("nan")}

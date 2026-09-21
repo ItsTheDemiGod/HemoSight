@@ -204,9 +204,11 @@ def main() -> int:
           f"alone, versus 1.0 g/dL. Phase 4.5's negative result is informative.\n")
         A(f"* **Imaging screening, within site: UNDERPOWERED, marginally.** MDE "
           f"**{scn['mde_80']:.3f}** specificity against the 0.10 pre-declared margin "
-          f"({scn['power_at_the_yardstick'] * 100:.0f}% power at the margin). A borderline "
-          "effect could have been missed; the effect the arm did find (+0.192 specificity, "
-          "mean-CIELAB) was comfortably above its own MDE.\n")
+          f"({scn['power_at_the_yardstick'] * 100:.0f}% power at the margin). **Stated as "
+          "the bound it is: no specificity gain of 0.10 or larger was detected for the "
+          f"CNN, and this design could have detected {scn['mde_80']:.3f}.** That is not "
+          "the same as no gain existing. The effect the arm did find (+0.192 specificity, "
+          "mean-CIELAB) was comfortably above its own MDE and is unaffected.\n")
         A(f"* **Imaging cross-site: UNDERPOWERED, and this is the project's most "
           f"load-bearing finding.** Per direction: italy->india MDE "
           f"**{i2i['mde_80']:.3f}** ({i2i['mde_80'] / 0.10:.1f}x the margin, "
@@ -214,9 +216,12 @@ def main() -> int:
           f"{pa['imaging_cross_site']['italy_to_india']['n_non_anaemic']} non-anaemic "
           f"subjects); india->italy MDE **{i2t['mde_80']:.3f}** "
           f"({i2t['power_at_the_yardstick'] * 100:.0f}% power). The cross-site *direction* "
-          "was directly observed (sensitivity 0.397, 27 of 68 anaemic flagged) and is not "
-          "weakened by this, but **the magnitude of the cross-site penalty is poorly pinned "
-          "down** and should not be quoted as precise.\n")
+          "was directly observed - **27 of 68 anaemic subjects flagged, 41 missed**, which "
+          "is a count and carries no estimation uncertainty - and is not weakened by this. "
+          "But **the magnitude of the penalty is poorly pinned down and must not be quoted "
+          "as precise**: the rate behind that count is sensitivity 0.397, 95% CI [0.278, "
+          "0.514], and in the other direction specificity 0.418, CI [0.323, 0.516]. Prefer "
+          "the counts; attach the interval wherever a rate is used.\n")
         A(f"* **PPG screening AUROC: UNDERPOWERED.** MDE **{pau['mde_80']:.2f}** AUROC on "
           f"{pa['ppg']['n_anaemic']} anaemic subjects (prevalence "
           f"{pa['ppg']['prevalence'] * 100:.1f}%), so the recorded AUROC difference of "
@@ -229,6 +234,80 @@ def main() -> int:
           "which those statements previously lacked.\n")
     else:
         A("*Run `scripts/phase9d_power.py` to populate this section.*\n")
+
+    # ---------------------------------------------- Phase 9E: the named boundaries
+    guided = load("phase9e/guided_capture.json")
+    reqn = load("phase9e/required_n.json")
+    if guided:
+        u = guided["headline_uncertainty"]
+        pt = next(r for r in guided["gate_curve"] if r["is_headline"])
+        lo = guided["bracketing_measurements"]["lower"]["residual_dE2000"]
+        hi = guided["bracketing_measurements"]["upper"]["residual_dE2000"]
+        A("\n### The guided-capture gap - the regime this project did not measure "
+          "(Phase 9E)\n\n")
+        A("**This is the project's primary future-work item, and it is a boundary of the "
+          "claim rather than an open question.** Phase 7 measured three capture regimes: "
+          "uncontrolled (3.456 dE2000), one phone and one lighting cell with gaze varying "
+          f"({hi:.3f}), and a studio rig ({lo:.3f}). **A deployed screening app operates "
+          "in none of them.** Its guided capture is one phone in one session, with a live "
+          "overlay enforcing framing and distance and a quality gate rejecting blurred or "
+          "badly exposed frames before the shutter - between the second and third "
+          "conditions, which is exactly the interval in which the gate crosses bands and "
+          "exactly where Phase 9C found the verdict fragile.\n\n")
+        A("**It cannot be closed here.** Closing it requires capturing images under that "
+          "protocol, which section 3 forbids permanently. What Phase 9E does instead is "
+          "bound it by INTERPOLATION between the two measured points - the geometric mean "
+          f"of the bracketing pair, {guided['headline_point']['residual_dE2000']:.3f} "
+          f"dE2000, declared before the gate was run at it. **This is an interpolation, "
+          "not a measurement, and is labelled so wherever it appears.** At that point the "
+          f"gate returns **{pt['mae_g_dl']:.2f} g/dL, {pt['band']}** at nominal "
+          f"parameters, and over the Phase 9C prior **median {u['median']:.2f}, 95% "
+          f"[{u['p2.5']:.2f}, {u['p97.5']:.2f}]** - {u['fraction_below_1.0'] * 100:.0f}% "
+          f"VIABLE, {u['fraction_in_1_2'] * 100:.0f}% MARGINAL, "
+          f"{u['fraction_above_2.0'] * 100:.0f}% NOT RECOVERABLE. **VIABLE needs a "
+          f"residual below {guided['interval_verdict']['residual_required_for_VIABLE']:.3f} "
+          "dE2000, below the best measured condition in the whole project, so no point in "
+          "the guided-capture interval reaches VIABLE - including its most favourable "
+          "end.** What evidence would settle it is specified in "
+          "`reports/phase9e_boundaries.md`.\n")
+    if reqn:
+        A("\n### What a confirmatory study would need (Phase 9E)\n\n")
+        A("Each UNDERPOWERED verdict above, converted into a specification. Required "
+          "counts are stated for the group that **carries** the metric - non-anaemic "
+          "subjects for a specificity, anaemic for a sensitivity - because that, not the "
+          "cohort size, is what failed here.\n\n")
+        A(row(["comparison", "carrier group", "now", "needed at 80%", "needed at 90%",
+               "cohort at the observed prevalence"]))
+        A(row(["---"] * 6))
+        order = [("imaging_screening_specificity", "imaging within site, specificity"),
+                 ("imaging_screening_sensitivity", "imaging within site, sensitivity"),
+                 ("cross_site_italy_to_india", "cross-site italy->india, specificity"),
+                 ("cross_site_india_to_italy", "cross-site india->italy, specificity"),
+                 ("ppg_auroc", "PPG screening, AUROC")]
+        for k, lab in order:
+            v = reqn["required"].get(k)
+            if not v:
+                continue
+            A(row([lab, v["carrier_group"].replace("_", "-"), v["n_carrier_observed"],
+                   f"**{v['headline_required_carrier_80']:.0f}**",
+                   f"{v['headline_required_carrier_90']:.0f}",
+                   f"{v['headline_required_total_at_observed_prevalence_80']:.0f}"]))
+        it = reqn["required"]["cross_site_italy_to_india"]
+        A(f"\n**The composition point, which matters more than any total here.** "
+          f"`italy_to_india` estimated specificity on {it['n_carrier_observed']} "
+          f"non-anaemic subjects. It needs **{it['headline_required_carrier_80']:.0f}** - "
+          f"{it['headline_required_carrier_80'] / it['n_carrier_observed']:.0f}x more - "
+          f"and at that direction's "
+          f"observed prevalence that means a test site of roughly "
+          f"{it['headline_required_total_at_observed_prevalence_80']:.0f} people, against "
+          f"{it['n_test_observed']} here. Recruiting to a balanced 50% prevalence instead "
+          f"cuts it to about "
+          f"{it['headline_required_total_at_balanced_prevalence_80']:.0f}. **The SE "
+          "scaling behind these figures was measured by subsampling, not assumed**; where "
+          "the fit was too weak to trust - which happened on exactly the smallest carrier "
+          "groups - the ordinary 1/sqrt(n) rate is used and the measured one reported "
+          "beside it. Full derivation, caveats and both figures: "
+          "`reports/phase9e_boundaries.md`.\n")
     A("\n### Method and scope\n\n")
     A("* **The imaging arm's conjunctiva datasets have no sclera** - they are "
       "pre-segmented cutouts (least-cropped image still 49.7% black), so N1 could only "

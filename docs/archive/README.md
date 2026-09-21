@@ -18,6 +18,16 @@ SHA-256 `86f6ff5d4cca64b47179afaeee2fc22d826832d699d43533d9c4839b49a17775`.
 | `results_log.md` | **Section 8, RESULTS LOG** — all 48 entries, in date order, verbatim. Every metric produced, including failures and negative results. |
 | `superseded_claims.md` | The 4 original claim wordings retained under a refuted or superseded banner (N1 headline; N1 before the N1a/N1b/N1c restructure; N2's original justification; N5's original method), plus a register of the 10 other superseded banners and where each is retained. |
 | `corrections.md` | All 7 standalone correction entries verbatim — each with the entry it corrects — plus a register of 9 in-place correction banners that are not standalone entries. |
+| `phase9d_predeclaration.md` | **Phase 9D's PRE-DECLARED block, verbatim**, moved out of CLAUDE.md section 6 on **2026-09-21** under section 9's splitting rule. CLAUDE.md keeps the heading, a summary and this pointer. |
+| `phase9e_predeclaration.md` | **Phase 9E's PRE-DECLARED block, verbatim**, moved on **2026-09-21**, the day it was written. It was committed to CLAUDE.md as `f4a3fc0` **before any Phase 9E script ran** — that commit, not this file, is what makes it a pre-declaration. |
+
+The two `phase9*_predeclaration.md` files were moved on **2026-09-21** for the same
+reason the directory exists: CLAUDE.md had reached **120,380 characters** against its
+**120,000-character** test-enforced limit (`tests/test_docs.py`) once the Phase 9E
+results were recorded in it. **The split moved text; it changed none.** Both blocks are
+also recoverable from git at the commits that first carried them, which is what
+establishes that each predates its own results. See the DECISION LOG entry of
+2026-09-21.
 
 `superseded_claims.md` and `corrections.md` are **cross-cutting collections**. Every
 block in them also stands in its original place: in `CLAUDE.md` section 2 (the claim

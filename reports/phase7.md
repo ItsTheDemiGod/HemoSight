@@ -16,14 +16,28 @@ Noise over the measured empirical signal (0.84 dE2000/g/dL): MOBIUS 4.1x; MOBIUS
 
 ### The Phase 3 gate at each measured residual
 
-| residual (measured) | dE2000 | Hb MAE g/dL | p90 | band |
-| --- | --- | --- | --- | --- |
-| MOBIUS, across 3 phones x 3 lighting (uncontrolled) | 3.456 | **3.471** | 7.09 | **NOT RECOVERABLE** |
-| MOBIUS, same phone + lighting, gaze varies (geometry only) | 1.981 | **2.027** | 4.37 | **NOT RECOVERABLE** |
-| SBVPI studio rig (controlled) | 1.062 | **1.040** | 2.29 | **MARGINAL** |
-| Phase 3 reference: grey-world 25% FOV, MOBIUS iris | 3.935 | 3.977 | 8.00 | NOT RECOVERABLE |
-| reference 2.0 | 2.000 | 2.018 | 4.43 | NOT RECOVERABLE |
-| reference 1.0 | 1.000 | 1.000 | 2.18 | VIABLE |
+Every MAE below is a POINT ESTIMATE from a forward model whose 14 tissue parameters were held fixed and known. The column beside it is Phase 9C's propagation of the declared prior over those parameters. **No measured or interpolated row here may be quoted without its interval, least of all the studio row.** The two bare reference rows are points on the curve by construction, not results.
+
+| residual (measured) | dE2000 | Hb MAE g/dL | 95% over the parameter prior (9C) | p90 | band |
+| --- | --- | --- | --- | --- | --- |
+| MOBIUS, across 3 phones x 3 lighting (uncontrolled) | 3.456 | **3.471** | median 4.28, [2.09, 7.90] | 7.09 | **NOT RECOVERABLE** |
+| MOBIUS, same phone + lighting, gaze varies (geometry only) | 1.981 | **2.027** | median 2.76, [1.17, 6.48] | 4.37 | **NOT RECOVERABLE** |
+| SBVPI studio rig (controlled) | 1.062 | **1.040** | median 1.52, [0.60, 4.90] | 2.29 | **MARGINAL** |
+| Phase 3 reference: grey-world 25% FOV, MOBIUS iris | 3.935 | 3.977 | median 4.67, [2.37, 8.02] | 8.00 | NOT RECOVERABLE |
+| reference 2.0 | 2.000 | 2.018 | - | 4.43 | NOT RECOVERABLE |
+| reference 1.0 | 1.000 | 1.000 | - | 2.18 | VIABLE |
+| *guided capture - INTERPOLATED, not measured (Phase 9E)* | *1.450* | *1.445* | *median 2.06, [0.83, 5.73]* | *-* | *MARGINAL* |
+
+> ### 🟡 THE REGIME THIS PROJECT DID NOT MEASURE (Phase 9E, 2026-09-21)
+>
+> **A deployed screening app operates in none of the three measured conditions above.** Its guided capture is one phone in one session, with a live overlay enforcing framing and distance and a quality gate rejecting blurred or badly exposed frames before the shutter - more controlled than the gaze-only condition, less than a studio rig. That places it between **1.062 and 1.981 dE2000**, which is exactly the interval in which this gate crosses bands, and exactly where Phase 9C found the verdict fragile.
+>
+> **The italicised row above is an INTERPOLATION between two measured points** - the geometric mean of the bracketing pair, declared before the gate was run at it - and is not a measurement of anything. No guided-capture image exists in this project and none ever will: section 3 of CLAUDE.md forbids collecting data, permanently. The two measured anchors were re-run on the same fresh perturbation banks and land within 0.018 g/dL of their recorded values, so the interpolated points are not an artefact of a different random draw.
+>
+> **What it says.** At nominal parameters the bracketing interval is MARGINAL throughout and tips into NOT RECOVERABLE at its uncontrolled end. Under the Phase 9C prior the headline point is median 2.06, 95% [0.83, 5.73]: 9% VIABLE, 39% MARGINAL, 52% NOT RECOVERABLE - FRAGILE at 2.0; FRAGILE at 1.0. **VIABLE needs a residual below 0.986 dE2000, which is below the best measured condition in the whole project. No point in the guided-capture interval reaches VIABLE, including its most favourable end.**
+>
+> **This is the project's primary future-work item, and it is a named boundary of the claim rather than an open question to be closed here.** What evidence would settle it - capture protocol, measurement, sample and the result in either direction - is specified in `reports/phase9e_boundaries.md`.
+
 
 > **Phase 9C (2026-09-20): these are point estimates, and the studio one is FRAGILE.** Propagating the forward model's own parameter uncertainty (declared prior over its 14 fixed tissue parameters) gives, at the three measured residuals: uncontrolled 3.456 -> median 4.28, 95% [2.09, 7.90] (ROBUST, entirely above 2.0); Phase 3 reference 3.935 -> median 4.67, 95% [2.37, 8.02] (ROBUST); **studio 1.062 -> median 1.52, 95% [0.60, 4.90] - spanning VIABLE, MARGINAL and NOT RECOVERABLE, so its MARGINAL label is not robust to parameter uncertainty** (27.1% of the prior VIABLE, 37.0% NOT RECOVERABLE). See `reports/phase9c_uncertainty.md`.
 
@@ -38,7 +52,7 @@ Noise over the measured empirical signal (0.84 dE2000/g/dL): MOBIUS 4.1x; MOBIUS
 
 ### Outcome: **B - partial - controlled capture reaches MARGINAL only**
 
-Controlled capture cuts the residual by a factor of 3.3 and moves the gate from NOT RECOVERABLE (3.98 g/dL) to MARGINAL (1.04), and the one controlled-illuminant dataset with haemoglobin labels lands in the same band empirically (1.34). It does not reach VIABLE: the studio residual is 1.1x the residual VIABLE needs, and Eyes-Defy shows that even at zero calibration residual a between-subject tissue term of ~4.5 dE2000 remains. **The boundary reading matters and is stated plainly:** at the studio residual the gate returns 1.04 g/dL, +0.04 from the VIABLE line - studio-grade control brings the CALIBRATION term to the edge of viable. **Phase 9C shows that edge sits inside the model's own parameter uncertainty:** over the declared prior the same residual gives median 1.52 g/dL, 95% [0.60, 4.90], spanning all three bands, so this number must not be quoted as 1.04 alone. What keeps the empirical result in MARGINAL is the other term: between-subject conjunctival colour at fixed haemoglobin, which no amount of capture control removes and which the gate model never contained. In the controlled regime the limiting factor shifts from calibration to tissue. **The refutation is restated in two parts:** from uncontrolled photographs the inversion is NOT RECOVERABLE; from controlled capture it reaches screening bands at best, does not beat site + sex + age, and moves no clinical threshold. The distinction a reviewer would raise is real and is now measured, and it does not rescue the claim.
+Controlled capture cuts the residual by a factor of 3.3 and moves the gate from NOT RECOVERABLE (3.98 g/dL) to MARGINAL (1.04), and the one controlled-illuminant dataset with haemoglobin labels lands in the same band empirically (1.34). It does not reach VIABLE: the studio residual is 1.1x the residual VIABLE needs, and Eyes-Defy shows that even at zero calibration residual a between-subject tissue term of ~4.5 dE2000 remains. **The boundary reading is the most fragile number in this project, and it is never stated without its interval:** at the studio residual the gate returns 1.04 g/dL at NOMINAL PARAMETERS, +0.04 from the VIABLE line - a residual 1.08x what VIABLE needs, which reads as 'within 8% of viable'. **That reading survives only at the nominal parameter choice. Over the declared prior the same residual gives median 1.52 g/dL, 95% [0.60, 4.90], spanning VIABLE, MARGINAL and NOT RECOVERABLE (27.1% / 35.9% / 37.0%), so the band is a property of the parameter choice as much as of the capture condition and the figure must never be quoted as 1.04 alone.** What keeps the empirical result in MARGINAL is the other term: between-subject conjunctival colour at fixed haemoglobin, which no amount of capture control removes and which the gate model never contained. In the controlled regime the limiting factor shifts from calibration to tissue. **The refutation is restated in two parts:** from uncontrolled photographs the inversion is NOT RECOVERABLE; from controlled capture it reaches screening bands at best and does not beat site + sex + age. **The clause "and moves no clinical threshold" stood here until Phase 9A retired it, and it is removed:** re-scored as the referral decision the product actually makes, the image cuts the referral rate from 0.634 to 0.519 at the same ~0.90 detection rate within site - a margin the colour model clears with a CI excluding zero. What controlled capture does not rescue is transfer between sites. The distinction a reviewer would raise is real and is now measured, and it does not rescue the claim.
 
 ## 2. TASK 2 - the statistically-real / clinically-useless pattern
 

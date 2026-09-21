@@ -311,3 +311,49 @@ lifted status on Li et al. 2015 alone (OCT, 34.0 +/- 5.8 um, palpebral).
 by Sobol total index, so sourcing them would have moved the gate interval very little. What
 dominates is unsourced in a different way: a modelling constant (the 0.6 deep-layer weight) and
 the epithelial blood volume fraction.
+
+## 11. "Moves no clinical threshold" again — the §8 correction had never reached `reports/phase7.md` (found and fixed 2026-09-21, Phase 9E)
+
+**This entry corrects the application of correction §8, not its content.** §8 (2026-09-17)
+records that Phase 9A retired the clause **"and moves no clinical threshold"** from the
+Phase 7 DECISION LOG entry of 2026-09-12. That retirement was written into
+`docs/archive/corrections.md`, into `docs/archive/decision_log.md`, into CLAUDE.md and
+into `reports/phase9a_screening_metrics.md`.
+
+**It was never applied to `scripts/phase7_report.py`.** For four days `reports/phase7.md`
+continued to assert the retired clause as a live conclusion, in the Task 1 verdict
+paragraph that restates the imaging refutation in two parts:
+
+> **The refutation is restated in two parts:** from uncontrolled photographs the inversion
+> is NOT RECOVERABLE; from controlled capture it reaches screening bands at best, does not
+> beat site + sex + age, ~~and moves no clinical threshold~~.
+
+A second instance stood in `reports/statistical_vs_clinical.md`: *"it loses to or barely
+matches the cheapest available baseline on the same folds, and it moves no screening
+threshold."*
+
+**How it was caught.** The Phase 9E Part C language pass (2026-09-21), which audited every
+reader-facing statement of a result rather than only the statements a phase had flagged.
+
+**What it now says.** The clause is removed from the generator and both reports were
+regenerated. In its place the Phase 7 verdict states what stood there, that Phase 9A
+retired it, and what replaces it: within site the image cuts the referral rate from 0.634
+to 0.519 at the same ~0.90 detection rate — a margin the mean-CIELAB model clears with a
+CI excluding zero — and what controlled capture does **not** rescue is transfer between
+sites. `statistical_vs_clinical.md` now says the threshold such a model moves, if it moves
+one at all, does not survive a change of site.
+
+**Enforced from here on.**
+`tests/test_phase9e.py::test_the_retired_phase9a_phrase_is_not_asserted_in_the_phase7_report`
+fails the suite if the phrase reappears in that report outside a sentence that retires it.
+
+**The generalisable lesson, recorded because this will happen again.** A correction is not
+applied when it is logged; it is applied when **every generated artefact that carried the
+claim has been regenerated**. This project generates its reports from scripts precisely so
+that *numbers* cannot drift from the evidence — but **prose inside a generator drifts
+exactly as easily as prose inside a document**, and nothing was checking it. Each of the
+ten corrections above should be read with the same question attached: which generated
+files carried that claim, and were they regenerated?
+
+**No verdict changes.** The Phase 7 outcome is still B; the imaging arm is still CLOSED,
+FINAL; §8 itself is unchanged and stands.

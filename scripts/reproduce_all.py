@@ -157,6 +157,23 @@ STAGES = [
                "reproduces the recorded differences before computing any MDE. "
                "Deterministic (bootstrap seed 20260911)"),
     Stage("Phase 9D report", "phase9d_report.py", 0.1),
+    Stage("Phase 9E cross-site intervals", "phase9e_intervals.py", 0.1,
+          note="CPU; the cross-site specificity/PPV/referral CIs Phase 9A never "
+               "stored. Rebuilds Phase 9A's calls from the recorded operating point "
+               "and asserts it reproduces its confusion matrices and sensitivity "
+               "intervals exactly before adding anything. Deterministic"),
+    Stage("Phase 9E required n", "phase9e_required_n.py", 5, slow=True,
+          note="CPU, MEASURED ~290 s. Asserts Phase 9D's MDEs reproduce, then "
+               "MEASURES the SE scaling by subsampling (25 subsamples x 2,000-"
+               "resample paired bootstraps per comparison) before computing any "
+               "required n. Deterministic (seeds 20260911 / 20260921)"),
+    Stage("Phase 9E guided capture", "phase9e_guided_capture.py", 3,
+          note="CPU, MEASURED ~155 s. Needs phase9c/design.npz for the prior draws. "
+               "Draws FRESH perturbation banks (seed 20260921) because no original "
+               "RNG order exists at an unmeasured residual, and re-runs the two "
+               "measured anchors on them as a check. INTERPOLATION, not a "
+               "measurement - see the report. Deterministic"),
+    Stage("Phase 9E report", "phase9e_report.py", 0.1),
 ]
 
 

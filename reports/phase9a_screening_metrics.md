@@ -151,16 +151,31 @@ pooled ranking advantage comes from one of the two sites.
 
 ### 3b. Cross-site - the decisive failure, and it is not a knife-edge
 
-| direction | n test | anaemic | prevalence | MAE (recorded) | bias | AUROC (95% CI) | sens | spec | flagged | referral | verdict |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| italy_to_india | 95 | 68 | 0.716 | 1.914 (1.958) | +1.551 | 0.764 [0.657, 0.857] | **0.397** | 0.963 | 27/68 | 0.295 | **NOT USEFUL** |
-| india_to_italy | 121 | 23 | 0.190 | 1.882 (1.995) | -1.450 | 0.883 [0.800, 0.956] | **0.913** | 0.418 | 21/23 | 0.645 | **NOT USEFUL** |
+**Counts first, rates second, and no rate without its interval.** Phase 9D found
+this the least precisely estimated comparison in the project, so the observed
+counts - which carry no estimation uncertainty at all - lead, and every rate below
+carries a 95% subject-level bootstrap CI (the specificity, PPV and referral-rate
+intervals were computed in Phase 9E; Phase 9A stored only the sensitivity one).
+
+| direction | n test | anaemic | flagged | MAE (recorded) | bias | AUROC (95% CI) | sens (95% CI) | spec (95% CI) | verdict |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| italy_to_india | 95 | 68 | **27 of 68** | 1.914 (1.958) | +1.551 | 0.764 [0.657, 0.857] | **0.397 [0.278, 0.514]** | 0.963 [0.885, 1.000] | **NOT USEFUL** |
+| india_to_italy | 121 | 23 | **21 of 23** | 1.882 (1.995) | -1.450 | 0.883 [0.800, 0.956] | **0.913 [0.783, 1.000]** | 0.418 [0.323, 0.516] | **NOT USEFUL** |
 
 The operating point is chosen on the **training site** and applied to the held-out
 site, which is the only honest construction available. It transfers badly:
-`italy_to_india` flags **27 of 68** anaemic subjects - **sensitivity 0.397** - because
+`italy_to_india` flags **27 of 68** anaemic subjects - sensitivity 0.397 [0.278, 0.514] - because
 the +1.55 g/dL bias pushes predictions above the train-site cut. `india_to_italy`
-reaches sensitivity 0.913 but at specificity 0.418, below the pre-declared 0.50 floor.
+flags 21 of 23 anaemic subjects, sensitivity 0.913 [0.783, 1.000], but at specificity 0.418 [0.323, 0.516] - below the
+pre-declared 0.50 floor, and its whole interval is below that floor.
+
+**What is certain here and what is not.** The *direction* of the collapse is
+directly observed and is not in doubt: 41 of 68 anaemic subjects went unflagged in
+one direction, and that is a count, not an estimate. The *magnitude* is another
+matter. `italy_to_india` specificity rests on **27 non-anaemic subjects** and
+Phase 9D measured only 14% power on that direction, so the size of the cross-site
+penalty must not be quoted as a precise quantity. Phase 9E gives the sample that
+would pin it down (`reports/phase9e_boundaries.md`).
 
 **Checked for seed dependence rather than assumed.** Per-seed cross-site operating
 points give sensitivity 0.250 / 0.412 / 0.426 for `italy_to_india` and
@@ -174,11 +189,11 @@ cross-site verdict does not rest on the non-determinism documented in section 6.
 | --- | --- | --- | --- |
 | image CNN, pooled | MAE 1.301 MARGINAL; does not beat site+sex+age (1.273) | **NOT USEFUL** | **WEAKENS** - AUROC and matched-sensitivity specificity gains over demographics have CIs excluding zero; the margin is missed by 0.004 |
 | colour features (Lab) | MAE 1.343 MARGINAL | **NOT USEFUL** | **WEAKENS** - clears the pre-declared specificity margin (+0.192, CI excludes zero); misses the 0.90 sensitivity floor by 0.010 |
-| image CNN, within India | within-site r 0.54 | **NOT USEFUL** | CONFIRMS - no AUROC advantage over age+sex (CI spans zero) |
+| image CNN, within India | within-site r 0.54 | **NOT USEFUL** | CONFIRMS - no AUROC advantage over age+sex was detected; +0.012, CI [-0.105, 0.141], which spans zero |
 | image CNN, within Italy | within-site r 0.63 | **NOT USEFUL** | WEAKENS within this site - AUROC +0.445 (CI excludes zero); still misses the sensitivity floor |
-| image CNN, italy_to_india | MAE 1.96 MARGINAL | **NOT USEFUL** | **CONFIRMS, strongly** - sensitivity 0.397, misses 41 of 68 anaemic subjects |
-| image CNN, india_to_italy | MAE 1.99 MARGINAL | **NOT USEFUL** | **CONFIRMS** - specificity 0.418, below the floor |
-| PPG features, 4-wavelength | MAE 1.190, R2 -0.025 NOT VIABLE | **NOT USEFUL** | CONFIRMS - AUROC diff -0.001, CI spans zero |
+| image CNN, italy_to_india | MAE 1.96 MARGINAL | **NOT USEFUL** | **CONFIRMS, strongly** - misses 41 of 68 anaemic subjects (sensitivity 0.397, 95% CI [0.278, 0.514]) |
+| image CNN, india_to_italy | MAE 1.99 MARGINAL | **NOT USEFUL** | **CONFIRMS** - flags 57 of 98 non-anaemic subjects; specificity 0.418, 95% CI [0.323, 0.516], the whole interval below the 0.50 floor |
+| PPG features, 4-wavelength | MAE 1.190, R2 -0.025 NOT VIABLE | **NOT USEFUL** | CONFIRMS **on MAE and NNS, not on AUROC** - AUROC diff -0.001, CI spans zero, but Phase 9D puts the AUROC MDE at 0.270 on 18 anaemic subjects, so that comparison is uninformative on its own |
 | PPG + demographics | MAE 0.824 - 'a sex classifier with a PPG-shaped decoration' | **NOT USEFUL** | CONFIRMS - no margin cleared; specificity gain +0.090 short of 0.10 |
 | PPG deep, speccnn 660 | MAE 1.113 NOT VIABLE; real but useless (z=-4.96) | **NOT USEFUL** | **CONFIRMS, strengthened** - significantly WORSE than demographics at matched sensitivity (-0.090, CI excludes zero) |
 
@@ -187,8 +202,10 @@ cross-site verdict does not rest on the non-determinism documented in section 6.
 **Imaging: WEAKENED within site, CONFIRMED cross-site.** The recorded clause
 "moves no clinical threshold" is contradicted for the site-mixed regime and is
 corrected. The arm remains not deployable, but the binding reason is now the
-cross-site collapse (sensitivity 0.397 in one direction, specificity 0.418 in the
-other) rather than the absence of a within-site effect. Under this project's own
+cross-site collapse - 41 of 68 anaemic subjects missed in one direction
+(sensitivity 0.397, CI [0.278, 0.514]); 57 of 98 non-anaemic subjects needlessly
+flagged in the other (specificity 0.418, CI [0.323, 0.516]) - rather than the
+absence of a within-site effect. Under this project's own
 hard constraint - *single-site accuracy numbers are considered worthless* - that
 binding reason is the one that governs.
 
@@ -196,7 +213,26 @@ binding reason is the one that governs.
 deep model is significantly worse than demographics at matched sensitivity; its NNS
 is worse than referring everybody. Phase 7's plug-in sensitivity 0.000 reproduces
 exactly, now correctly labelled as a plug-in artefact rather than a discriminative
-ceiling.
+ceiling. **The PPG verdict rests on its MAE and NNS figures, which are well
+powered (MDE 0.137 g/dL), and not on its AUROC comparison, whose MDE is 0.270 on
+18 anaemic subjects.** An AUROC difference of -0.000 on that sample is not
+evidence of equivalence; it is an uninformative measurement, and is reported as
+one.
+
+### How precisely these numbers are known (added by Phase 9E)
+
+Phase 9D measured what this design could have detected, and the answer differs
+sharply by comparison. **The two regression comparisons are ADEQUATELY POWERED** -
+MDE 0.181 g/dL for imaging and 0.137 for PPG, against a narrowest WHO band of 1.0 -
+so those negative results are informative evidence of absence and keep their full
+strength. **Three comparisons here are UNDERPOWERED and their nulls are bounded,
+not empty:** within site no specificity gain of 0.10 or larger was detected and
+the design could have detected 0.116 (67% power at the margin); the same applies
+to the sensitivity direction at 0.114. Cross-site, the MDE is 0.314 for
+italy_to_india (14% power) and 0.165 for india_to_italy (40%). **This bounds what
+the null comparisons mean; it does not touch the observed collapse**, which is a
+count of subjects, not an estimate. Phase 9E converts each underpowered comparison
+into a required sample size - see `reports/phase9e_boundaries.md`.
 
 ## 5. WHO thresholds, and which subjects they were applied to
 

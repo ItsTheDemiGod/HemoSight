@@ -254,16 +254,24 @@ def main() -> int:
       "only have detected an effect far larger than the one the project declared worth "
       "having.\n\n")
     A("**What this does and does not do to the recorded verdict.** Phase 9A's cross-site "
-      "result was **not** a null finding: it reported sensitivity **0.397** in "
-      "italy->india, flagging 27 of 68 anaemic subjects - a large, directly observed failure, "
-      "not an absence of evidence. A power analysis constrains what *null* comparisons can be "
+      "result was **not** a null finding: in italy->india the model **flagged 27 of 68 "
+      "anaemic subjects and missed 41** - a count, carrying no estimation uncertainty at "
+      "all - which is a large, directly observed failure, not an absence of evidence. The "
+      "rate behind that count is sensitivity 0.397, 95% CI [0.278, 0.514]; in the other "
+      "direction 57 of 98 non-anaemic subjects were needlessly flagged, specificity 0.418, "
+      "CI [0.323, 0.516] (Phase 9E computed the specificity intervals Phase 9A did not "
+      "store). **Prefer the counts, and attach the interval wherever a rate is used.** A "
+      "power analysis constrains what *null* comparisons can be "
       "concluded from; it does not weaken an observed collapse. **But the honest statement is "
       "uncomfortable and is made anyway:** the comparison carrying the most weight in this "
       "project - the one that turned a within-site success into a non-deployable verdict - is "
       "also its least precisely estimated, and the *size* of the cross-site penalty is "
       "correspondingly uncertain even though its *direction* is not. Anyone continuing this "
       "line of work should treat the cross-site magnitude as poorly pinned down and collect "
-      "more sites before quoting it.\n\n")
+      "more sites before quoting it. **Phase 9E says how many:** specificity in that "
+      "direction rests on 27 non-anaemic subjects and needs about 266 to reach 80% power "
+      "at the 0.10 margin - roughly a 936-person test site at that direction's prevalence, "
+      "or 532 if recruited to a balanced one. See `reports/phase9e_boundaries.md`.\n\n")
 
     A("### 3.4 PPG - ADEQUATELY POWERED on MAE, UNDERPOWERED on screening AUROC\n\n")
     A(f"n = {ppg['n']} subjects with venous HemoCue reference, "

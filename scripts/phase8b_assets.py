@@ -75,8 +75,23 @@ def noise_signal() -> dict:
              "mobius_within_cell_gaze_only": "same phone and lighting",
              "sbvpi_studio": "studio rig"}
     conds = [{"label": names[k], "residual_dE2000": round(v["residual_dE2000"], 3),
-              "gate_mae_g_dl": round(cc["gate"][k]["mae_g_dl"], 3), "band": cc["gate"][k]["band"]}
+              "gate_mae_g_dl": round(cc["gate"][k]["mae_g_dl"], 3),
+              "band": cc["gate"][k]["band"], "interpolated": False}
              for k, v in cc["best_residual_per_condition"].items()]
+    # Phase 9E: the regime a deployed app actually uses sits between the second and third
+    # measured conditions and was never measured. It is shown, labelled as interpolated,
+    # because leaving it out is what made the gap invisible in the first place.
+    gp = paths.INTERIM / "phase9e" / "guided_capture.json"
+    if gp.exists():
+        g = json.loads(gp.read_text(encoding="utf-8"))
+        pt = next(r for r in g["gate_curve"] if r["is_headline"])
+        u = g["headline_uncertainty"]
+        conds.append({"label": "guided capture (interpolated)",
+                      "residual_dE2000": round(pt["residual_dE2000"], 3),
+                      "gate_mae_g_dl": round(pt["mae_g_dl"], 3), "band": pt["band"],
+                      "interpolated": True,
+                      "band_interval_95": [round(u["p2.5"], 2), round(u["p97.5"], 2)]})
+        conds.sort(key=lambda c: -c["residual_dE2000"])
     return {"conditions": conds,
             "signal_dE2000_per_g_dl": round(emp["headline"]["de_per_g_dl"], 3),
             "signal_ci95": [round(x, 3) for x in emp["headline"]["ci95"]],

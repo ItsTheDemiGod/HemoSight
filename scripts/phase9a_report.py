@@ -15,6 +15,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from hemosight.io import paths   # noqa: E402
 
 SRC = paths.INTERIM / "phase9a" / "screening.json"
+# Phase 9E computed the cross-site intervals Phase 9A never stored (specificity, PPV,
+# referral rate). Read, never retyped; the report degrades to the bare rate if absent.
+XSCI = paths.INTERIM / "phase9e" / "cross_site_intervals.json"
 DST = paths.REPORTS / "phase9a_screening_metrics.md"
 
 
@@ -44,6 +47,22 @@ def signed(x, nd=3):
 def main() -> int:
     r = json.loads(SRC.read_text(encoding="utf-8"))
     img, ppg, xs = r["imaging"], r["ppg"], r["imaging_cross_site"]
+    try:
+        xsci = json.loads(XSCI.read_text(encoding="utf-8"))["directions"]
+    except (OSError, KeyError, json.JSONDecodeError):
+        xsci = {}
+
+    def rate(direction, metric, nd=3):
+        """A cross-site rate with its interval attached, never bare (Phase 9E)."""
+        d = xsci.get(direction, {}).get(metric)
+        v = xs["directions"][direction]["cnn"][metric]
+        if not d:
+            return f(v, nd)
+        return f"{f(v, nd)} {ci([d['lo'], d['hi']], nd)}"
+
+    def flagged(direction):
+        c = xs["directions"][direction]["cnn"]
+        return "%d of %d" % (c["n_anaemic_flagged"], c["n_anaemic"])
     L: list[str] = []
     A = L.append
 
@@ -239,28 +258,42 @@ def main() -> int:
     A("")
     A("### 3b. Cross-site - the decisive failure, and it is not a knife-edge")
     A("")
-    A("| direction | n test | anaemic | prevalence | MAE (recorded) | bias | AUROC (95% CI) | sens | spec | flagged | referral | verdict |")
-    A("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |")
+    A("**Counts first, rates second, and no rate without its interval.** Phase 9D found")
+    A("this the least precisely estimated comparison in the project, so the observed")
+    A("counts - which carry no estimation uncertainty at all - lead, and every rate below")
+    A("carries a 95% subject-level bootstrap CI (the specificity, PPV and referral-rate")
+    A("intervals were computed in Phase 9E; Phase 9A stored only the sensitivity one).")
+    A("")
+    A("| direction | n test | anaemic | flagged | MAE (recorded) | bias | AUROC (95% CI) | sens (95% CI) | spec (95% CI) | verdict |")
+    A("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |")
     for tag, v in xs.get("directions", {}).items():
         c = v["cnn"]
-        A("| %s | %d | %d | %s | %s (%s) | %s | %s %s | **%s** | %s | %d/%d | %s | **%s** |" % (
-            tag, v["n_test"], v["n_anaemic_test"], f(v["prevalence_test"]),
+        A("| %s | %d | %d | **%s** | %s (%s) | %s | %s %s | **%s** | %s | **%s** |" % (
+            tag, v["n_test"], v["n_anaemic_test"], flagged(tag),
             f(c["mae_g_dl"]), f(c["mae_recorded"]), signed(c["bias_g_dl"]),
-            f(c["auroc"]), ci(c["auroc_ci"]), f(c["sensitivity"]), f(c["specificity"]),
-            c["n_anaemic_flagged"], c["n_anaemic"], f(c["referral_rate"]),
-            v["screening_verdict"]))
+            f(c["auroc"]), ci(c["auroc_ci"]), rate(tag, "sensitivity"),
+            rate(tag, "specificity"), v["screening_verdict"]))
     A("")
     A("The operating point is chosen on the **training site** and applied to the held-out")
     A("site, which is the only honest construction available. It transfers badly:")
-    A("`italy_to_india` flags **%d of %d** anaemic subjects - **sensitivity %s** - because"
-      % (xs["directions"]["italy_to_india"]["cnn"]["n_anaemic_flagged"],
-         xs["directions"]["italy_to_india"]["cnn"]["n_anaemic"],
-         f(xs["directions"]["italy_to_india"]["cnn"]["sensitivity"])))
+    A("`italy_to_india` flags **%s** anaemic subjects - sensitivity %s - because"
+      % (flagged("italy_to_india"), rate("italy_to_india", "sensitivity")))
     A("the %s g/dL bias pushes predictions above the train-site cut. `india_to_italy`"
       % signed(xs["directions"]["italy_to_india"]["cnn"]["bias_g_dl"], 2))
-    A("reaches sensitivity %s but at specificity %s, below the pre-declared 0.50 floor."
-      % (f(xs["directions"]["india_to_italy"]["cnn"]["sensitivity"]),
-         f(xs["directions"]["india_to_italy"]["cnn"]["specificity"])))
+    A("flags %s anaemic subjects, sensitivity %s, but at specificity %s - below the"
+      % (flagged("india_to_italy"), rate("india_to_italy", "sensitivity"),
+         rate("india_to_italy", "specificity")))
+    A("pre-declared 0.50 floor, and its whole interval is below that floor.")
+    A("")
+    A("**What is certain here and what is not.** The *direction* of the collapse is")
+    A("directly observed and is not in doubt: 41 of 68 anaemic subjects went unflagged in")
+    A("one direction, and that is a count, not an estimate. The *magnitude* is another")
+    A("matter. `italy_to_india` specificity rests on **%d non-anaemic subjects** and"
+      % (xs["directions"]["italy_to_india"]["n_test"]
+         - xs["directions"]["italy_to_india"]["n_anaemic_test"]))
+    A("Phase 9D measured only 14% power on that direction, so the size of the cross-site")
+    A("penalty must not be quoted as a precise quantity. Phase 9E gives the sample that")
+    A("would pin it down (`reports/phase9e_boundaries.md`).")
     A("")
     A("**Checked for seed dependence rather than assumed.** Per-seed cross-site operating")
     A("points give sensitivity 0.250 / 0.412 / 0.426 for `italy_to_india` and")
@@ -285,20 +318,25 @@ def main() -> int:
          "zero); misses the 0.90 sensitivity floor by 0.010"),
         ("image CNN, within India", "within-site r 0.54",
          img["within_site"]["eyes_defy:India"]["comparisons"]["image_cnn"]["screening_verdict"],
-         "CONFIRMS - no AUROC advantage over age+sex (CI spans zero)"),
+         "CONFIRMS - no AUROC advantage over age+sex was detected; +0.012, CI "
+         "[-0.105, 0.141], which spans zero"),
         ("image CNN, within Italy", "within-site r 0.63",
          img["within_site"]["eyes_defy:Italy"]["comparisons"]["image_cnn"]["screening_verdict"],
          "WEAKENS within this site - AUROC +0.445 (CI excludes zero); still misses the "
          "sensitivity floor"),
         ("image CNN, italy_to_india", "MAE 1.96 MARGINAL",
          xs["directions"]["italy_to_india"]["screening_verdict"],
-         "**CONFIRMS, strongly** - sensitivity 0.397, misses 41 of 68 anaemic subjects"),
+         "**CONFIRMS, strongly** - misses 41 of 68 anaemic subjects (sensitivity "
+         "0.397, 95% CI [0.278, 0.514])"),
         ("image CNN, india_to_italy", "MAE 1.99 MARGINAL",
          xs["directions"]["india_to_italy"]["screening_verdict"],
-         "**CONFIRMS** - specificity 0.418, below the floor"),
+         "**CONFIRMS** - flags 57 of 98 non-anaemic subjects; specificity 0.418, 95% "
+         "CI [0.323, 0.516], the whole interval below the 0.50 floor"),
         ("PPG features, 4-wavelength", "MAE 1.190, R2 -0.025 NOT VIABLE",
          ppg["comparisons"]["ppg_features_four_wavelength"]["screening_verdict"],
-         "CONFIRMS - AUROC diff -0.001, CI spans zero"),
+         "CONFIRMS **on MAE and NNS, not on AUROC** - AUROC diff -0.001, CI spans "
+         "zero, but Phase 9D puts the AUROC MDE at 0.270 on 18 anaemic subjects, so "
+         "that comparison is uninformative on its own"),
         ("PPG + demographics", "MAE 0.824 - 'a sex classifier with a PPG-shaped decoration'",
          ppg["comparisons"]["ppg_features_plus_demographics"]["screening_verdict"],
          "CONFIRMS - no margin cleared; specificity gain +0.090 short of 0.10"),
@@ -315,8 +353,10 @@ def main() -> int:
     A("**Imaging: WEAKENED within site, CONFIRMED cross-site.** The recorded clause")
     A("\"moves no clinical threshold\" is contradicted for the site-mixed regime and is")
     A("corrected. The arm remains not deployable, but the binding reason is now the")
-    A("cross-site collapse (sensitivity 0.397 in one direction, specificity 0.418 in the")
-    A("other) rather than the absence of a within-site effect. Under this project's own")
+    A("cross-site collapse - 41 of 68 anaemic subjects missed in one direction")
+    A("(sensitivity 0.397, CI [0.278, 0.514]); 57 of 98 non-anaemic subjects needlessly")
+    A("flagged in the other (specificity 0.418, CI [0.323, 0.516]) - rather than the")
+    A("absence of a within-site effect. Under this project's own")
     A("hard constraint - *single-site accuracy numbers are considered worthless* - that")
     A("binding reason is the one that governs.")
     A("")
@@ -324,7 +364,26 @@ def main() -> int:
     A("deep model is significantly worse than demographics at matched sensitivity; its NNS")
     A("is worse than referring everybody. Phase 7's plug-in sensitivity 0.000 reproduces")
     A("exactly, now correctly labelled as a plug-in artefact rather than a discriminative")
-    A("ceiling.")
+    A("ceiling. **The PPG verdict rests on its MAE and NNS figures, which are well")
+    A("powered (MDE 0.137 g/dL), and not on its AUROC comparison, whose MDE is 0.270 on")
+    A("18 anaemic subjects.** An AUROC difference of -0.000 on that sample is not")
+    A("evidence of equivalence; it is an uninformative measurement, and is reported as")
+    A("one.")
+    A("")
+    A("### How precisely these numbers are known (added by Phase 9E)")
+    A("")
+    A("Phase 9D measured what this design could have detected, and the answer differs")
+    A("sharply by comparison. **The two regression comparisons are ADEQUATELY POWERED** -")
+    A("MDE 0.181 g/dL for imaging and 0.137 for PPG, against a narrowest WHO band of 1.0 -")
+    A("so those negative results are informative evidence of absence and keep their full")
+    A("strength. **Three comparisons here are UNDERPOWERED and their nulls are bounded,")
+    A("not empty:** within site no specificity gain of 0.10 or larger was detected and")
+    A("the design could have detected 0.116 (67% power at the margin); the same applies")
+    A("to the sensitivity direction at 0.114. Cross-site, the MDE is 0.314 for")
+    A("italy_to_india (14% power) and 0.165 for india_to_italy (40%). **This bounds what")
+    A("the null comparisons mean; it does not touch the observed collapse**, which is a")
+    A("count of subjects, not an estimate. Phase 9E converts each underpowered comparison")
+    A("into a required sample size - see `reports/phase9e_boundaries.md`.")
     A("")
 
     # ------------------------------------------------------------ 5. thresholds

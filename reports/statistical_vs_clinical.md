@@ -4,7 +4,7 @@
 
 ## 1. The pattern
 
-A model can be **distinguishable from chance** - its error is far below what shuffled labels produce, with a permutation p at the floor of what the sample allows - and at the same time **worth nothing to a decision**: it improves on predicting a constant by a fraction of a gram per decilitre, it loses to or barely matches the cheapest available baseline on the same folds, and it moves no screening threshold. The two properties are separable, and a result reported with only the first looks like a working estimator.
+A model can be **distinguishable from chance** - its error is far below what shuffled labels produce, with a permutation p at the floor of what the sample allows - and at the same time **worth nothing to a decision**: it improves on predicting a constant by a fraction of a gram per decilitre, it loses to or barely matches the cheapest available baseline on the same folds, and the threshold it moves - if it moves one at all - does not survive a change of site. The two properties are separable, and a result reported with only the first looks like a working estimator.
 
 This project produced the pattern twice, independently, in two modalities that share nothing but the target molecule. Neither result is wrong. Both are real. Neither is useful. The section below puts them on the same axes.
 

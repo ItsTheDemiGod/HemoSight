@@ -65,11 +65,31 @@ Minimum detectable effect at 80% power, alpha 0.05, two-sided, on the comparison
 
 * **Imaging regression: ADEQUATELY POWERED.** n=216; MDE **0.18 g/dL** of MAE against the site+sex+age baseline, versus the 1.0 g/dL narrowest WHO band - 100% power to detect a clinically meaningful improvement. The negative result is informative evidence of absence.
 * **PPG regression: ADEQUATELY POWERED, and the best-powered comparison in the project.** n=252; MDE **0.14 g/dL** against sex alone, versus 1.0 g/dL. Phase 4.5's negative result is informative.
-* **Imaging screening, within site: UNDERPOWERED, marginally.** MDE **0.116** specificity against the 0.10 pre-declared margin (67% power at the margin). A borderline effect could have been missed; the effect the arm did find (+0.192 specificity, mean-CIELAB) was comfortably above its own MDE.
-* **Imaging cross-site: UNDERPOWERED, and this is the project's most load-bearing finding.** Per direction: italy->india MDE **0.314** (3.1x the margin, 14% power, specificity estimated on 27 non-anaemic subjects); india->italy MDE **0.165** (40% power). The cross-site *direction* was directly observed (sensitivity 0.397, 27 of 68 anaemic flagged) and is not weakened by this, but **the magnitude of the cross-site penalty is poorly pinned down** and should not be quoted as precise.
+* **Imaging screening, within site: UNDERPOWERED, marginally.** MDE **0.116** specificity against the 0.10 pre-declared margin (67% power at the margin). **Stated as the bound it is: no specificity gain of 0.10 or larger was detected for the CNN, and this design could have detected 0.116.** That is not the same as no gain existing. The effect the arm did find (+0.192 specificity, mean-CIELAB) was comfortably above its own MDE and is unaffected.
+* **Imaging cross-site: UNDERPOWERED, and this is the project's most load-bearing finding.** Per direction: italy->india MDE **0.314** (3.1x the margin, 14% power, specificity estimated on 27 non-anaemic subjects); india->italy MDE **0.165** (40% power). The cross-site *direction* was directly observed - **27 of 68 anaemic subjects flagged, 41 missed**, which is a count and carries no estimation uncertainty - and is not weakened by this. But **the magnitude of the penalty is poorly pinned down and must not be quoted as precise**: the rate behind that count is sensitivity 0.397, 95% CI [0.278, 0.514], and in the other direction specificity 0.418, CI [0.323, 0.516]. Prefer the counts; attach the interval wherever a rate is used.
 * **PPG screening AUROC: UNDERPOWERED.** MDE **0.27** AUROC on 18 anaemic subjects (prevalence 7.1%), so the recorded AUROC difference of -0.000 with CI [-0.195, +0.189] is uninformative on its own. The PPG verdict rests on the MAE comparison and the NNS arithmetic, not on AUROC. The PPG *specificity* comparison is adequately powered (MDE 0.073).
 
 **None of this changes any recorded verdict.** It supplies the second half of each negative statement - *and we could have detected an effect of size Y* - which those statements previously lacked.
+
+### The guided-capture gap - the regime this project did not measure (Phase 9E)
+
+**This is the project's primary future-work item, and it is a boundary of the claim rather than an open question.** Phase 7 measured three capture regimes: uncontrolled (3.456 dE2000), one phone and one lighting cell with gaze varying (1.981), and a studio rig (1.062). **A deployed screening app operates in none of them.** Its guided capture is one phone in one session, with a live overlay enforcing framing and distance and a quality gate rejecting blurred or badly exposed frames before the shutter - between the second and third conditions, which is exactly the interval in which the gate crosses bands and exactly where Phase 9C found the verdict fragile.
+
+**It cannot be closed here.** Closing it requires capturing images under that protocol, which section 3 forbids permanently. What Phase 9E does instead is bound it by INTERPOLATION between the two measured points - the geometric mean of the bracketing pair, 1.450 dE2000, declared before the gate was run at it. **This is an interpolation, not a measurement, and is labelled so wherever it appears.** At that point the gate returns **1.44 g/dL, MARGINAL** at nominal parameters, and over the Phase 9C prior **median 2.06, 95% [0.83, 5.73]** - 9% VIABLE, 39% MARGINAL, 52% NOT RECOVERABLE. **VIABLE needs a residual below 0.986 dE2000, below the best measured condition in the whole project, so no point in the guided-capture interval reaches VIABLE - including its most favourable end.** What evidence would settle it is specified in `reports/phase9e_boundaries.md`.
+
+### What a confirmatory study would need (Phase 9E)
+
+Each UNDERPOWERED verdict above, converted into a specification. Required counts are stated for the group that **carries** the metric - non-anaemic subjects for a specificity, anaemic for a sensitivity - because that, not the cohort size, is what failed here.
+
+| comparison | carrier group | now | needed at 80% | needed at 90% | cohort at the observed prevalence |
+| --- | --- | --- | --- | --- | --- |
+| imaging within site, specificity | non-anaemic | 125 | **166** | 217 | 286 |
+| imaging within site, sensitivity | anaemic | 91 | **120** | 162 | 284 |
+| cross-site italy->india, specificity | non-anaemic | 27 | **266** | 356 | 936 |
+| cross-site india->italy, specificity | non-anaemic | 98 | **311** | 435 | 384 |
+| PPG screening, AUROC | anaemic | 18 | **131** | 176 | 1839 |
+
+**The composition point, which matters more than any total here.** `italy_to_india` estimated specificity on 27 non-anaemic subjects. It needs **266** - 10x more - and at that direction's observed prevalence that means a test site of roughly 936 people, against 95 here. Recruiting to a balanced 50% prevalence instead cuts it to about 532. **The SE scaling behind these figures was measured by subsampling, not assumed**; where the fit was too weak to trust - which happened on exactly the smallest carrier groups - the ordinary 1/sqrt(n) rate is used and the measured one reported beside it. Full derivation, caveats and both figures: `reports/phase9e_boundaries.md`.
 
 ### Method and scope
 

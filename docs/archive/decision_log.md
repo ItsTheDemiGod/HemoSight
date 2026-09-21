@@ -1616,3 +1616,116 @@ the counts above are measurements of the move itself. `docs/archive/README.md` r
 **What that does and does not do to the recorded verdict.** Phase 9A's cross-site result was **not** a null finding: it measured sensitivity **0.397**, flagging 27 of 68 anaemic subjects — a large, directly observed failure. A power analysis constrains what can be concluded from *null* comparisons; it does not weaken an observed collapse, and the arm verdict stands. **But the honest consequence is recorded:** the *magnitude* of the cross-site penalty is poorly pinned down even though its *direction* is not, and it must not be quoted as a precise quantity. Anyone continuing this line should collect more sites before relying on the size of that penalty.
 **UNDERPOWERED: PPG screening AUROC.** MDE **0.270** on **18 anaemic subjects** (prevalence 7.1%), so the recorded AUROC difference of −0.000 with CI [−0.195, +0.189] is **consistent with anything from a moderate real effect to none**, and is uninformative on its own. The PPG arm's verdict rests on its MAE comparison and its number-needed-to-screen arithmetic (15.8 vs 14.0 for referring everybody), both of which are well powered. This is a correction of emphasis, not of a number: the AUROC figure stays on the record with its power now attached.
 **Consequences.** The five statements above are added to `reports/final_results.md` limitations and to CLAUDE.md. **No arm verdict, MAE, AUROC, interval or band changes.** The write-up must now carry the detectable-effect clause beside each negative claim, and must not quote the cross-site magnitude as precise.
+
+### 2026-09-21 — Phase 9E: the three boundaries named, and two pre-declarations moved to the archive
+
+**Decision.** Run Phase 9E: state precisely what this project's claims are bounded by.
+Three parts, all pre-declared in CLAUDE.md and committed as `f4a3fc0` **before any Phase
+9E script ran**; the pre-declaration is verbatim in `docs/archive/phase9e_predeclaration.md`.
+Phase 9E was declared **forbidden to change any verdict**, and it changed none.
+
+**Rationale.** Three things were implicit in the record and none was named. (A) Phase 7
+measured three capture regimes and **a deployed app operates in none of them** — its
+guided capture sits between the two most controlled, which is exactly where the gate
+crosses bands and where Phase 9C found the verdict FRAGILE. The regime where real
+products operate is the one regime this project did not measure, and it is the one where
+the answer is closest to changing. (B) Phase 9D called three comparisons UNDERPOWERED
+without saying what sample would fix them; an UNDERPOWERED verdict without a required n
+is a complaint, not a specification. (C) Several recorded statements claimed more
+precision, or more absoluteness, than the evidence behind them.
+
+**Part A — the guided-capture gap is NAMED, not closed.** It cannot be closed without
+collecting data, which section 3 forbids permanently, so it is recorded as a **permanent
+boundary of the claim and the project's primary future-work item**, not as deferred work.
+It is bounded by an **interpolation** between the two measured residuals that bracket it
+(1.981 and 1.062 dE2000), headline point the geometric mean **1.450**, fixed before the
+gate was run at it. Fresh perturbation banks were drawn (seed 20260921) because no
+original RNG order exists at a residual nobody measured, and the two measured anchors
+were re-run on those same banks, landing within **0.018 g/dL** of their recorded values.
+**The interpolation is labelled as an interpolation everywhere it appears**, including in
+the Phase 7 gate table, `final_results.md`, CLAUDE.md, the landing-page visual and the
+case-study endpoint. The evidence that would settle it — capture protocol, measurement,
+sample, and the result that would move the verdict in **either** direction — is specified
+in `reports/phase9e_boundaries.md`.
+
+**Part B — every UNDERPOWERED verdict becomes a study specification.** Required group
+size = observed group size x (observed MDE / 0.10) ** (1 / slope). **The slope was
+MEASURED, not assumed**, by subsampling this project's own data and re-running the whole
+nested-operating-point and paired-bootstrap pipeline at each fraction. Required n is
+reported **first as a minimum count in the group that carries the metric** — non-anaemic
+for a specificity, anaemic for a sensitivity — because Phase 9D established the
+cross-site failure is a composition problem, not a raw-n one.
+
+> **A rule added during the run, and recorded as a deviation rather than applied
+> silently.** The pre-declaration said that if the measured slope departed materially
+> from 0.5 the figures would be reported as approximate with the measured slope stated.
+> What actually happened needed a rule of its own: **on the two smallest carrier groups
+> the fit itself failed** (R2 0.25 on n 11-27, and 0.23 on n 7-18) — there is not enough
+> range to fit a slope over. A floor of **R2 >= 0.50** was therefore fixed: below it the
+> ordinary 1/sqrt(n) rate is the headline and the measured figure is reported beside it.
+> **The rule is applied by R2, not by which answer is preferred**, and a test asserts
+> both bases stay on the record and that the headline tracks R2. That these two groups
+> are too small even to measure how their own precision scales **is the same composition
+> problem showing up a second time**, and is reported as such.
+
+**Part C — the language pass, calibrated in both directions.** Three named overstatements
+corrected wherever they appeared, by editing the **generating scripts** and regenerating;
+no report was hand-patched. **Two supported conclusions were explicitly checked and left
+at full strength:** the imaging and PPG regression arms are ADEQUATELY POWERED (MDE 0.181
+and 0.137 g/dL against a 1.0 g/dL band) and hedging them would be the same error in the
+opposite direction.
+
+**Alternatives considered.** *Closing the guided-capture gap by simulating a guided
+capture protocol* — rejected: a simulated residual is an assumption dressed as a
+measurement, and the point of this phase is to stop doing that. *Reporting required n as
+a total cohort size only* — rejected: it hides the composition failure, which is the
+actionable finding. *Quietly dropping the underpowered AUROC comparisons* — rejected;
+they stay on the record with their power attached. *Softening the regression arms'
+negative results for symmetry* — rejected as the mirror-image error.
+
+**Consequences.** Four new scripts and three additions to `hemosight.evaluation.power`
+(`required_group_n`, `total_n_for_group`, `scaling_slope`); five generating scripts
+edited and their reports regenerated; `reports/phase9e_boundaries.md`;
+`tests/test_phase9e.py` (18 tests, 232 passing); four reproduce stages. **No arm verdict,
+MAE, AUROC, interval or band changes.**
+
+**Two pre-declarations moved to the archive, same day.** Recording the Phase 9E results in
+CLAUDE.md took it to **120,380 characters** against the **120,000** limit that
+`tests/test_docs.py::test_claude_md_fits_in_context` enforces. Under section 9's own rule
+— *"If it grows past that, split again — move content to `docs/archive/`, never delete
+it"* — the **PRE-DECLARED blocks of Phases 9D and 9E** were moved verbatim to
+`docs/archive/phase9d_predeclaration.md` and `docs/archive/phase9e_predeclaration.md`.
+CLAUDE.md keeps each heading, a summary and a pointer. **The split moved text; it changed
+none.** Both blocks remain recoverable from the commits that first carried them, which is
+what establishes that each predates its own results — `f4a3fc0` for Phase 9E. CLAUDE.md is
+now 117,001 characters. `docs/archive/README.md` records both files and the reason.
+
+### 2026-09-21 — CORRECTION: a retired phrase that had not been propagated into `reports/phase7.md`
+
+**What was wrong.** Phase 9A retired the clause **"and moves no clinical threshold"** on
+2026-09-17 (`docs/archive/corrections.md` §8, and the DECISION LOG of that date). The
+correction was recorded in the archive, in CLAUDE.md and in the Phase 9A report — **but it
+was never applied to `scripts/phase7_report.py`**, so `reports/phase7.md` went on
+asserting the retired clause as a live conclusion for four days, in the Task 1 verdict
+paragraph that restates the imaging refutation in two parts. A second instance stood in
+`reports/statistical_vs_clinical.md` ("it moves no screening threshold").
+
+**How it was caught.** The Phase 9E Part C language pass, which grepped every
+reader-facing statement of a result rather than only the ones a phase had flagged.
+
+**What changed.** Both sentences are rewritten in the generating script and the reports
+regenerated. The Phase 7 verdict now states what stood there, that Phase 9A retired it,
+and what replaces it: within site the image cuts the referral rate from 0.634 to 0.519 at
+the same ~0.90 detection rate, a margin the colour model clears with a CI excluding zero,
+and what controlled capture does **not** rescue is transfer between sites.
+`tests/test_phase9e.py::test_the_retired_phase9a_phrase_is_not_asserted_in_the_phase7_report`
+now fails the suite if the phrase reappears outside a sentence that retires it.
+
+**The lesson, recorded because it generalises.** A correction is not applied when it is
+logged; it is applied when every generated artefact that carried the claim has been
+regenerated. This project generates its reports from scripts precisely so that numbers
+cannot drift — **but prose inside a generator drifts exactly as easily as prose inside a
+document**, and nothing was checking it. The Phase 9E tests are that check.
+
+**No verdict changes.** The Phase 7 outcome is still B; the imaging arm is still CLOSED,
+FINAL.

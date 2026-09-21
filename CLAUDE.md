@@ -22,7 +22,7 @@ write-up.**
 | --- | --- |
 | Phases complete | 0, 1, 1.5, 2, 2.5, 3 (closed at gate), 3.5 (closed at gate), 4, 4.5, 5, 6, 6.5, 7, 8A, 8B, 9A, 9B, 9C, 9D |
 | Open plan items | **0** — every unticked box is classified 🔴 SUPERSEDED or ⛔ BLOCKED, with its gate or blocker cited inline |
-| Imaging arm | 🔴 **CLOSED, FINAL** — four representations refuted, each with a measured mechanism. **Phase 9A: as a screening task it beats site+sex+age within site (+0.192 specificity at matched sensitivity, CI excludes zero) but collapses cross-site (sensitivity 0.397). Not deployable, for the cross-site reason** |
+| Imaging arm | 🔴 **CLOSED, FINAL** — four representations refuted, each with a measured mechanism. **Phase 9A: as a screening task it beats site+sex+age within site (+0.192 specificity at matched sensitivity, CI excludes zero) but collapses cross-site — **flagging 27 of 68 anaemic subjects and missing 41** (sensitivity 0.397, 95% CI [0.278, 0.514]). Not deployable, for the cross-site reason** |
 | PPG arm | 🔴 **NOT VIABLE** — negative R²; sex alone beats it by 30%. **Phase 9A confirms as a screening task**: AUROC diff vs demographics −0.000 (CI [−0.195,+0.189]); NNS 15.8 vs 14.0 for referring everybody |
 | Conventional CNN baseline (§3 hard constraint) | ✅ built, Phase 6.5 — MAE 1.301, MARGINAL; site + sex + age alone 1.273 |
 | Shipped software | **HemoSight Audit** — the methodological audit harness, `src/hemosight/audit/` + `app/` |
@@ -30,6 +30,8 @@ write-up.**
 | The one positive claim | raw-PPG spectrogram CNN, z = −4.96, empirical p ≤ 0.0041 (a **floor**, not a measurement) — and clinically useless: ~0.05 g/dL better than a constant |
 | Gate result, with uncertainty (Phase 9C) | **median 4.67 g/dL, 95% [2.37, 8.02]** at the 3.935 dE2000 residual over a declared prior on the 14 fixed tissue parameters — point estimate 3.893 retained. 99.5% of the prior is > 2.0, and the whole interval is, so the imaging refutation is **ROBUST to parameter uncertainty**. The **studio** number (1.040) is **FRAGILE**: 95% [0.60, 4.90], spanning all three bands (`reports/phase9c_uncertainty.md`) |
 
+| The one regime nobody measured (Phase 9E) | **THE GUIDED-CAPTURE GAP — named, not closed, and the project's primary future-work item.** A deployed app captures with one phone in one session behind a framing overlay and a quality gate: between the 1.981 and 1.062 dE2000 measured conditions, which is exactly where the gate crosses bands. **Interpolated** (not measured) at the geometric mean 1.450 → **1.44 g/dL MARGINAL** at nominal parameters, **median 2.06, 95% [0.83, 5.73]** over the prior. **VIABLE needs < 0.986, below the best measured condition in the project**, so no point in the interval reaches VIABLE (`reports/phase9e_boundaries.md`) |
+| What a confirmatory study would need (Phase 9E) | Every UNDERPOWERED comparison converted to a specification, stated for the group that **carries** the metric. **italy→india: 27 non-anaemic subjects now, 266 needed** (10×, a ~936-person test site at that prevalence, 532 if balanced); india→italy 98 → 311; within site 125 → 166 non-anaemic and 91 → 120 anaemic; PPG AUROC 18 → 131 anaemic. The SE scaling was **measured by subsampling**, not assumed |
 | Statistical power (Phase 9D) | MDE at 80% power on each arm's **deciding** comparison. **ADEQUATELY POWERED:** imaging regression (0.18 g/dL vs a 1.0 g/dL clinical yardstick) and PPG regression (0.14 g/dL) — both negative results are informative. **UNDERPOWERED:** imaging screening within site (0.116 vs the 0.10 margin, 67% power), **imaging cross-site (italy→india 0.314 — 3.1× the margin, 14% power, specificity on 27 non-anaemic subjects)** and PPG screening AUROC (0.27 on 18 anaemic subjects). Retrospective power deliberately NOT computed (`reports/phase9d_power.md`) |
 
 | Literature audit (Phase 9B) | **7 full texts read, 12 identified**; a convenience sample, not a review. Demographic baseline reported by **0 of 7**; per-site results by **0 of the 3 multi-site papers**; deduplication mentioned by 0 of 7. **No paper is recorded as failing a check.** The claim "a literature that frequently omits it" was **narrowed** to a statement about these seven (`reports/literature_gap.md` §9B) |
@@ -38,7 +40,30 @@ write-up.**
 work. The project's contribution is the body of negative results and their
 mechanisms; **nothing further should be built.**
 
-**One thing the write-up must not repeat.** Phase 9A retired the phrase "moves no
+**The one thing a successor would have to measure, and it is not buildable here.**
+The **guided-capture gap** (Phase 9E): a deployed app captures in a regime none of the
+three measured conditions represents, and it is the regime where the answer is closest
+to changing. It cannot be closed without collecting data, which section 3 forbids
+permanently, so it is recorded as a **named boundary of the claim** rather than an open
+task. What evidence would settle it — capture protocol, measurement, sample size and
+composition, and the result that would move the verdict in either direction — is
+specified in `reports/phase9e_boundaries.md`.
+
+**Three things the write-up must not do** (Phase 9E language pass, 2026-09-21).
+**(i)** Quote a cross-site **rate** bare. The counts are bulletproof and lead — *27 of 68
+anaemic subjects flagged, 41 missed* — and any rate carries its interval (sensitivity
+0.397 [0.278, 0.514]; specificity 0.418 [0.323, 0.516] the other way). The verdict is
+unchanged; only the precision claimed for the magnitude is.
+**(ii)** State an **underpowered null as an absence**. Say *no specificity gain of 0.10
+or larger was detected, and the design could have detected 0.116*. The PPG AUROC
+comparison (MDE 0.270 on 18 anaemic subjects) is uninformative alone and **nothing may
+lean on it**; that arm rests on its MAE and NNS. **The two regression arms are
+ADEQUATELY POWERED (MDE 0.181 and 0.137 g/dL against a 1.0 g/dL band) and keep their
+full strength — hedging them is the same error in the other direction.**
+**(iii)** Quote the **studio 1.040 without its interval** — 95% [0.60, 4.90], spanning
+all three bands. The "within 8% of viable" reading holds only at the nominal parameters.
+
+**And one it must not repeat.** Phase 9A retired the phrase "moves no
 clinical threshold" (`docs/archive/corrections.md` §8). Within site the image does
 move a referral threshold; what fails is transfer to another site. If any future
 imaging work is ever started, it should begin from **three mean palpebral CIELAB
@@ -63,6 +88,7 @@ text; it changed none. The pre-split file is recoverable from the git tag
 | `docs/archive/results_log.md` | **Section 8, RESULTS LOG** — the 48 entries that stood in this file, in date order, verbatim, plus everything appended since. Every metric produced, including failures and negative results. |
 | `docs/archive/superseded_claims.md` | Every original claim wording retained under a refuted or superseded banner (N1 headline, N1 pre-restructure, N2 justification, N5 method), plus a register of the 10 other superseded banners and where each is retained. |
 | `docs/archive/corrections.md` | All 7 standalone correction entries verbatim, each with the entry it corrects, plus a register of 9 in-place correction banners. |
+| `docs/archive/phase9d_predeclaration.md`, `docs/archive/phase9e_predeclaration.md` | The **PRE-DECLARED blocks of Phases 9D and 9E**, verbatim, moved out of section 6 on 2026-09-21 under section 9's splitting rule when this file hit 120,380 characters. Each also stands in the commit that first carried it — `f4a3fc0` for 9E — which is what makes it a pre-declaration rather than a summary written afterwards. |
 | `docs/archive/README.md` | The index, the split's verification numbers, and the append rules. |
 
 `superseded_claims.md` and `corrections.md` are **cross-cutting collections**: every
@@ -131,7 +157,8 @@ These drive every design decision.
 > | 6 | PPG | Raw waveform, 3 deep architectures | 4.5 | **NOT VIABLE** | best MAE 1.113; **sex alone 0.831** |
 > | 7 | Imaging | **Conventional CNN baseline** (ResNet-18, Eyes-Defy, the §3 comparison arm) | 6.5 | **MARGINAL** | MAE 1.301; site+sex+age alone 1.273; image adds +0.08; cross-site italy_to_india 1.96, india_to_italy 1.99 |
 > | 8 | Imaging | **Controlled capture** (studio residual 1.06 dE2000 vs 3.94 uncontrolled) | 7 | **MARGINAL**, and **FRAGILE** under parameter uncertainty (Phase 9C) | gate MAE 1.04 g/dL at the measured studio residual, **95% [0.60, 4.90] over the parameter prior — spanning VIABLE, MARGINAL and NOT RECOVERABLE**; VIABLE needs < 0.99; Eyes-Defy (fixed LED) colour model 1.34 - refutation restated in two parts |
-> | 9 | Both | **The SCREENING reframe** — the same models re-scored as a referral decision, not a g/dL estimate | 9A | **imaging WEAKENED within site, CONFIRMED cross-site; PPG CONFIRMED** | within site the image beats site+sex+age by **+0.192 specificity at matched sensitivity, CI [+0.114,+0.276]** (mean-CIELAB) — margin cleared; cross-site **sensitivity 0.397**, flagging 27 of 68 anaemic. PPG: AUROC diff **−0.000, CI [−0.195,+0.189]**, NNS **15.8 vs 14.0 for referring everybody** |
+> | 9 | Both | **The SCREENING reframe** — the same models re-scored as a referral decision, not a g/dL estimate | 9A | **imaging WEAKENED within site, CONFIRMED cross-site; PPG CONFIRMED** | within site the image beats site+sex+age by **+0.192 specificity at matched sensitivity, CI [+0.114,+0.276]** (mean-CIELAB) — margin cleared; cross-site it **flags 27 of 68 anaemic subjects and misses 41** (sensitivity 0.397, 95% CI [0.278, 0.514]). PPG: AUROC diff **−0.000, CI [−0.195,+0.189]** — but that comparison's MDE is 0.270 on 18 anaemic subjects, so **the PPG verdict rests on MAE and NNS 15.8 vs 14.0 for referring everybody**, not on AUROC |
+> | 10 | Imaging | **Guided capture** — one phone, one session, a framing overlay and a quality gate | 9E | ⚪ **NOT MEASURED, and not measurable here** | the regime a deployed app actually uses, bracketed by the measured 1.981 and 1.062 dE2000. **Interpolated** at 1.450 → 1.44 g/dL MARGINAL, **95% [0.83, 5.73]** over the prior. VIABLE needs < 0.986, below the best measured condition in the project. A **named boundary**, not an open task |
 >
 > ### 🔴 One recorded claim did NOT survive the reframe (Phase 9A, 2026-09-17)
 >
@@ -159,6 +186,14 @@ These drive every design decision.
 > *"We found no effect"* is weaker than *"we found no effect and could have detected one of size Y"*. The minimum detectable effect at 80% power, on the comparison that actually decided each arm: **imaging regression 0.18 g/dL** of MAE and **PPG regression 0.14 g/dL**, both against a 1.0 g/dL clinical yardstick (the narrowest WHO band) — **ADEQUATELY POWERED**, so those negative results are informative evidence of absence, and the effects too small to detect are also far too small to matter. **Imaging screening within site is marginally UNDERPOWERED** (0.116 against the 0.10 pre-declared margin, 67% power at the margin), though the effect it did find (+0.192 specificity) was comfortably detectable.
 >
 > **The uncomfortable finding, reported because it is true: the project's most load-bearing result is its least powered comparison.** The cross-site collapse is what turns a within-site success into a non-deployable verdict, and per direction the MDE is **0.314 specificity for italy→india (3.1× the margin, 14% power — specificity is estimated on 27 non-anaemic subjects) and 0.165 for india→italy (40% power)**. The cross-site *direction* was directly observed (sensitivity 0.397, 27 of 68 anaemic flagged) and a power analysis does not weaken an observed collapse — but **the magnitude of the cross-site penalty is poorly pinned down and must not be quoted as precise.** Likewise the PPG AUROC comparison (MDE 0.27 on 18 anaemic subjects) is uninformative alone; that arm's verdict rests on its MAE and NNS numbers, which are well powered.
+>
+> ### ⚪ Phase 9E (2026-09-21): the boundaries, stated precisely
+>
+> **The regime a real product operates in is the one regime this project did not measure.** A deployed app's guided capture — one phone, one session, a live framing and distance overlay, a quality gate before the shutter — sits between the 1.981 and 1.062 dE2000 measured conditions, which is exactly where the gate crosses bands and where Phase 9C found the verdict fragile. **It cannot be closed here** (section 3 forbids collecting data, permanently), so it is recorded as a **named boundary of the claim and the project's primary future-work item**, bounded by an interpolation between the two measured points: **1.450 dE2000 → 1.44 g/dL MARGINAL** at nominal parameters, **median 2.06, 95% [0.83, 5.73]** over the prior. Labelled an interpolation everywhere it appears. **No point in the interval reaches VIABLE, including its most favourable end.**
+>
+> **Every UNDERPOWERED verdict is now a study specification, stated by the group that carries the metric.** The cross-site failure is a **composition** problem, not a raw-n one: `italy→india` estimates specificity on **27 non-anaemic subjects and needs about 266** — 10× more, a ~936-person test site at that prevalence, or 532 recruited to a balanced one. `india→italy` 98 → 311; within site 125 → 166 non-anaemic and 91 → 120 anaemic; PPG AUROC 18 → 131 anaemic. **The SE scaling was measured by subsampling rather than assumed**, and where the fit itself failed — on the two smallest carrier groups, which is the same problem showing up twice — the 1/√n reference is the headline and the measured slope is reported beside it.
+>
+> **A language pass bounded three overstatements and weakened nothing that the evidence supports.** Cross-site counts now lead and no rate is quoted without its interval; underpowered nulls are stated as bounds; the studio 1.040 never appears without its [0.60, 4.90]. **The two regression arms stay at full strength.** One stale correction was found and fixed: `reports/phase7.md` still carried the phrase Phase 9A retired in 2026-09-17. **No verdict changed.**
 >
 > **Retrospective / observed power was deliberately not computed** — it is a deterministic function of the observed p-value and would hand every negative result here a built-in excuse. `hemosight.evaluation.power` contains no such function and a test enforces that. **No recorded verdict changes.** See `reports/phase9d_power.md`.
 >
@@ -503,6 +538,7 @@ and its output exists on disk.
 > | 9B Literature audit widened | ✅ COMPLETE — 7 full texts, 6 criteria; one claim **NARROWED** | — | 0 |
 > | 9C Parameter uncertainty | ✅ COMPLETE — imaging refutation **ROBUST**; the studio number **FRAGILE**; one banner kept and strengthened | — | 0 |
 > | 9D Power analysis | ✅ COMPLETE — 2 arms **ADEQUATELY POWERED**, 3 comparisons **UNDERPOWERED**; the most load-bearing finding is the least powered | — | 0 |
+> | 9E Boundaries | ✅ COMPLETE — the guided-capture gap **NAMED** (not closed); every underpowered comparison converted to a **required n**; three overstatements corrected, **no verdict changed** | — | 0 |
 > | 6 (orig) Conformal (N4) | 🔴 SUPERSEDED | no estimator | 0 |
 > | 7 Fairness (N5) | 🔴 SUPERSEDED | no estimator; mechanism measured in Phase 3 Task 4 | 0 |
 > | 8 Fusion (N6) | 🔴 SUPERSEDED | no g/dL estimate from any modality | 0 (2 items found done, ticked) |
@@ -1051,59 +1087,16 @@ anywhere else changes on the strength of it.
 
 #### PRE-DECLARED, 2026-09-20, before any Phase 9D number was computed
 
-**1. The quantity computed is the MINIMUM DETECTABLE EFFECT (MDE), not observed power.**
-For a two-sided test at alpha = 0.05 and power 1 − beta,
-
-    MDE = (z_0.975 + z_{1−beta}) x SE(difference)      multiplier 2.802 at 80%, 3.242 at 90%
-
-**Retrospective / observed / post-hoc power — recomputing power at the effect size that was
-actually observed — is a known statistical error and is NOT computed here.** Observed power is
-a deterministic function of the observed p-value and so adds no information; it is also
-guaranteed to look low whenever a result was null, which would manufacture a false excuse for
-every negative finding in this project. The question asked is what effect size **the design**
-could detect given its sample size and the variance structure of its own measurements. The
-distinction is stated in the report so a reader can see which analysis was run.
-*Stated limitation of the MDE approach itself:* SE is estimated from this sample, so it carries
-its own sampling uncertainty, and for the screening metrics SE depends mildly on the true effect
-size. Neither is corrected for; both are reported.
-
-**2. One comparison per arm, and only the comparison that ACTUALLY DECIDED that arm.** No power
-is computed for a comparison the project never made.
-
-| arm | n | deciding comparison | SE method |
-| --- | --- | --- | --- |
-| Imaging regression | 216 Hb-labelled Eyes-Defy subjects | image-CNN MAE vs **site + sex + age** (1.273 g/dL) | paired, per-subject absolute-error differences (exact SE = sd(d)/sqrt(n)); bootstrap reported beside it |
-| Imaging screening | 216, 91 anaemic | specificity gain at matched sensitivity, and AUROC difference, vs site + sex + age | **paired subject-level bootstrap**, the identical 2,000-resample scheme Phase 9A used (`screening.paired_difference_ci` / `bootstrap_ci`, seed 20260911) |
-| PPG | 252, venous HemoCue | deep-model MAE vs **sex alone** (0.831 g/dL); AUROC vs best demographic baseline | paired per-subject absolute-error differences; paired bootstrap for AUROC |
-| Imaging cross-site | **per direction, reported separately** — italy→india and india→italy | same as the within-site screening comparison, per direction | paired subject-level bootstrap within each direction |
-
-Predictions are correlated across models on the same subjects, so every difference is **paired**;
-an unpaired SE would be wider than the evidence warrants and would inflate every MDE. Where a
-statistic is a non-smooth function of the data (sensitivity and specificity at a nested operating
-point) the bootstrap SD is used rather than a closed form, because no closed form applies.
-
-**3. The clinical yardstick each MDE is judged against is one the project ALREADY declared. No
-new threshold is invented here.**
-- **Screening:** the **0.10 (10 percentage point)** clinically meaningful margin pre-declared in
-  Phase 9A, with its justification (at Eyes-Defy prevalence, ~9 more anaemic subjects referred
-  per 216 screened, about 1 per 24 people).
-- **MAE:** the Phase 3 / Phase 7 band structure — **VIABLE < 1.0, MARGINAL 1.0-2.0, NOT
-  RECOVERABLE > 2.0 g/dL** — plus whether the detectable improvement could move a **WHO severity
-  boundary** (severe < 7.0, moderate 7.0-9.9, mild 10.0-10.9 men / 10.0-11.9 women). A band is
-  1-3 g/dL wide, which is the scale an MAE improvement must reach to change a clinical decision.
-
-**4. The verdict per arm, declared before the numbers.** Exactly one of:
-- **ADEQUATELY POWERED** — the MDE at 80% power is **at or below** the arm's clinical yardstick,
-  so the design could have detected any effect large enough to matter clinically, and the
-  negative result is informative evidence of absence.
-- **UNDERPOWERED** — the MDE at 80% power is **above** the yardstick, so only effects larger
-  than those that would matter clinically were detectable, and the negative result is weak
-  evidence of absence and must be reported as such.
-
-Applied per arm, whichever way it falls, **including if the project's most load-bearing finding
-(the cross-site collapse) turns out to rest on its least powered comparison.** The cross-site
-directions are reported separately and prominently, never pooled, because each uses a fraction of
-the cohort.
+➡️ **Verbatim in `docs/archive/phase9d_predeclaration.md`** (moved 2026-09-21 under
+section 9's splitting rule; nothing summarised). In summary: the quantity computed is
+the **minimum detectable effect**, never observed/retrospective power; **one comparison
+per arm, and only the one that actually decided it**, every difference **paired**; the
+clinical yardsticks are ones earlier phases already declared (the 0.10 screening margin,
+the 1.0/2.0 g/dL gate bands, the WHO severity boundaries); and the verdict is exactly
+one of **ADEQUATELY POWERED** (MDE at 80% power at or below the yardstick) or
+**UNDERPOWERED**, applied per arm whichever way it falls — including if the project's
+most load-bearing finding turns out to rest on its least powered comparison, which it
+did. Cross-site directions are reported separately and never pooled.
 
 - [x] Task 1: n and MDE at 80% and 90% power for the deciding comparison of each arm, paired methods stated per comparison; cross-site reported per direction and prominently *(ticked 2026-09-20: imaging regression n=216 MDE 0.181/0.209 g/dL; imaging screening n=216 spec 0.116/0.135 and sens 0.114/0.132; cross-site **italy→india n=95 (68 anaemic) 0.314/0.363** and **india→italy n=121 (23 anaemic) 0.165/0.191**; PPG n=252 MAE 0.137/0.159 g/dL, AUROC 0.270/0.313, spec 0.073/0.084. Paired throughout — exact paired SE for MAE (error r=0.62, pairing saves 38% of the SE), 2,000-resample paired bootstrap for the screening metrics; Phase 9A's recorded differences reproduced before reporting)*
 - [x] Task 2: every MDE restated in clinical units — g/dL against the WHO boundaries and the gate bands; percentage points against additional anaemic subjects detected and unnecessary referrals avoided at the reported operating point *(ticked 2026-09-20: 0.18 and 0.14 g/dL move **no** WHO boundary and no gate band — the narrowest band is 1.0 g/dL wide; within site 0.116 specificity = 15 of 125 needless referrals avoided and 0.114 sensitivity = 10 of 91 anaemic subjects, ~1 extra case per 21 screened; italy→india 0.314 = 8 of 27 non-anaemic subjects)*
@@ -1123,55 +1116,22 @@ data, and is not permitted to change any verdict.**
 
 #### PRE-DECLARED, 2026-09-21, before any Phase 9E script was run
 
-**1. The guided-capture gap is a named boundary, not a gap to be closed.** It cannot be
-closed without collecting data, which section 3 forbids permanently. What is produced is
-a statement of the gap, a specification of the evidence that would settle it, and an
-**interpolation** between the two measured residuals that bracket it (1.981 dE2000,
-MOBIUS one phone + one lighting cell, gaze varying; 1.062, SBVPI studio). The
-interpolation is labelled as such everywhere it appears and **is never called a
-measurement**. Its headline point is the geometric mean of the two bracketing residuals,
-**1.450 dE2000**, chosen before the gate was run at it; the whole bracketing interval is
-reported beside it, and the Phase 9C prior is propagated at the headline point so the
-interpolated number carries an interval from the start. Fresh perturbation banks are
-drawn for the interpolation grid (no original RNG order exists at a residual nobody
-measured); the two bracketing anchors are re-run on those same fresh banks and reported
-beside their recorded values, so the bank draw is visibly not doing the work.
+➡️ **Verbatim in `docs/archive/phase9e_predeclaration.md`**, moved there the day it was
+written under section 9's splitting rule; committed to CLAUDE.md as `f4a3fc0` **before
+any Phase 9E script ran**, which is what makes it a pre-declaration. In summary: the
+guided-capture gap is **named, not closed** (closing it needs data, which section 3
+forbids) and bounded by an **interpolation** between the two measured residuals that
+bracket it, headline point **1.450 dE2000**, the geometric mean, fixed before the gate
+was run at it; required n = observed group n × (observed MDE / 0.10)², with the **SE
+scaling MEASURED by subsampling rather than assumed** and reported **by the group that
+carries the metric** first; and the language pass corrects three named overstatements
+while being **forbidden to weaken a supported conclusion** — the two regression arms are
+ADEQUATELY POWERED and keep their full strength. **No verdict may change in this phase.**
 
-**2. Required n is computed from the SE scaling, and the scaling is MEASURED, not
-assumed.** For a target MDE of the pre-declared **0.10** margin at 80% and 90% power,
-required group size = observed group size × (observed MDE / 0.10)². That step assumes
-SE ∝ 1/√n at fixed per-subject variance. **The assumption is checked by subsampling this
-project's own data** at several fractions, re-running the whole nested-operating-point
-and paired-bootstrap pipeline at each, and fitting log SE against log n: the fitted slope
-is reported, and if it departs materially from −0.5 the required-n figures are reported
-as approximate with the measured slope stated. Phase 9D's MDEs are asserted to reproduce
-before any new number is computed, exactly as Phase 9D asserted Phase 9A's.
-
-**3. Required n is reported by the group that carries the metric, not as a total alone.**
-Specificity is a proportion over **non-anaemic** subjects and sensitivity over **anaemic**
-subjects, so each required n is stated first as a **minimum count in that group**, then
-converted to a total at the observed prevalence and at a balanced 50%. Phase 9D
-established that italy→india's 14% power is a composition problem — 68 of 95 test
-subjects anaemic, leaving specificity on 27 people — so the composition figure is the
-one a study designer acts on and is reported first.
-
-**4. The language pass is calibration in both directions, and may not weaken a supported
-conclusion.** Three specific overstatements are corrected wherever they appear in
-CLAUDE.md, the reports, `hemosight.audit.content` and the case-study endpoint:
-*(i)* a cross-site **rate** quoted without its interval — observed **counts** are
-preferred where both exist, and a CI is attached wherever a rate is quoted; *(ii)* an
-**underpowered null stated as absence** — restated as bounded ("no gain of 0.10 or larger
-was detected; the study could have detected 0.116"); *(iii)* the **studio result quoted
-without its Phase 9C interval**. **The two regression arms are ADEQUATELY POWERED and
-their negative results keep their full strength**; hedging them would be the same error in
-the opposite direction and is forbidden here. **No verdict changes in this phase** — the
-cross-site collapse was directly observed and a power analysis constrains null
-conclusions, not observed ones; only the precision claimed for its magnitude changes.
-
-- [ ] Task 1 (Part A): the guided-capture gap named as a boundary in CLAUDE.md, `final_results.md` and `reports/phase7.md`; the evidence that would settle it specified (protocol, measurement, sample, result in either direction); the interpolation run and labelled; recorded as the primary future-work item
-- [ ] Task 2 (Part B): required n at 80% and 90% power for all three underpowered comparisons, with the SE scaling measured by subsampling; reported as a minimum count in the group that carries the metric, then as totals; minimum non-anaemic count stated per cross-site direction
-- [ ] Task 3 (Part C): the three overstatements corrected everywhere they appear; generating scripts edited and reports regenerated, never hand-patched; supported conclusions verified unweakened
-- [ ] Task 4 (Part D): `reports/phase9e_boundaries.md` with all three parts and a consolidated "what a confirmatory study would need" section; CLAUDE.md updated; `tests/test_phase9e.py`; reproduce stages; decisions and results logged to `docs/archive/`
+- [x] Task 1 (Part A): the guided-capture gap named as a boundary in CLAUDE.md, `final_results.md` and `reports/phase7.md`; the evidence that would settle it specified (protocol, measurement, sample, result in either direction); the interpolation run and labelled; recorded as the primary future-work item *(ticked 2026-09-21: `scripts/phase9e_guided_capture.py`. Headline interpolation **1.450 dE2000 → 1.44 g/dL, MARGINAL** at nominal parameters; over the Phase 9C prior **median 2.06, 95% [0.83, 5.73]** — 9% VIABLE / 39% MARGINAL / 52% NOT RECOVERABLE, **FRAGILE at both thresholds**. The two measured anchors re-run on the same fresh banks land within **0.018 g/dL** of their recorded values. **VIABLE needs < 0.986 dE2000, below the best measured condition in the project, so no point in the interval reaches VIABLE — including its most favourable end.** The 1.981 bracket also gained the interval it never had: median 2.76, 95% [1.17, 6.48])*
+- [x] Task 2 (Part B): required n at 80% and 90% power for all three underpowered comparisons, with the SE scaling measured by subsampling; reported as a minimum count in the group that carries the metric, then as totals; minimum non-anaemic count stated per cross-site direction *(ticked 2026-09-21: `scripts/phase9e_required_n.py`, Phase 9D's MDEs reproduced first. **Minimum non-anaemic counts: italy→india 27 → 266 (10×), india→italy 98 → 311.** Within site 125 → 166 specificity and 91 → 120 anaemic for sensitivity; PPG AUROC 18 → 131 anaemic. Cohorts at the observed prevalence 936 / 384 / 286 / 284 / 1,839. **The SE scaling was measured, not assumed** — slope 0.538 (R² 0.91) and 0.480 (R² 0.75) where the carrier group is large, bracketing the 1/√n rate; on the two smallest carrier groups the fit itself fails (R² 0.25 and 0.23), so the 1/√n reference is the headline there and the measured figure is reported beside it)*
+- [x] Task 3 (Part C): the three overstatements corrected everywhere they appear; generating scripts edited and reports regenerated, never hand-patched; supported conclusions verified unweakened *(ticked 2026-09-21: five generating scripts edited and their reports regenerated. `scripts/phase9e_intervals.py` supplies the cross-site specificity/PPV/referral intervals Phase 9A never stored. **One further find, fixed:** `reports/phase7.md` still carried the phrase "moves no clinical threshold" that Phase 9A retired on 2026-09-17 — the correction had not been propagated into the Phase 7 generator. **The audit content model and the case-study endpoint carried none of the three overstatements** (neither quotes a cross-site rate, an underpowered null or the studio figure); what they lacked was any statement of the boundaries, so `/api/case-study` now serves one. The two ADEQUATELY POWERED regression arms were checked and are unweakened)*
+- [x] Task 4 (Part D): `reports/phase9e_boundaries.md` with all three parts and a consolidated "what a confirmatory study would need" section; CLAUDE.md updated; `tests/test_phase9e.py`; reproduce stages; decisions and results logged to `docs/archive/` *(ticked 2026-09-21)*
 
 ### Phase 6 (original plan): Conformal prediction and abstention (N4)
 

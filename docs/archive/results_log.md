@@ -962,3 +962,114 @@ Cross-site AUROC MDEs: italy→india 0.180, india→italy 0.179. Cross-site MAE 
 **Clinical translation.** 0.181 and 0.137 g/dL of MAE move **no** WHO severity boundary (narrowest band 1.0 g/dL wide) and no gate band (VIABLE <1.0, MARGINAL 1.0-2.0). Within site, MDE 0.116 specificity = **15 of 125** non-anaemic subjects spared a needless test; MDE 0.114 sensitivity = **10 of 91** anaemic subjects additionally detected, about 1 extra case per 21 screened. italy→india MDE 0.314 = **8 of 27** non-anaemic subjects. PPG MDE 0.073 specificity = 17 of 234.
 **Pairing effect, measured.** Imaging MAE: per-subject error correlation **r = 0.621**, paired SE 0.0645 against an unpaired 0.1046 — pairing removes **38%** of the SE. PPG MAE: r = 0.563.
 **Interpretation.** The two regression arms are adequately powered and their negative results are informative evidence of absence; the effects too small to detect are far too small to matter clinically, which is the symmetric counterpart of the Phase 7 statistical-versus-clinical finding. Imaging screening within site is marginally underpowered (67% power at the margin) but detected the effect it found. **The cross-site comparison — the project's most load-bearing finding — is its least powered, at 14% power for italy→india with specificity estimated on 27 subjects.** Its *direction* was directly observed (sensitivity 0.397) and stands; its *magnitude* is poorly pinned down and must not be quoted as precise. The PPG AUROC comparison is uninformative alone (18 anaemic subjects); that arm's verdict rests on MAE and NNS. **No recorded verdict changes. Status: confirmed.**
+
+### 2026-09-21 — Phase 9E Part A: the guided-capture regime, bounded by interpolation
+
+**Config.** `scripts/phase9e_guided_capture.py` (fresh perturbation banks, seed 20260921;
+Phase 9C's own 2,048 prior draws reused from `phase9c/design.npz`) →
+`data/interim/phase9e/guided_capture.json`. Bracketing pair, headline point and labelling
+rule pre-declared in CLAUDE.md, committed `f4a3fc0`, before the run.
+
+**Data.** No new data. The forward model, inversion LUT, Hb grid (4–18), trial count (240
+per Hb) and perturbation generator are Phase 3 Task 0's, unchanged.
+
+**Bank-draw check, reported first.** The two **measured** anchors re-run on the fresh
+banks land within **0.018 g/dL** of their recorded values (1.062 → 1.057 vs 1.040 recorded;
+1.981 → 2.045 vs 2.027). The interpolated points are therefore not an artefact of a
+different random draw.
+
+**Gate across the bracketing interval, nominal theta.**
+
+| residual dE2000 | status | Hb MAE g/dL | band |
+| --- | --- | --- | --- |
+| 1.062 | **measured** (SBVPI studio) | 1.057 | MARGINAL |
+| 1.200 | *interpolated* | 1.194 | MARGINAL |
+| **1.450** | ***interpolated, headline*** (geometric mean) | **1.445** | **MARGINAL** |
+| 1.700 | *interpolated* | 1.686 | MARGINAL |
+| 1.981 | **measured** (one phone + one lighting cell, gaze varying) | 2.045 | NOT RECOVERABLE |
+
+**Over the Phase 9C parameter prior (2,048 draws).**
+
+| residual | median | 95% interval | VIABLE / MARGINAL / NOT RECOVERABLE | rule |
+| --- | --- | --- | --- | --- |
+| **1.450** *(interpolated)* | **2.06** | **[0.83, 5.73]** | 9.3% / 39.1% / **51.6%** | FRAGILE at 2.0; FRAGILE at 1.0 |
+| 1.981 *(measured; had no interval on record before this)* | 2.76 | [1.17, 6.48] | 0.5% / 28.7% / **70.8%** | FRAGILE at 2.0; ROBUST at 1.0 |
+
+**Interpretation.** At nominal parameters the whole bracketing interval is MARGINAL and
+tips into NOT RECOVERABLE at its uncontrolled end, so **guided capture plausibly lands
+MARGINAL**. Under the prior the headline point's median sits *above* the 2.0 line, with
+51.6% of the prior NOT RECOVERABLE and 9.3% VIABLE. **The ceiling is hard and is the
+finding that matters: VIABLE requires a residual below 0.986 dE2000, which is below the
+best measured condition in the entire project — a studio rig — so no point in the
+guided-capture interval reaches VIABLE, including its most favourable end.** Nothing here
+is a measurement of guided capture; it is an interpolation between two measured points,
+and is labelled so in every artefact that carries it. **No verdict changes. Status:
+confirmed (as an interpolation, explicitly not as a measurement).**
+
+### 2026-09-21 — Phase 9E Part B: required sample size for every underpowered comparison
+
+**Config.** `scripts/phase9e_required_n.py` → `data/interim/phase9e/required_n.json`.
+Phase 9D's MDEs asserted to reproduce before any new number was computed (all four
+reproduce to < 5e-3). Target: the **0.10 margin pre-declared in Phase 9A**. Bootstrap
+scheme, folds and operating-point construction identical to Phase 9A/9D (seeds 20260911,
+subsampling 20260921).
+
+**The SE scaling was MEASURED, not assumed** — 25 stratified subsamples per comparison,
+the whole nested-operating-point and paired-bootstrap pipeline re-run at each, log SE
+fitted against log n.
+
+| comparison | carrier group | n probed | slope | fit R2 | trusted |
+| --- | --- | --- | --- | --- | --- |
+| imaging within site, specificity | non-anaemic | 50–125 | **0.538** | 0.91 | yes |
+| imaging within site, sensitivity | anaemic | 36–91 | **0.480** | 0.75 | yes |
+| cross-site india→italy, specificity | non-anaemic | 39–98 | 0.432 | 0.71 | yes |
+| cross-site **italy→india**, specificity | non-anaemic | **11–27** | 0.340 | **0.25** | **no** |
+| PPG screening AUROC | anaemic | **7–18** | 0.411 | **0.23** | **no** |
+
+**Required n at the 0.10 margin**, stated for the group that carries the metric.
+
+| comparison | carrier | now | **80%** | 90% | multiple | cohort @ observed prevalence | @ 50% |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| cross-site **italy→india** | non-anaemic | **27** | **266** | 356 | 9.9× | **936** | 532 |
+| cross-site india→italy | non-anaemic | 98 | **311** | 435 | 3.2× | 384 | 621 |
+| imaging within site, specificity | non-anaemic | 125 | **166** | 217 | 1.3× | 286 | 331 |
+| imaging within site, sensitivity | anaemic | 91 | **120** | 162 | 1.3× | 284 | 239 |
+| PPG screening AUROC | anaemic | **18** | **131** | 176 | 7.3× | 1,839 | 263 |
+
+Where the fit was not trustworthy the 1/sqrt(n) reference is the headline and the
+measured-slope figure is kept beside it: italy→india **266** (reference) / 778 (measured);
+PPG AUROC **131** / 202.
+
+**Interpretation.** **The minimum non-anaemic count per direction is the number a study
+designer acts on: 266 for italy→india and 311 for india→italy.** The two land close
+together, which is the expected result if the per-subject variance is similar in both
+directions and the difference really is composition — a consistency check the analysis
+passes. The within-site comparisons are close to adequate already (1.3×); the cross-site
+and PPG-AUROC ones are not. **A second symptom of the same problem:** on the two smallest
+carrier groups the scaling fit itself fails, i.e. those groups are too small even to
+measure how their own precision scales. Read the figures as **lower bounds** — the
+subsampling holds the model scores fixed, while a real smaller study would also have
+retrained on less data. **No verdict changes. Status: confirmed.**
+
+### 2026-09-21 — Phase 9E Part C: the intervals the cross-site rates were quoted without
+
+**Config.** `scripts/phase9e_intervals.py` → `data/interim/phase9e/cross_site_intervals.json`.
+Phase 9A's calls rebuilt from the per-subject predictions and its recorded train-site
+operating point; **its confusion matrices and sensitivity intervals reproduced exactly
+before anything new was computed**. 2,000 subject-level resamples, seed 20260911 — Phase
+9A's own scheme. **Nothing in Phase 9A was modified.**
+
+| direction | the count (preferred wording) | sensitivity (95% CI) | specificity (95% CI) | estimated on |
+| --- | --- | --- | --- | --- |
+| italy→india | **flagged 27 of 68 anaemic, 1 of 27 non-anaemic** | 0.397 [0.278, 0.514] | 0.963 [0.885, 1.000] | 68 / 27 |
+| india→italy | **flagged 21 of 23 anaemic, 57 of 98 non-anaemic** | 0.913 [0.783, 1.000] | 0.418 [0.323, 0.516] | 23 / 98 |
+
+**Interpretation.** The counts carry no estimation uncertainty and are now the preferred
+wording; the rates carry intervals wherever they are used. `italy→india` specificity
+0.963 reads as decisive until one notices it rests on **27 subjects** and its interval
+reaches 1.000. **The verdict is untouched** — sensitivity 0.397 was *observed*, and a
+power analysis constrains conclusions drawn from *null* comparisons, not from an observed
+collapse. Only the precision claimed for the magnitude changes. `india→italy`'s
+specificity interval [0.323, 0.516] lies **entirely below** the pre-declared 0.50 floor,
+which strengthens rather than weakens that half of the finding. **No verdict changes.
+Status: confirmed.**

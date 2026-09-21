@@ -118,23 +118,31 @@ export function NullDistribution({ className = "" }: { className?: string }) {
 /* --------------------------------------------------------- noise vs signal ladder */
 export function NoiseSignal({ className = "" }: { className?: string }) {
   const W = 640, H = 220, pad = 28, left = 190;
-  const conds = noise.conditions as { label: string; residual_dE2000: number; gate_mae_g_dl: number; band: string }[];
+  /* `interpolated` marks the guided-capture regime: it sits between two measured
+     conditions and was never measured, so it is drawn as an outline, never a solid bar,
+     and says so in its own label. See reports/phase9e_boundaries.md. */
+  const conds = noise.conditions as { label: string; residual_dE2000: number; gate_mae_g_dl: number; band: string; interpolated?: boolean; band_interval_95?: number[] }[];
   const maxR = Math.max(...conds.map((c) => c.residual_dE2000)) * 1.15;
   const x = (v: number) => left + (v / maxR) * (W - left - pad);
   const rowH = (H - 2 * pad) / conds.length;
   const sig = noise.signal_dE2000_per_g_dl, viable = noise.viable_residual;
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className={className} role="img"
-         aria-label="Residual colour error per capture condition against the measured haemoglobin signal">
+         aria-label="Residual colour error per capture condition against the measured haemoglobin signal. The guided-capture row is interpolated between two measured conditions, not measured.">
       {conds.map((c, i) => {
         const y = pad + i * rowH;
         const tone = c.band === "VIABLE" ? "var(--pass)" : c.band === "MARGINAL" ? "var(--insufficient)" : "var(--fail)";
+        const ci = c.band_interval_95;
         return (
           <g key={c.label}>
-            <text x={left - 10} y={y + rowH / 2 + 4} fill="var(--muted)" fontSize="12" textAnchor="end" fontFamily="Inter, system-ui, sans-serif">{c.label}</text>
-            <rect x={left} y={y + rowH * 0.25} width={x(c.residual_dE2000) - left} height={rowH * 0.5} fill={tone} opacity="0.85" />
+            <text x={left - 10} y={y + rowH / 2 + 4} fill="var(--muted)" fontSize="12" textAnchor="end" fontFamily="Inter, system-ui, sans-serif"
+                  fontStyle={c.interpolated ? "italic" : undefined}>{c.label}</text>
+            <rect x={left} y={y + rowH * 0.25} width={x(c.residual_dE2000) - left} height={rowH * 0.5}
+                  fill={c.interpolated ? "none" : tone} opacity="0.85"
+                  stroke={c.interpolated ? tone : undefined} strokeWidth={c.interpolated ? 1 : undefined}
+                  strokeDasharray={c.interpolated ? "4 3" : undefined} />
             <text x={x(c.residual_dE2000) + 6} y={y + rowH / 2 + 4} fill="var(--ink)" fontSize="11" fontFamily="ui-monospace, monospace">
-              {c.residual_dE2000.toFixed(2)} · {c.gate_mae_g_dl.toFixed(2)} g/dL · {c.band.toLowerCase()}
+              {c.residual_dE2000.toFixed(2)} · {c.gate_mae_g_dl.toFixed(2)} g/dL{ci ? ` [${ci[0]}–${ci[1]}]` : ""} · {c.band.toLowerCase()}
             </text>
           </g>
         );
