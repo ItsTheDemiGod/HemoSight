@@ -152,6 +152,11 @@ STAGES = [
                "3.892987 / 3.470951 / 1.039592 to 1e-12 or the run aborts. --reuse-design "
                "reruns the summaries from the cached design in ~3 min"),
     Stage("Phase 9C report", "phase9c_report.py", 0.1),
+    Stage("Phase 9D power analysis", "phase9d_power.py", 4,
+          note="CPU; rebuilds Phase 9A's own model scores and folds and asserts it "
+               "reproduces the recorded differences before computing any MDE. "
+               "Deterministic (bootstrap seed 20260911)"),
+    Stage("Phase 9D report", "phase9d_report.py", 0.1),
 ]
 
 

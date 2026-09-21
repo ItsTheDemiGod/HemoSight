@@ -20,7 +20,7 @@ write-up.**
 
 | | |
 | --- | --- |
-| Phases complete | 0, 1, 1.5, 2, 2.5, 3 (closed at gate), 3.5 (closed at gate), 4, 4.5, 5, 6, 6.5, 7, 8A, 8B, 9A, 9B, 9C |
+| Phases complete | 0, 1, 1.5, 2, 2.5, 3 (closed at gate), 3.5 (closed at gate), 4, 4.5, 5, 6, 6.5, 7, 8A, 8B, 9A, 9B, 9C, 9D |
 | Open plan items | **0** — every unticked box is classified 🔴 SUPERSEDED or ⛔ BLOCKED, with its gate or blocker cited inline |
 | Imaging arm | 🔴 **CLOSED, FINAL** — four representations refuted, each with a measured mechanism. **Phase 9A: as a screening task it beats site+sex+age within site (+0.192 specificity at matched sensitivity, CI excludes zero) but collapses cross-site (sensitivity 0.397). Not deployable, for the cross-site reason** |
 | PPG arm | 🔴 **NOT VIABLE** — negative R²; sex alone beats it by 30%. **Phase 9A confirms as a screening task**: AUROC diff vs demographics −0.000 (CI [−0.195,+0.189]); NNS 15.8 vs 14.0 for referring everybody |
@@ -28,7 +28,10 @@ write-up.**
 | Shipped software | **HemoSight Audit** — the methodological audit harness, `src/hemosight/audit/` + `app/` |
 | The benchmark nothing beat | **sex alone, MAE 0.831 g/dL** (PPG). On the imaging screening task the benchmark to beat is **site + sex + age**, AUROC 0.816 |
 | The one positive claim | raw-PPG spectrogram CNN, z = −4.96, empirical p ≤ 0.0041 (a **floor**, not a measurement) — and clinically useless: ~0.05 g/dL better than a constant |
-| Gate result, with uncertainty (Phase 9C) | **median 4.67 g/dL, 95% [2.37, 8.02]** at the 3.935 dE2000 residual over a declared prior on the 14 fixed tissue parameters — point estimate 3.893 retained. 99.5% of the prior is > 2.0, and the whole interval is, so the imaging refutation is **ROBUST to parameter uncertainty**. The **studio** number (1.040) is **FRAGILE**: 95% [0.60, 4.90], spanning all three bands (`reports/phase9c_uncertainty.md`) |
+| Gate result, with uncertainty (Phase 9C) | **median 4.67 g/dL, 95% [2.37, 8.02]** at the 3.935 dE2000 residual over a declared prior on the 14 fixed tissue parameters — point estimate 3.893 retained. 99.5% of the prior is > 2.0, and the whole interval is, so the imaging refutation is **ROBUST to parameter uncertainty**. The **studio** number (1.040) is **FRAGILE**: 95% [0.60, 4.90], spanning all three bands (`reports/phase9c_uncertainty.md`) |
+
+| Statistical power (Phase 9D) | MDE at 80% power on each arm's **deciding** comparison. **ADEQUATELY POWERED:** imaging regression (0.18 g/dL vs a 1.0 g/dL clinical yardstick) and PPG regression (0.14 g/dL) — both negative results are informative. **UNDERPOWERED:** imaging screening within site (0.116 vs the 0.10 margin, 67% power), **imaging cross-site (italy→india 0.314 — 3.1× the margin, 14% power, specificity on 27 non-anaemic subjects)** and PPG screening AUROC (0.27 on 18 anaemic subjects). Retrospective power deliberately NOT computed (`reports/phase9d_power.md`) |
+
 | Literature audit (Phase 9B) | **7 full texts read, 12 identified**; a convenience sample, not a review. Demographic baseline reported by **0 of 7**; per-site results by **0 of the 3 multi-site papers**; deduplication mentioned by 0 of 7. **No paper is recorded as failing a check.** The claim "a literature that frequently omits it" was **narrowed** to a statement about these seven (`reports/literature_gap.md` §9B) |
 
 **What is outstanding.** The write-up, and nothing else. Section 6 records no open
@@ -150,6 +153,14 @@ These drive every design decision.
 > **One recorded number is weakened: the studio condition.** Phase 7's 1.040 g/dL MARGINAL becomes **median 1.52, 95% [0.60, 4.90]** — 27.1% of the prior VIABLE, 35.9% MARGINAL, 37.0% NOT RECOVERABLE. **Its band is a property of the nominal parameter choice as much as of the capture condition, and it must never again be quoted as 1.04 alone.**
 >
 > **The sensitivity ranking did not confirm the expected story.** Phase 3 called melanin the model's most consequential assumption; in the self-consistent setting it ranks **3rd** at the gate residual (behind the **deep-layer contribution weight**, an uncited modelling constant, and the epithelial blood volume fraction) and **1st** at the studio residual. Melanin's +9.6 g/dL result stands but belongs to the *mismatch* setting, reported separately. A measured melanin curve is the most valuable future *spectroscopic* measurement; at the uncontrolled residual two unsourced structural quantities matter as much, and one of them is not a tissue property at all.
+>
+> ### 🟡 Phase 9D (2026-09-20): what these negative results could have detected
+>
+> *"We found no effect"* is weaker than *"we found no effect and could have detected one of size Y"*. The minimum detectable effect at 80% power, on the comparison that actually decided each arm: **imaging regression 0.18 g/dL** of MAE and **PPG regression 0.14 g/dL**, both against a 1.0 g/dL clinical yardstick (the narrowest WHO band) — **ADEQUATELY POWERED**, so those negative results are informative evidence of absence, and the effects too small to detect are also far too small to matter. **Imaging screening within site is marginally UNDERPOWERED** (0.116 against the 0.10 pre-declared margin, 67% power at the margin), though the effect it did find (+0.192 specificity) was comfortably detectable.
+>
+> **The uncomfortable finding, reported because it is true: the project's most load-bearing result is its least powered comparison.** The cross-site collapse is what turns a within-site success into a non-deployable verdict, and per direction the MDE is **0.314 specificity for italy→india (3.1× the margin, 14% power — specificity is estimated on 27 non-anaemic subjects) and 0.165 for india→italy (40% power)**. The cross-site *direction* was directly observed (sensitivity 0.397, 27 of 68 anaemic flagged) and a power analysis does not weaken an observed collapse — but **the magnitude of the cross-site penalty is poorly pinned down and must not be quoted as precise.** Likewise the PPG AUROC comparison (MDE 0.27 on 18 anaemic subjects) is uninformative alone; that arm's verdict rests on its MAE and NNS numbers, which are well powered.
+>
+> **Retrospective / observed power was deliberately not computed** — it is a deterministic function of the observed p-value and would hand every negative result here a built-in excuse. `hemosight.evaluation.power` contains no such function and a test enforces that. **No recorded verdict changes.** See `reports/phase9d_power.md`.
 >
 > **The strongest within-site screening model is not the CNN**: three mean palpebral
 > CIELAB numbers plus a ridge match it on AUROC (0.874 vs 0.875) and beat it on
@@ -491,13 +502,14 @@ and its output exists on disk.
 > | 9A Screening reframe | ✅ COMPLETE — imaging **WEAKENED** within site, **CONFIRMED** cross-site; PPG **CONFIRMED** | — | 0 (one recorded claim corrected) |
 > | 9B Literature audit widened | ✅ COMPLETE — 7 full texts, 6 criteria; one claim **NARROWED** | — | 0 |
 > | 9C Parameter uncertainty | ✅ COMPLETE — imaging refutation **ROBUST**; the studio number **FRAGILE**; one banner kept and strengthened | — | 0 |
+> | 9D Power analysis | ✅ COMPLETE — 2 arms **ADEQUATELY POWERED**, 3 comparisons **UNDERPOWERED**; the most load-bearing finding is the least powered | — | 0 |
 > | 6 (orig) Conformal (N4) | 🔴 SUPERSEDED | no estimator | 0 |
 > | 7 Fairness (N5) | 🔴 SUPERSEDED | no estimator; mechanism measured in Phase 3 Task 4 | 0 |
 > | 8 Fusion (N6) | 🔴 SUPERSEDED | no g/dL estimate from any modality | 0 (2 items found done, ticked) |
 > | 9 Web app | 🔴 SUPERSEDED | replaced by Phase 6 audit app | 0 (2 scaffold items ticked, with caveat) |
 > | 10 Flutter | 🔴 SUPERSEDED | no estimator | 0 |
 >
-> **Open work in the whole plan: none (Phase 9C, 2026-09-20).** What remains is the write-up.
+> **Open work in the whole plan: none (Phase 9D, 2026-09-20).** What remains is the write-up.
 >
 > ⚠️ **The write-up must carry the Phase 9A correction**: the imaging arm's refutation is
 > about **cross-site transfer**, not about the absence of a within-site screening effect.
@@ -1028,6 +1040,75 @@ attempt is recorded and the banner stays.
 - [x] Task 3: Sobol first-order and total indices, ranked; one-at-a-time swing per parameter; the melanin recommendation stated if supported *(ticked 2026-09-20: at 3.935 the ranking is deep-layer weight 0.303, epithelial BVF 0.284, **melanin 0.258**, stromal BVF 0.187 — melanin is 3rd here and 1st at the studio residual; the expected "melanin dominates" is only partly supported and is reported as such; mechanism measured: rank correlation between gate MAE and colour-per-g/dL span **-0.96**)*
 - [x] Task 4: Efron 2009 and Zhivov 2006 sought; outcome recorded; banner lifted or kept *(ticked 2026-09-20: **Efron 2009 OBTAINED** via the open-access QUT thesis that carries the same study — and it contains **no palpebral thickness in µm at all**, only "two or three cell-layers deep"; its 32.9 µm is **BULBAR**, a different tissue. **Zhivov 2006 NOT OBTAINED** (closed access, no repository copy). **Banner KEPT and strengthened** from "could not be verified" to "the source was read and does not contain them"; correction logged)*
 - [x] Task 5: `reports/phase9c_uncertainty.md`; the interval placed beside the point estimate in CLAUDE.md, `final_results.md`, the audit package provenance and the case study, the point estimate retained with a pointer; CLAUDE.md, logs, tests, reproduce stage *(ticked 2026-09-20: report written; interval added to CLAUDE.md (CURRENT STATE, section 2 rows 3 and 8, the Phase 3 row), `final_results.md` master table, `phase3_simulation.md` headline box, `phase7.md` gate table and outcome-B verdict, and the front end's case study and pre-registration pages; **no point estimate deleted anywhere**; `tests/test_phase9c.py`; reproduce stage added)*
+
+### Phase 9D: Power analysis — what this study could have detected (2026-09-20)
+
+**Why this phase exists.** The project reports a body of negative results. *"We found no
+effect"* is a substantially weaker statement than *"we found no effect and had X% power to
+detect an effect of size Y"*, and the project currently cannot answer the second. This phase
+answers it. **It is not an attempt to reinterpret any result**, and no verdict recorded
+anywhere else changes on the strength of it.
+
+#### PRE-DECLARED, 2026-09-20, before any Phase 9D number was computed
+
+**1. The quantity computed is the MINIMUM DETECTABLE EFFECT (MDE), not observed power.**
+For a two-sided test at alpha = 0.05 and power 1 − beta,
+
+    MDE = (z_0.975 + z_{1−beta}) x SE(difference)      multiplier 2.802 at 80%, 3.242 at 90%
+
+**Retrospective / observed / post-hoc power — recomputing power at the effect size that was
+actually observed — is a known statistical error and is NOT computed here.** Observed power is
+a deterministic function of the observed p-value and so adds no information; it is also
+guaranteed to look low whenever a result was null, which would manufacture a false excuse for
+every negative finding in this project. The question asked is what effect size **the design**
+could detect given its sample size and the variance structure of its own measurements. The
+distinction is stated in the report so a reader can see which analysis was run.
+*Stated limitation of the MDE approach itself:* SE is estimated from this sample, so it carries
+its own sampling uncertainty, and for the screening metrics SE depends mildly on the true effect
+size. Neither is corrected for; both are reported.
+
+**2. One comparison per arm, and only the comparison that ACTUALLY DECIDED that arm.** No power
+is computed for a comparison the project never made.
+
+| arm | n | deciding comparison | SE method |
+| --- | --- | --- | --- |
+| Imaging regression | 216 Hb-labelled Eyes-Defy subjects | image-CNN MAE vs **site + sex + age** (1.273 g/dL) | paired, per-subject absolute-error differences (exact SE = sd(d)/sqrt(n)); bootstrap reported beside it |
+| Imaging screening | 216, 91 anaemic | specificity gain at matched sensitivity, and AUROC difference, vs site + sex + age | **paired subject-level bootstrap**, the identical 2,000-resample scheme Phase 9A used (`screening.paired_difference_ci` / `bootstrap_ci`, seed 20260911) |
+| PPG | 252, venous HemoCue | deep-model MAE vs **sex alone** (0.831 g/dL); AUROC vs best demographic baseline | paired per-subject absolute-error differences; paired bootstrap for AUROC |
+| Imaging cross-site | **per direction, reported separately** — italy→india and india→italy | same as the within-site screening comparison, per direction | paired subject-level bootstrap within each direction |
+
+Predictions are correlated across models on the same subjects, so every difference is **paired**;
+an unpaired SE would be wider than the evidence warrants and would inflate every MDE. Where a
+statistic is a non-smooth function of the data (sensitivity and specificity at a nested operating
+point) the bootstrap SD is used rather than a closed form, because no closed form applies.
+
+**3. The clinical yardstick each MDE is judged against is one the project ALREADY declared. No
+new threshold is invented here.**
+- **Screening:** the **0.10 (10 percentage point)** clinically meaningful margin pre-declared in
+  Phase 9A, with its justification (at Eyes-Defy prevalence, ~9 more anaemic subjects referred
+  per 216 screened, about 1 per 24 people).
+- **MAE:** the Phase 3 / Phase 7 band structure — **VIABLE < 1.0, MARGINAL 1.0-2.0, NOT
+  RECOVERABLE > 2.0 g/dL** — plus whether the detectable improvement could move a **WHO severity
+  boundary** (severe < 7.0, moderate 7.0-9.9, mild 10.0-10.9 men / 10.0-11.9 women). A band is
+  1-3 g/dL wide, which is the scale an MAE improvement must reach to change a clinical decision.
+
+**4. The verdict per arm, declared before the numbers.** Exactly one of:
+- **ADEQUATELY POWERED** — the MDE at 80% power is **at or below** the arm's clinical yardstick,
+  so the design could have detected any effect large enough to matter clinically, and the
+  negative result is informative evidence of absence.
+- **UNDERPOWERED** — the MDE at 80% power is **above** the yardstick, so only effects larger
+  than those that would matter clinically were detectable, and the negative result is weak
+  evidence of absence and must be reported as such.
+
+Applied per arm, whichever way it falls, **including if the project's most load-bearing finding
+(the cross-site collapse) turns out to rest on its least powered comparison.** The cross-site
+directions are reported separately and prominently, never pooled, because each uses a fraction of
+the cohort.
+
+- [x] Task 1: n and MDE at 80% and 90% power for the deciding comparison of each arm, paired methods stated per comparison; cross-site reported per direction and prominently *(ticked 2026-09-20: imaging regression n=216 MDE 0.181/0.209 g/dL; imaging screening n=216 spec 0.116/0.135 and sens 0.114/0.132; cross-site **italy→india n=95 (68 anaemic) 0.314/0.363** and **india→italy n=121 (23 anaemic) 0.165/0.191**; PPG n=252 MAE 0.137/0.159 g/dL, AUROC 0.270/0.313, spec 0.073/0.084. Paired throughout — exact paired SE for MAE (error r=0.62, pairing saves 38% of the SE), 2,000-resample paired bootstrap for the screening metrics; Phase 9A's recorded differences reproduced before reporting)*
+- [x] Task 2: every MDE restated in clinical units — g/dL against the WHO boundaries and the gate bands; percentage points against additional anaemic subjects detected and unnecessary referrals avoided at the reported operating point *(ticked 2026-09-20: 0.18 and 0.14 g/dL move **no** WHO boundary and no gate band — the narrowest band is 1.0 g/dL wide; within site 0.116 specificity = 15 of 125 needless referrals avoided and 0.114 sensitivity = 10 of 91 anaemic subjects, ~1 extra case per 21 screened; italy→india 0.314 = 8 of 27 non-anaemic subjects)*
+- [x] Task 3: retrospective power explicitly NOT computed, and the distinction stated in the report *(ticked 2026-09-20: stated in report section 1 with the reason — observed power is a deterministic function of the observed p-value and is low by construction after a null result; `hemosight.evaluation.power` has no such function and `test_retrospective_power_is_absent_from_the_module` enforces it. `power_at()` exists but takes a **pre-declared** yardstick, never an observed effect)*
+- [x] Task 4: `reports/phase9d_power.md` with the single summary table; ADEQUATELY POWERED / UNDERPOWERED per arm; the statements added to `final_results.md` limitations and to CLAUDE.md; logs, tests, reproduce stage *(ticked 2026-09-20: 8-row summary table with a power-at-the-yardstick column; **ADEQUATELY POWERED** imaging regression, PPG regression, PPG specificity; **UNDERPOWERED** imaging screening within site, both cross-site directions, PPG AUROC; new limitations subsection in `final_results.md`; `tests/test_phase9d.py` (14 tests); two reproduce stages)*
 
 ### Phase 6 (original plan): Conformal prediction and abstention (N4)
 

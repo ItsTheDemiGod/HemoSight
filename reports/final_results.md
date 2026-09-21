@@ -59,6 +59,18 @@ Each of these is a measurement, not an interpretation.
 * **Headline file counts overstate the data ~2x**: 2,015 unique images among 4,262 Ghana conjunctiva files; 2,097 among 4,260 fingernail files.
 * **No ground-truth skin tone labels.** SCIN held no data and had no participant overlap; N5's tone axis would be an ITA proxy confounded with site.
 
+### Statistical power - what these negative results could have detected (Phase 9D)
+
+Minimum detectable effect at 80% power, alpha 0.05, two-sided, on the comparison that actually decided each arm. **Observed (retrospective) power was deliberately not computed** - see `reports/phase9d_power.md`.
+
+* **Imaging regression: ADEQUATELY POWERED.** n=216; MDE **0.18 g/dL** of MAE against the site+sex+age baseline, versus the 1.0 g/dL narrowest WHO band - 100% power to detect a clinically meaningful improvement. The negative result is informative evidence of absence.
+* **PPG regression: ADEQUATELY POWERED, and the best-powered comparison in the project.** n=252; MDE **0.14 g/dL** against sex alone, versus 1.0 g/dL. Phase 4.5's negative result is informative.
+* **Imaging screening, within site: UNDERPOWERED, marginally.** MDE **0.116** specificity against the 0.10 pre-declared margin (67% power at the margin). A borderline effect could have been missed; the effect the arm did find (+0.192 specificity, mean-CIELAB) was comfortably above its own MDE.
+* **Imaging cross-site: UNDERPOWERED, and this is the project's most load-bearing finding.** Per direction: italy->india MDE **0.314** (3.1x the margin, 14% power, specificity estimated on 27 non-anaemic subjects); india->italy MDE **0.165** (40% power). The cross-site *direction* was directly observed (sensitivity 0.397, 27 of 68 anaemic flagged) and is not weakened by this, but **the magnitude of the cross-site penalty is poorly pinned down** and should not be quoted as precise.
+* **PPG screening AUROC: UNDERPOWERED.** MDE **0.27** AUROC on 18 anaemic subjects (prevalence 7.1%), so the recorded AUROC difference of -0.000 with CI [-0.195, +0.189] is uninformative on its own. The PPG verdict rests on the MAE comparison and the NNS arithmetic, not on AUROC. The PPG *specificity* comparison is adequately powered (MDE 0.073).
+
+**None of this changes any recorded verdict.** It supplies the second half of each negative statement - *and we could have detected an effect of size Y* - which those statements previously lacked.
+
 ### Method and scope
 
 * **The imaging arm's conjunctiva datasets have no sclera** - they are pre-segmented cutouts (least-cropped image still 49.7% black), so N1 could only be tested end-to-end on Eyes-Defy's 218 subjects.

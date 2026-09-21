@@ -177,6 +177,58 @@ def main() -> int:
       "4,262 Ghana conjunctiva files; 2,097 among 4,260 fingernail files.\n")
     A("* **No ground-truth skin tone labels.** SCIN held no data and had no participant "
       "overlap; N5's tone axis would be an ITA proxy confounded with site.\n")
+    # Phase 9D: statistical power of the comparisons that decided each arm.
+    pwr = load("phase9d/power.json")
+    A("\n### Statistical power - what these negative results could have detected "
+      "(Phase 9D)\n\n")
+    if pwr:
+        pa = pwr["arms"]
+        reg = pa["imaging_regression"]
+        scn = pa["imaging_screening"]["image_cnn"]["specificity_at_matched_sensitivity"]
+        i2i = pa["imaging_cross_site"]["italy_to_india"][
+            "specificity_at_matched_sensitivity"]
+        i2t = pa["imaging_cross_site"]["india_to_italy"][
+            "specificity_at_matched_sensitivity"]
+        pmae = pa["ppg"]["mae_vs_sex_alone"]
+        pau = pa["ppg"]["auroc"]
+        A("Minimum detectable effect at 80% power, alpha 0.05, two-sided, on the "
+          "comparison that actually decided each arm. **Observed (retrospective) power was "
+          "deliberately not computed** - see `reports/phase9d_power.md`.\n\n")
+        A(f"* **Imaging regression: ADEQUATELY POWERED.** n={reg['paired']['n']}; MDE "
+          f"**{reg['mde_80']:.2f} g/dL** of MAE against the site+sex+age baseline, versus "
+          f"the 1.0 g/dL narrowest WHO band - {reg['power_at_the_yardstick'] * 100:.0f}% "
+          "power to detect a clinically meaningful improvement. The negative result is "
+          "informative evidence of absence.\n")
+        A(f"* **PPG regression: ADEQUATELY POWERED, and the best-powered comparison in the "
+          f"project.** n={pa['ppg']['n']}; MDE **{pmae['mde_80']:.2f} g/dL** against sex "
+          f"alone, versus 1.0 g/dL. Phase 4.5's negative result is informative.\n")
+        A(f"* **Imaging screening, within site: UNDERPOWERED, marginally.** MDE "
+          f"**{scn['mde_80']:.3f}** specificity against the 0.10 pre-declared margin "
+          f"({scn['power_at_the_yardstick'] * 100:.0f}% power at the margin). A borderline "
+          "effect could have been missed; the effect the arm did find (+0.192 specificity, "
+          "mean-CIELAB) was comfortably above its own MDE.\n")
+        A(f"* **Imaging cross-site: UNDERPOWERED, and this is the project's most "
+          f"load-bearing finding.** Per direction: italy->india MDE "
+          f"**{i2i['mde_80']:.3f}** ({i2i['mde_80'] / 0.10:.1f}x the margin, "
+          f"{i2i['power_at_the_yardstick'] * 100:.0f}% power, specificity estimated on "
+          f"{pa['imaging_cross_site']['italy_to_india']['n_non_anaemic']} non-anaemic "
+          f"subjects); india->italy MDE **{i2t['mde_80']:.3f}** "
+          f"({i2t['power_at_the_yardstick'] * 100:.0f}% power). The cross-site *direction* "
+          "was directly observed (sensitivity 0.397, 27 of 68 anaemic flagged) and is not "
+          "weakened by this, but **the magnitude of the cross-site penalty is poorly pinned "
+          "down** and should not be quoted as precise.\n")
+        A(f"* **PPG screening AUROC: UNDERPOWERED.** MDE **{pau['mde_80']:.2f}** AUROC on "
+          f"{pa['ppg']['n_anaemic']} anaemic subjects (prevalence "
+          f"{pa['ppg']['prevalence'] * 100:.1f}%), so the recorded AUROC difference of "
+          "-0.000 with CI [-0.195, +0.189] is uninformative on its own. The PPG verdict "
+          "rests on the MAE comparison and the NNS arithmetic, not on AUROC. The PPG "
+          f"*specificity* comparison is adequately powered (MDE "
+          f"{pa['ppg']['specificity_at_matched_sensitivity']['mde_80']:.3f}).\n")
+        A("\n**None of this changes any recorded verdict.** It supplies the second half of "
+          "each negative statement - *and we could have detected an effect of size Y* - "
+          "which those statements previously lacked.\n")
+    else:
+        A("*Run `scripts/phase9d_power.py` to populate this section.*\n")
     A("\n### Method and scope\n\n")
     A("* **The imaging arm's conjunctiva datasets have no sclera** - they are "
       "pre-segmented cutouts (least-cropped image still 49.7% black), so N1 could only "
