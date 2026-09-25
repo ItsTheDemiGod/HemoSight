@@ -109,12 +109,12 @@ This encodes the discipline that made this project's findings defensible: every 
 
 ## 7. Validation — the harness audited itself (TASK 4)
 
-`scripts/phase6_validate_harness.py`, 1.0 min.
+`scripts/phase6_validate_harness.py`, 3.1 min.
 
 | | result |
 | --- | --- |
-| Known-truth verdicts reproduced | **15 / 15** (100%) |
-| Sensitivity to injected faults | **12 / 12** (100%) |
+| Known-truth verdicts reproduced | **19 / 19** (100%) |
+| Sensitivity to injected faults | **13 / 13** (100%) |
 | False positives on clean inputs | **6 of 160** check-runs (3.75%) |
 
 ### 7.1 Against this project's own data, where the verdict is on the record
@@ -129,6 +129,10 @@ This encodes the discipline that made this project's findings defensible: every 
 | phase4_5_permutation | `permutation` | FAIL | **FAIL** | empirical p = 0.27073 over 1000 selected-model-only permutations |
 | phase5_empirical_p_floor | `permutation (statistic)` | reproduced | **reproduced** | p = 0.01639, floor 0.01639 |
 | phase5_seed_ratio | `seed_stability (statistic)` | reproduced | **reproduced** | effect is 11.9x the seed SD |
+| phase5_deep_baseline | `demographic_baseline` | FAIL | **FAIL** | sex alone reaches MAE 0.8344 against the model's 1.1126 |
+| phase5_deep_permutation | `permutation` | PASS | **PASS** | empirical p = 0.00050 over 2000 selection-aware permutations - AT THE FLOOR 1/(n+1)=0.00050, a bound, not a measurement |
+| phase5_deep_seed_stability | `seed_stability` | PASS | **PASS** | effect is 8.6x the seed SD (0.0698 against 0.00808 over 10 seeds) |
+| phase5_deep_subgroup | `subgroup_robustness` | PASS | **PASS** | 71% of the model's advantage survives dropping its best 25 subjects |
 
 The two Phase 1 figures reproduce exactly: **419** byte-identical image groups spanning the split boundary, and **1,708 nominal subject ids collapsing to 1,067 leak-proof groups**. The Phase 4 submissions were regenerated with Phase 4's own estimator, imported from `scripts/phase4_gate_b.py` rather than reimplemented, and land on **1.190** and **0.824** g/dL — the numbers the phase recorded.
 
@@ -157,7 +161,6 @@ These are not tuned away. They are concentrated in the two checks that compare *
 
 ### 7.4 What was NOT validated end to end
 
-- permutation, seed stability and subgroup robustness against the Phase 4.5 DEEP model: its per-subject predictions were never written to disk and regenerating them needs the GPU, which is held by the extended permutation run. Validated at statistic level against harden.json instead.
 
 ## 8. Generalisations made deliberately, and why
 
