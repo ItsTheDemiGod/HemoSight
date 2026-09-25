@@ -91,8 +91,8 @@ def test_hardening_reports_empirical_p_not_only_z():
 def _perm_module():
     import sys
     sys.path.insert(0, str(paths.ROOT / "scripts"))
-    import phase5_perm_extended
-    return phase5_perm_extended
+    import permutation_extended_run_phase5
+    return permutation_extended_run_phase5
 
 
 def test_permutation_labels_depend_only_on_the_index():
@@ -141,7 +141,7 @@ def test_extended_run_does_not_alter_the_reported_p():
     The extended runner READS harden.json for the real MAE - so it cannot move the
     number it is testing against - and writes only its own JSONL and summary.
     """
-    src = (paths.ROOT / "scripts" / "phase5_perm_extended.py").read_text(encoding="utf-8")
+    src = (paths.ROOT / "scripts" / "permutation_extended_run_phase5.py").read_text(encoding="utf-8")
     assert 'harden.json' in src, "the real MAE must be read from the hardening run"
     for line in src.splitlines():
         if "harden.json" in line:

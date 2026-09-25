@@ -74,7 +74,7 @@ def test_obtainability_arithmetic():
 
 def test_json_on_disk_matches_the_module():
     if not RESULT.exists():
-        pytest.skip("run scripts/phase9b_literature_audit.py first")
+        pytest.skip("run scripts/literature_methodology_audit_phase9b.py first")
     d = json.loads(RESULT.read_text(encoding="utf-8"))
     assert d["counts"] == lit.counts()
     assert d["obtainability"] == lit.obtainability()
@@ -84,7 +84,7 @@ def test_json_on_disk_matches_the_module():
 # ------------------------------------------------------------------ the report
 def test_report_states_sample_size_and_what_it_is():
     if not REPORT.exists():
-        pytest.skip("run scripts/phase9b_literature_audit.py first")
+        pytest.skip("run scripts/literature_methodology_audit_phase9b.py first")
     txt = REPORT.read_text(encoding="utf-8")
     n = len(lit.obtained())
     ob = lit.obtainability()
@@ -101,7 +101,7 @@ def test_report_states_sample_size_and_what_it_is():
 
 def test_report_does_not_make_a_field_level_claim():
     if not REPORT.exists():
-        pytest.skip("run scripts/phase9b_literature_audit.py first")
+        pytest.skip("run scripts/literature_methodology_audit_phase9b.py first")
     sec = REPORT.read_text(encoding="utf-8")
     sec = sec[sec.index("## Phase 9B"):]
     # The counts are stated with the sample as the denominator, never the field.

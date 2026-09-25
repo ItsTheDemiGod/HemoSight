@@ -66,7 +66,7 @@ def test_scaling_slope_recovers_a_known_rate():
 
 
 # ------------------------------------------------------- the recorded Part B result
-@pytest.mark.skipif(not REQN.exists(), reason="run scripts/phase9e_required_n.py")
+@pytest.mark.skipif(not REQN.exists(), reason="run scripts/required_sample_size_phase9e.py")
 def test_required_n_is_reported_for_the_group_that_carries_the_metric():
     """A specificity must be sized on non-anaemic subjects, a sensitivity on anaemic."""
     r = json.loads(REQN.read_text(encoding="utf-8"))["required"]
@@ -80,7 +80,7 @@ def test_required_n_is_reported_for_the_group_that_carries_the_metric():
                 > v["headline_required_carrier_80"]), k
 
 
-@pytest.mark.skipif(not REQN.exists(), reason="run scripts/phase9e_required_n.py")
+@pytest.mark.skipif(not REQN.exists(), reason="run scripts/required_sample_size_phase9e.py")
 def test_both_slope_bases_are_kept_and_the_weak_fit_rule_is_applied_by_r2():
     """The headline may not be chosen by which answer is smaller."""
     r = json.loads(REQN.read_text(encoding="utf-8"))
@@ -97,7 +97,7 @@ def test_both_slope_bases_are_kept_and_the_weak_fit_rule_is_applied_by_r2():
     assert not it["slope_fit_is_trustworthy"]
 
 
-@pytest.mark.skipif(not REQN.exists(), reason="run scripts/phase9e_required_n.py")
+@pytest.mark.skipif(not REQN.exists(), reason="run scripts/required_sample_size_phase9e.py")
 def test_phase9d_mdes_were_reproduced_before_anything_new_was_computed():
     r = json.loads(REQN.read_text(encoding="utf-8"))["reproduction"]
     assert r, "the reproduction block must not be empty"
@@ -107,7 +107,7 @@ def test_phase9d_mdes_were_reproduced_before_anything_new_was_computed():
 
 
 # ------------------------------------------------------- the recorded Part A result
-@pytest.mark.skipif(not GUIDED.exists(), reason="run scripts/phase9e_guided_capture.py")
+@pytest.mark.skipif(not GUIDED.exists(), reason="run scripts/guided_capture_interpolation_phase9e.py")
 def test_the_guided_capture_point_is_labelled_an_interpolation_everywhere():
     g = json.loads(GUIDED.read_text(encoding="utf-8"))
     assert "INTERPOLATION" in g["what_this_is"].upper()
@@ -121,7 +121,7 @@ def test_the_guided_capture_point_is_labelled_an_interpolation_everywhere():
             assert "interpolat" in t.lower()
 
 
-@pytest.mark.skipif(not GUIDED.exists(), reason="run scripts/phase9e_guided_capture.py")
+@pytest.mark.skipif(not GUIDED.exists(), reason="run scripts/guided_capture_interpolation_phase9e.py")
 def test_the_headline_point_is_the_declared_geometric_mean_of_the_measured_brackets():
     g = json.loads(GUIDED.read_text(encoding="utf-8"))
     lo = g["bracketing_measurements"]["lower"]["residual_dE2000"]
@@ -130,21 +130,21 @@ def test_the_headline_point_is_the_declared_geometric_mean_of_the_measured_brack
     assert lo < g["headline_point"]["residual_dE2000"] < hi
 
 
-@pytest.mark.skipif(not GUIDED.exists(), reason="run scripts/phase9e_guided_capture.py")
+@pytest.mark.skipif(not GUIDED.exists(), reason="run scripts/guided_capture_interpolation_phase9e.py")
 def test_the_fresh_banks_reproduce_the_measured_anchors():
     """If a different random draw moved the anchors, the interpolation would be noise."""
     g = json.loads(GUIDED.read_text(encoding="utf-8"))
     assert g["bank_draw_check"]["max_abs_difference_from_recorded"] < 0.05
 
 
-@pytest.mark.skipif(not GUIDED.exists(), reason="run scripts/phase9e_guided_capture.py")
+@pytest.mark.skipif(not GUIDED.exists(), reason="run scripts/guided_capture_interpolation_phase9e.py")
 def test_no_point_in_the_interval_reaches_viable():
     g = json.loads(GUIDED.read_text(encoding="utf-8"))
     assert not g["interval_verdict"]["any_point_in_the_interval_reaches_VIABLE"]
     assert all(r["band"] != "VIABLE" for r in g["gate_curve"])
 
 
-@pytest.mark.skipif(not GUIDED.exists(), reason="run scripts/phase9e_guided_capture.py")
+@pytest.mark.skipif(not GUIDED.exists(), reason="run scripts/guided_capture_interpolation_phase9e.py")
 def test_the_interpolated_point_carries_an_interval_not_just_a_number():
     g = json.loads(GUIDED.read_text(encoding="utf-8"))
     u = g["headline_uncertainty"]
@@ -153,7 +153,7 @@ def test_the_interpolated_point_carries_an_interval_not_just_a_number():
 
 
 # --------------------------------------------------------- the Part C language pass
-@pytest.mark.skipif(not XSCI.exists(), reason="run scripts/phase9e_intervals.py")
+@pytest.mark.skipif(not XSCI.exists(), reason="run scripts/cross_site_interval_estimation_phase9e.py")
 def test_every_cross_site_rate_has_an_interval_and_a_count_beside_it():
     d = json.loads(XSCI.read_text(encoding="utf-8"))["directions"]
     assert set(d) == {"italy_to_india", "india_to_italy"}
@@ -164,7 +164,7 @@ def test_every_cross_site_rate_has_an_interval_and_a_count_beside_it():
         assert str(v["counts"]["tp"]) in v["preferred_wording"]
 
 
-@pytest.mark.skipif(not PHASE9A.exists(), reason="run scripts/phase9a_report.py")
+@pytest.mark.skipif(not PHASE9A.exists(), reason="run scripts/screening_reframe_report_phase9a.py")
 def test_the_cross_site_sensitivity_is_never_quoted_bare_in_the_report():
     """0.397 may appear, but not without an interval or a count in the same sentence."""
     t = PHASE9A.read_text(encoding="utf-8")
@@ -174,7 +174,7 @@ def test_the_cross_site_sensitivity_is_never_quoted_bare_in_the_report():
                     or "0.397 in one direction" in line), line
 
 
-@pytest.mark.skipif(not PHASE7.exists(), reason="run scripts/phase7_report.py")
+@pytest.mark.skipif(not PHASE7.exists(), reason="run scripts/capture_and_clinical_report_phase7.py")
 def test_the_retired_phase9a_phrase_is_not_asserted_in_the_phase7_report():
     """Phase 9A retired 'moves no clinical threshold'. It may be quoted while being
     retired; it may not be stated as a live conclusion."""
@@ -184,7 +184,7 @@ def test_the_retired_phase9a_phrase_is_not_asserted_in_the_phase7_report():
             assert "retired" in line, line
 
 
-@pytest.mark.skipif(not PHASE7.exists(), reason="run scripts/phase7_report.py")
+@pytest.mark.skipif(not PHASE7.exists(), reason="run scripts/capture_and_clinical_report_phase7.py")
 def test_the_studio_figure_is_never_quoted_without_its_interval_nearby():
     t = PHASE7.read_text(encoding="utf-8")
     assert "0.60, 4.90" in t or "[0.60, 4.90]" in t
@@ -193,7 +193,7 @@ def test_the_studio_figure_is_never_quoted_without_its_interval_nearby():
             assert "0.60, 4.90" in line, line
 
 
-@pytest.mark.skipif(not REPORT.exists(), reason="run scripts/phase9e_report.py")
+@pytest.mark.skipif(not REPORT.exists(), reason="run scripts/boundaries_report_phase9e.py")
 def test_the_report_does_not_weaken_the_adequately_powered_arms():
     t = REPORT.read_text(encoding="utf-8")
     assert "ADEQUATELY POWERED" in t

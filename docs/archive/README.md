@@ -1,3 +1,5 @@
+*Renamed files and folders since this archive was written are mapped in [docs/CODE_MAP.md](../CODE_MAP.md); nothing below is rewritten to match new names.*
+
 # docs/archive — the HemoSight evidentiary record
 
 This directory holds the project's append-only logs. It was created on **2026-09-17**,

@@ -1,6 +1,6 @@
 """Shared subject-disjoint CV driver for the raw-waveform PPG models.
 
-Extracted from `scripts/phase5_harden.py` unchanged in NUMERICS so that the extended
+Extracted from `scripts/permutation_hardening_phase5.py` unchanged in NUMERICS so that the extended
 permutation runner and the original hardening script cannot drift apart. Two things
 were added, neither of which alters a single output value:
 

@@ -8,7 +8,7 @@
 #   powershell -ExecutionPolicy Bypass -File scripts\launch_perm_extended.ps1
 #   powershell -ExecutionPolicy Bypass -File scripts\launch_perm_extended.ps1 -Target 480
 #
-# Progress:  .\.venv\Scripts\python.exe scripts\phase5_perm_status.py
+# Progress:  .\.venv\Scripts\python.exe scripts\permutation_run_status_phase5.py
 
 param(
     [int]$Target = 240,
@@ -46,7 +46,7 @@ foreach ($f in @($log, $err)) {
 }
 
 $p = Start-Process -FilePath $py `
-    -ArgumentList "-u", "scripts\phase5_perm_extended.py", "--target", "$Target", "--train-batch", "$TrainBatch" `
+    -ArgumentList "-u", "scripts\permutation_extended_run_phase5.py", "--target", "$Target", "--train-batch", "$TrainBatch" `
     -WorkingDirectory $root `
     -RedirectStandardOutput $log `
     -RedirectStandardError $err `

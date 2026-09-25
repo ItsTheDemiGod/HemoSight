@@ -7,6 +7,10 @@ import { Reveal } from "../components/disclosure";
 import { isSettled, pollUntilSettled, type PollHandle } from "../polling";
 import { readSession, writeSession } from "../store";
 
+/* Choose which of the eight checks to run, kick off the background job, and poll it
+   to completion. This is the one screen that actually calls POST /api/runs; Results
+   and Report only ever read back what this page started. */
+
 export default function RunPage() {
   const nav = useNavigate();
   const [specs, setSpecs] = useState<CheckSpec[]>([]);

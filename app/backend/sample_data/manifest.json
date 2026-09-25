@@ -1,5 +1,5 @@
 {
-  "generated_by": "scripts/phase6_make_sample_data.py",
+  "generated_by": "scripts/make_sample_submissions_phase6.py",
   "n_subjects": 240,
   "image_dir": "C:\\Users\\demia\\Desktop\\HemoSight\\data\\interim\\phase6\\sample_images",
   "image_zip": "C:\\Users\\demia\\Desktop\\HemoSight\\data\\interim\\phase6\\sample_images.zip",

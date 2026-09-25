@@ -64,7 +64,7 @@ cannot be done here; **OUTSTANDING** = still to do and worth doing; **DONE BUT U
 | Validate the simulator against published spectra or an analytic limiting case | **SUPERSEDED** | Task 0 gate. The only check made is inversion self-consistency (max 0.0001 g/dL), which is not a validation. |
 | Sample Hb 4–18 g/dL and export a synthetic spectral library to `data/synthetic/` | **SUPERSEDED** | Task 0 gate; `data/synthetic/` empty. |
 | Collect or fit camera SSFs and illuminant SPDs; project spectra to synthetic RGB | **DONE BUT UNTICKED (reduced)** | camspec database on disk (`data/raw/camera_sensitivities/`, 28 cameras, 400–720 nm) and parsed by `optical_data.py`; used in Phase 4 Gate B. Projection in `forward.py` is through D65 and the **CIE 1931 observer as a camera proxy** — only 2 of 6 nus8 cameras have measured SSFs (DECISION LOG 2026-09-11). |
-| Compare synthetic RGB against real conjunctiva pixels; document the sim-to-real gap | **OUTSTANDING (reproducibility)** | The comparison was made and reported — **0.70 dE2000/g/dL empirical on 216 Eyes-Defy subjects vs 0.452 simulated** — but **no script and no output file produce it**. The figure is hard-coded in `scripts/phase3_report.py:81`. See section 3. The outstanding work is preserving the computation, not redoing the science. |
+| Compare synthetic RGB against real conjunctiva pixels; document the sim-to-real gap | **OUTSTANDING (reproducibility)** | The comparison was made and reported — **0.70 dE2000/g/dL empirical on 216 Eyes-Defy subjects vs 0.452 simulated** — but **no script and no output file produce it**. The figure is hard-coded in `scripts/tissue_simulator_gate_report_phase3.py:81`. See section 3. The outstanding work is preserving the computation, not redoing the science. |
 | Log the severe-anemia coverage the simulator adds | **SUPERSEDED** | No corpus was generated. |
 
 ### Phase 3.5
@@ -122,7 +122,7 @@ cannot be done here; **OUTSTANDING** = still to do and worth doing; **DONE BUT U
 
 | item | class | evidence / reason |
 | --- | --- | --- |
-| Build the PPG pipeline: load, filter, extract four-wavelength features, per-subject Hb estimate | **DONE BUT UNTICKED** | `src/hemosight/ppg/features.py`, `scripts/phase4_gate_a.py` / `phase4_gate_b.py`; `data/interim/phase4/features.csv` (252 subjects, 41+ features incl. per-channel SNR and heart rate); `gate_b.json` holds the per-subject-CV estimates. The estimate is NOT VIABLE, but the pipeline the box asks for exists and ran. |
+| Build the PPG pipeline: load, filter, extract four-wavelength features, per-subject Hb estimate | **DONE BUT UNTICKED** | `src/hemosight/ppg/features.py`, `scripts/ppg_acdc_cancellation_gate_phase4.py` / `ppg_hb_estimation_gate_phase4.py`; `data/interim/phase4/features.csv` (252 subjects, 41+ features incl. per-channel SNR and heart rate); `gate_b.json` holds the per-subject-CV estimates. The estimate is NOT VIABLE, but the pipeline the box asks for exists and ran. |
 | Build the nail and palm pipelines | **SUPERSEDED** | No estimator to feed. Also partly BLOCKED: **no palm dataset exists anywhere in the inventory** — the claim text names a modality the project never had data for. Nail data is binary-label-only. |
 | Fusion model into one physical estimate | **SUPERSEDED** | Nothing to fuse; no g/dL estimate from any modality. |
 | Modality dropout / evaluate every subset | **SUPERSEDED** | As above. |
@@ -159,7 +159,7 @@ box has nothing behind it.** Three have less behind them than the box implies:
 
 | phase / item | what is on disk | gap |
 | --- | --- | --- |
-| **Phase 3, Task 2:** "compare simulated RGB against real Eyes-Defy images at matched Hb; report the gap honestly *(DONE in reduced form: empirical 0.70 vs simulated 0.452)*" | The figure appears in `reports/phase3_simulation.md` and is hard-coded as a string in `scripts/phase3_report.py:81–101`. | **No script computes it and no file stores it.** No Phase 3 script references Eyes-Defy or palpebral masks; `task0_gate.json` has no empirical key; `reproduce_all.py` has no stage for it. The detail in the report (216 subjects, an n=3 bin at 5.26 excluded) says it was genuinely computed — but in code that was not preserved. This is the load-bearing "signal" number in the 5.6x noise/signal ratio, and it is currently unreproducible. **Worst finding of this audit.** |
+| **Phase 3, Task 2:** "compare simulated RGB against real Eyes-Defy images at matched Hb; report the gap honestly *(DONE in reduced form: empirical 0.70 vs simulated 0.452)*" | The figure appears in `reports/phase3_simulation.md` and is hard-coded as a string in `scripts/tissue_simulator_gate_report_phase3.py:81–101`. | **No script computes it and no file stores it.** No Phase 3 script references Eyes-Defy or palpebral masks; `task0_gate.json` has no empirical key; `reproduce_all.py` has no stage for it. The detail in the report (216 subjects, an n=3 bin at 5.26 excluded) says it was genuinely computed — but in code that was not preserved. This is the load-bearing "signal" number in the 5.6x noise/signal ratio, and it is currently unreproducible. **Worst finding of this audit.** |
 | **Phase 2:** "Apply the estimator to the conjunctiva datasets and inspect stability within and across sites" | `data/interim/phase2/eyes_defy_segmentation_quality.csv`; `segmentation_eval.json["eyes_defy"]` (quality 0.811 India / 0.816 Italy, 0% failure). | What is stored is **segmentation quality**, not the illuminant estimate. No per-image illuminant estimate for Eyes-Defy exists on disk, so "stability of the estimator across sites" was never measured — the RESULTS LOG entry already says "this is a confidence measure, not accuracy". Reduced delivery, honestly logged, but the box text overstates it. |
 | **Phase 6, Task 2:** "FastAPI backend — upload, run, retrieve, export" | All four endpoints exist; Markdown export works end to end (tested). | **PDF export returns HTTP 501** (`main.py:281–292`) because `reportlab` is not installed. Half of "export". See section 4 — the blocker has lapsed. |
 
@@ -186,7 +186,7 @@ ends "elapsed 10.65 h"; PID 11608 is not running; GPU at 1,636 of 8,188 MiB with
 project process). The blocker stated in `reports/phase6_audit_harness.md` lines 160 and
 176 no longer holds.
 
-*What is missing:* `scripts/phase5_harden.py` computes the 10 per-seed prediction
+*What is missing:* `scripts/permutation_hardening_phase5.py` computes the 10 per-seed prediction
 vectors (`all_preds`) and the seed-averaged `mean_pred` in memory (lines 75–93) and
 writes only their summary statistics to `harden.json`. The six candidate models' per-
 subject predictions from the selection step are likewise discarded. The harness's
@@ -195,16 +195,16 @@ contract (`hemosight.audit.contract`) needs `subject_id, y_true, y_pred`, plus
 aware permutation, plus `sex`/`age` for the baseline.
 
 *What it takes:*
-1. A ~40-line script (or a `--dump-predictions` flag on `phase5_harden.py`) that calls
+1. A ~40-line script (or a `--dump-predictions` flag on `permutation_hardening_phase5.py`) that calls
    `hemosight.ppg.cv.fit_predict` for the 10 seeds of `speccnn_660` and once for each
    of the six candidates, and writes one CSV in the contract format to
    `data/interim/phase6/known_truth/phase5_deep_model.csv` (untracked — real Hb).
    **Cost: ~16 CV runs at ~26 s each ≈ 7 min of GPU** (measured: 60 CV runs per
-   permutation at ~158 s). Same seeds as `phase5_harden.py` (`SEED + s`), so the
+   permutation at ~158 s). Same seeds as `permutation_hardening_phase5.py` (`SEED + s`), so the
    per-seed MAEs should reproduce to the cuDNN tolerance (~0.01).
 2. Run `permutation`, `seed_stability`, `subgroup_robustness` (and the demographic
    baseline) over that file through the harness; add it as a known-truth case in
-   `phase6_validate_harness.py` so it becomes 16/16.
+   `validate_audit_harness_phase6.py` so it becomes 16/16.
 3. Compare: seed SD ≈ 0.0069 and effect/SD ≈ 11.9 should reproduce; retained-advantage
    fraction should PASS as Phase 5 did. **The permutation p will NOT match 0.0041** —
    the harness permutes labels against fixed predictions, a different null from the

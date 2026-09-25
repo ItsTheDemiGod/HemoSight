@@ -16,7 +16,7 @@ import pytest
 
 from hemosight.audit import (ALL_IDS, ContractError, load_predictions, run_audit,
                              to_markdown)
-from hemosight.audit.permutation import permuted_labels
+from hemosight.audit.check5_permutation_test import permuted_labels
 from hemosight.audit.registry import BY_ID, catalogue
 from hemosight.audit.stats import benjamini_hochberg, empirical_p
 from hemosight.audit.verdict import FAIL, INSUFFICIENT, PASS
@@ -137,7 +137,7 @@ def test_permutation_shuffles_across_subjects_not_rows():
 
 def test_benjamini_hochberg_is_shared_with_the_phase_4_5_script():
     """Re-homed, not duplicated: two copies of a correction drift invisibly."""
-    src = (paths.ROOT / "scripts" / "phase4_5_ceiling.py").read_text(encoding="utf-8")
+    src = (paths.ROOT / "scripts" / "ppg_ceiling_analysis_phase4_5.py").read_text(encoding="utf-8")
     assert "from hemosight.audit.stats import benjamini_hochberg" in src
     assert "def benjamini_hochberg(" not in src
     rej, adj = benjamini_hochberg(np.array([0.001, 0.04, 0.5, 0.9]))
@@ -211,7 +211,7 @@ def test_harness_validation_reproduced_the_recorded_verdicts():
     """If the validation has been run, it must still agree with the project's record."""
     f = paths.INTERIM / "phase6" / "harness_validation.json"
     if not f.exists():
-        pytest.skip("run scripts/phase6_validate_harness.py first")
+        pytest.skip("run scripts/validate_audit_harness_phase6.py first")
     d = json.loads(f.read_text(encoding="utf-8"))
     s = d["summary"]
     assert s["agreement_rate"] == 1.0, [c for c in d["cases"] if not c["ok"]]
@@ -372,7 +372,7 @@ def test_the_upload_endpoint_accepts_the_sample_submission():
     csv = paths.ROOT / "app" / "backend" / "sample_data" / "01_mixed_start_here.csv"
     images = paths.INTERIM / "phase6" / "sample_images"
     if not csv.exists():
-        pytest.skip("run scripts/phase6_make_sample_data.py first")
+        pytest.skip("run scripts/make_sample_submissions_phase6.py first")
     from fastapi.testclient import TestClient
     main = _app_module("app.backend.main")
 

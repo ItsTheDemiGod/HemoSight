@@ -86,7 +86,7 @@ def test_retrospective_power_is_absent_from_the_module():
 # ------------------------------------------------------------------ the results
 def _result():
     if not RESULT.exists():
-        pytest.skip("run scripts/phase9d_power.py first")
+        pytest.skip("run scripts/power_analysis_phase9d.py first")
     return json.loads(RESULT.read_text(encoding="utf-8"))
 
 
@@ -153,7 +153,7 @@ def test_the_verdicts_that_the_write_up_depends_on():
 
 def test_report_states_what_was_and_was_not_computed():
     if not REPORT.exists():
-        pytest.skip("run scripts/phase9d_report.py first")
+        pytest.skip("run scripts/power_analysis_report_phase9d.py first")
     txt = REPORT.read_text(encoding="utf-8")
     assert "NOT computed" in txt
     assert "retrospective" in txt.lower() and "post-hoc" in txt.lower()

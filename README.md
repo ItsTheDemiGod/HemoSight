@@ -116,6 +116,7 @@ permutation p (0.978) all reproduce exactly.
 | Path | Purpose |
 | --- | --- |
 | `CLAUDE.md` | Governs the repository: claims, constraints, phase plan, current state |
+| `docs/CODE_MAP.md` | Directory tree, the eight audit checks by file, headline results by producing script, and the phase-name → content-name rename mapping |
 | `docs/archive/` | The evidentiary record — decision log, results log, corrections, superseded claims, pre-declarations |
 | `data/` | Datasets and derived artefacts. **Gitignored in full; `data/raw/` is read-only** |
 | `src/hemosight/` | Library code — calibration, simulation, ppg, evaluation, audit |

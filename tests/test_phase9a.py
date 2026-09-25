@@ -105,7 +105,7 @@ def test_verdict_accepts_either_margin_direction():
 # ------------------------------------------------------- the recorded findings
 def _result():
     if not RESULT.exists():
-        pytest.skip("run scripts/phase9a_screening.py first")
+        pytest.skip("run scripts/screening_reframe_metrics_phase9a.py first")
     return json.loads(RESULT.read_text(encoding="utf-8"))
 
 
@@ -171,7 +171,7 @@ def test_pooled_auroc_is_decomposed_by_site():
 # --------------------------------------------------------------- report hygiene
 def test_report_leads_with_the_baseline_comparison_not_auroc():
     if not REPORT.exists():
-        pytest.skip("run scripts/phase9a_report.py first")
+        pytest.skip("run scripts/screening_reframe_report_phase9a.py first")
     txt = REPORT.read_text(encoding="utf-8")
     head = txt[:txt.index("## 2.")]
     assert "THE COMPARISON THAT DECIDES IT" in head
@@ -190,7 +190,7 @@ def test_the_retired_phrase_is_not_reused_as_a_claim():
 
 def test_report_states_the_pregnancy_limitation():
     if not REPORT.exists():
-        pytest.skip("run scripts/phase9a_report.py first")
+        pytest.skip("run scripts/screening_reframe_report_phase9a.py first")
     txt = REPORT.read_text(encoding="utf-8").lower()
     assert "pregnancy status is not recorded" in txt
     assert "over-called anaemic" in txt

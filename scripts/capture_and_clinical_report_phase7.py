@@ -1,0 +1,404 @@
+"""Phase 7 reports: reports/statistical_vs_clinical.md and reports/phase7.md.
+
+Every number is read from the phase's artefacts. The first report is written to stand
+on its own (it is the project's most citable single contribution); the second is the
+phase record.
+"""
+from __future__ import annotations
+
+import json
+
+from hemosight.io import paths
+
+I = paths.INTERIM
+
+
+def load(rel):
+    p = I / rel
+    return json.loads(p.read_text(encoding="utf-8")) if p.exists() else None
+
+
+def row(cells):
+    return "| " + " | ".join(str(c) for c in cells) + " |\n"
+
+
+def pct(x):
+    return f"{100 * x:.0f}%"
+
+
+def _p9c_intervals() -> dict:
+    """Phase 9C's 95% interval per residual, keyed by this report's condition names.
+
+    Read from `phase9c/uncertainty.json`, never retyped. Phase 9E's rule: no gate MAE is
+    quoted in this report without the interval beside it.
+    """
+    u = load("phase9c/uncertainty.json") or {}
+    res = u.get("residuals", {})
+
+    def fmt(de):
+        for k, v in res.items():
+            if abs(float(k) - de) < 1e-6:
+                return f"median {v['median']:.2f}, [{v['p2.5']:.2f}, {v['p97.5']:.2f}]"
+        return "-"
+    # Phase 9C propagated three residuals. Phase 9E added the gaze-only bracket, which
+    # the table would otherwise have had to quote bare.
+    g = load("phase9e/guided_capture.json") or {}
+    res = {**res, **{k: v for k, v in g.get("uncertainty", {}).items()
+                     if v.get("is_measured_residual")}}
+    cc = load("phase7/controlled_capture.json") or {}
+    best = cc.get("best_residual_per_condition", {})
+    out = {k: fmt(v["residual_dE2000"]) for k, v in best.items()}
+    out["reference_3.935"] = fmt(3.935)
+    return out
+
+
+P9C_INTERVAL = _p9c_intervals()
+GUIDED = load("phase9e/guided_capture.json")
+
+
+def guided_row(A, gate: dict) -> None:
+    """The interpolated guided-capture row, and the boundary it names (Phase 9E).
+
+    Italicised and labelled INTERPOLATED in the row itself, because it is the only row in
+    the table that is not a measurement and must never be read as one.
+    """
+    if not GUIDED:
+        return
+    g = GUIDED
+    u = g["headline_uncertainty"]
+    pt = next(r for r in g["gate_curve"] if r["is_headline"])
+    lo = g["bracketing_measurements"]["lower"]["residual_dE2000"]
+    hi = g["bracketing_measurements"]["upper"]["residual_dE2000"]
+    A(row(["*guided capture - INTERPOLATED, not measured (Phase 9E)*",
+           f"*{g['headline_point']['residual_dE2000']:.3f}*", f"*{pt['mae_g_dl']:.3f}*",
+           f"*median {u['median']:.2f}, [{u['p2.5']:.2f}, {u['p97.5']:.2f}]*", "*-*",
+           f"*{pt['band']}*"]))
+    A("\n> ### \U0001F7E1 THE REGIME THIS PROJECT DID NOT MEASURE (Phase 9E, 2026-09-21)\n>\n"
+      "> **A deployed screening app operates in none of the three measured conditions "
+      "above.** Its guided capture is one phone in one session, with a live overlay "
+      "enforcing framing and distance and a quality gate rejecting blurred or badly "
+      "exposed frames before the shutter - more controlled than the gaze-only condition, "
+      f"less than a studio rig. That places it between **{lo:.3f} and {hi:.3f} dE2000**, "
+      "which is exactly the interval in which this gate crosses bands, and exactly where "
+      "Phase 9C found the verdict fragile.\n>\n"
+      "> **The italicised row above is an INTERPOLATION between two measured points** - "
+      "the geometric mean of the bracketing pair, declared before the gate was run at it "
+      "- and is not a measurement of anything. No guided-capture image exists in this "
+      "project and none ever will: section 3 of CLAUDE.md forbids collecting data, "
+      "permanently. The two measured anchors were re-run on the same fresh perturbation "
+      f"banks and land within {g['bank_draw_check']['max_abs_difference_from_recorded']:.3f} g/dL of their recorded values, so the "
+      "interpolated points are not an artefact of a different random draw.\n>\n"
+      f"> **What it says.** At nominal parameters the bracketing interval is MARGINAL "
+      "throughout and tips into NOT RECOVERABLE at its uncontrolled end. Under the Phase "
+      f"9C prior the headline point is median {u['median']:.2f}, 95% "
+      f"[{u['p2.5']:.2f}, {u['p97.5']:.2f}]: {pct(u['fraction_below_1.0'])} VIABLE, "
+      f"{pct(u['fraction_in_1_2'])} MARGINAL, {pct(u['fraction_above_2.0'])} NOT "
+      f"RECOVERABLE - {u['rule']}. **VIABLE needs a residual below "
+      f"{g['interval_verdict']['residual_required_for_VIABLE']:.3f} dE2000, which is "
+      "below the best measured condition in the whole project. No point in the "
+      "guided-capture interval reaches VIABLE, including its most favourable end.**\n>\n"
+      "> **This is the project's primary future-work item, and it is a named boundary of "
+      "the claim rather than an open question to be closed here.** What evidence would "
+      "settle it - capture protocol, measurement, sample and the result in either "
+      "direction - is specified in `reports/phase9e_boundaries.md`.\n\n")
+
+
+def write_statistical_vs_clinical(svc: dict) -> None:
+    P, Cj = svc["ppg_waveform"], svc["conjunctival_colour"]
+    pu, cu = P["utility"], Cj["utility"]
+    pd_, cd = P["detectability"], Cj["detectability"]
+    L: list[str] = []
+    A = L.append
+    A("# Statistically real, clinically useless: a pattern found twice, and the reporting standard that exposes it\n\n")
+    A("*HemoSight, 2026-09-12. Generated by `scripts/capture_and_clinical_report_phase7.py` from "
+      "`data/interim/phase7/statistical_vs_clinical.json`; every number below is computed, "
+      "not typed.*\n\n")
+    A("## 1. The pattern\n\n")
+    A("A model can be **distinguishable from chance** - its error is far below what "
+      "shuffled labels produce, with a permutation p at the floor of what the sample "
+      "allows - and at the same time **worth nothing to a decision**: it improves on "
+      "predicting a constant by a fraction of a gram per decilitre, it loses to or barely "
+      "matches the cheapest available baseline on the same folds, and the threshold it "
+      "moves - if it moves one at all - does not survive a change of site. The two "
+      "properties are separable, and a result reported "
+      "with only the first looks like a working estimator.\n\n")
+    A("This project produced the pattern twice, independently, in two modalities that "
+      "share nothing but the target molecule. Neither result is wrong. Both are real. "
+      "Neither is useful. The section below puts them on the same axes.\n\n")
+
+    A("## 2. Both results on comparable axes\n\n")
+    A(row(["axis", "PPG raw waveform (spectrogram CNN, 660 nm)", "conjunctival colour (CNN / mean Lab, fixed LED)"]))
+    A(row(["---"] * 3))
+    A(row(["subjects", P["n_subjects"], Cj["n_subjects"]]))
+    A(row(["**detectability** - effect vs null",
+           f"MAE {pd_['real_mae']:.4f} vs null {pd_['null_mean']:.4f} +/- {pd_['null_sd']:.4f}; **z = {pd_['z']:.2f}**",
+           f"MAE {cd['cnn_permutation']['real_mae']:.3f} vs null {cd['cnn_permutation']['null_mean']:.3f} +/- {cd['cnn_permutation']['null_sd']:.3f}; **z = {cd['cnn_permutation']['z']:.1f}**"]))
+    A(row(["empirical p (and whether it is a floor)",
+           f"p <= {pd_['p_empirical']:.4f}, **floor** at n = {pd_['n_perm']} (selection-aware, model refit per permutation)",
+           f"p <= {cd['cnn_permutation']['p_empirical']:.3f}, **floor** at n = {cd['cnn_permutation']['n_perm']} (model refit per permutation); colour slope p = {cd['colour_slope']['p_empirical']:.3f}, z = {cd['colour_slope']['z']:.1f}"]))
+    A(row(["**utility (a)** - gain over predicting a constant",
+           f"{pu['constant_mae']:.3f} -> {pu['model_mae']:.3f}: **{pu['gain_over_constant']:+.3f} g/dL**",
+           f"{cu['constant_mae']:.3f} -> {cu['model_mae']:.3f}: **{cu['gain_over_constant']:+.3f} g/dL**"]))
+    A(row(["**utility (b)** - the cheapest baseline, identical folds",
+           f"{pu['cheap_baseline']}: **{pu['cheap_baseline_mae']:.3f}**",
+           f"{cu['cheap_baseline']}: **{cu['cheap_baseline_mae']:.3f}**"]))
+    A(row(["gain over that baseline",
+           f"**{pu['gain_over_cheap_baseline']:+.3f} g/dL** (the model loses)",
+           f"**{cu['gain_over_cheap_baseline']:+.3f} g/dL** (the model loses, narrowly)"]))
+    A(row(["increment when ADDED to the baseline",
+           f"{pu['cheap_baseline_mae']:.3f} -> {pu['model_plus_baseline_mae']:.3f}: **{pu['increment_when_added_to_baseline']:+.3f}**",
+           f"{cu['cheap_baseline_mae']:.3f} -> {cu['model_plus_baseline_mae']:.3f}: **{cu['increment_when_added_to_baseline']:+.3f}**"]))
+    A(row(["**utility (c)** - fraction of the baseline's own advantage the model reaches",
+           pct(pu["fraction_of_baseline_advantage"]), pct(cu["fraction_of_baseline_advantage"])]))
+    A(row(["**utility (d)** - WHO anaemia band (12 F / 13 M): AUROC model vs baseline",
+           f"{pu['who_screening_model']['auroc']:.3f} vs {pu['who_screening_cheap_baseline']['auroc']:.3f} (prevalence {pct(pu['who_screening_model']['prevalence'])})",
+           f"{cu['who_screening_model']['auroc']:.3f} vs {cu['who_screening_cheap_baseline']['auroc']:.3f} (prevalence {pct(cu['who_screening_model']['prevalence'])})"]))
+    A(row(["screening at the WHO threshold: sensitivity / specificity, model vs baseline",
+           f"{pu['who_screening_model']['sensitivity']:.2f} / {pu['who_screening_model']['specificity']:.2f} vs {pu['who_screening_cheap_baseline']['sensitivity']:.2f} / {pu['who_screening_cheap_baseline']['specificity']:.2f}",
+           f"{cu['who_screening_model']['sensitivity']:.2f} / {cu['who_screening_model']['specificity']:.2f} vs {cu['who_screening_cheap_baseline']['sensitivity']:.2f} / {cu['who_screening_cheap_baseline']['specificity']:.2f}"]))
+    A(row(["does any decision boundary move?",
+           f"**No.** Sensitivity {pu['who_screening_model']['sensitivity']:.2f}: the model flags none of the {round(pu['who_screening_model']['prevalence'] * P['n_subjects'])} anaemic subjects; neither does the baseline",
+           f"**Marginally, within site only.** AUROC +{cu['who_screening_model']['auroc'] - cu['who_screening_cheap_baseline']['auroc']:.2f}; sensitivity falls, specificity rises; cross-site the model sits at the top of the MARGINAL band with a bias the size of the site gap"]))
+    A(row(["pre-declared band (< 1.0 viable, 1.0-2.0 marginal, > 2.0 not)",
+           "MARGINAL (1.11)", "MARGINAL (1.30 pooled; 1.96-2.00 cross-site)"]))
+    A("\n**Reading the table.** In the PPG column, detectability is beyond dispute "
+      f"(z = {pd_['z']:.1f} against a null that refit the whole selection procedure) and "
+      f"utility is absent on every axis: the model reaches {pct(pu['fraction_of_baseline_advantage'])} of the "
+      "advantage that knowing the subject's sex confers, adds nothing when combined with "
+      "it, and flags no anaemic subject. In the conjunctiva column detectability is even "
+      f"stronger (z = {cd['cnn_permutation']['z']:.0f}) and utility is not quite zero: the image is worth "
+      f"{cu['increment_when_added_to_baseline']:+.2f} g/dL on top of site, sex and age and moves the pooled "
+      "AUROC by a few hundredths. That is the difference between 'nothing' and 'not "
+      "enough'; neither moves a decision a clinician would make differently, and the "
+      "second evaporates across sites.\n\n")
+
+    A("## 3. Why the two are the same finding\n\n")
+    A("In both cases the model found a real physiological correlate of haemoglobin and "
+      "reported it as haemoglobin. The evidence for that reading is direct: in PPG the "
+      "hand-engineered features carry no signal at all (permutation p = 0.978) while the "
+      "raw waveform does, so the network is reading something the features discard - a "
+      "waveform-shape correlate; in the conjunctiva the mean palpebral colour - three "
+      "numbers - matches the CNN, and the same regression adjusted for sex and age loses "
+      "40% of its slope, so a large share of what tracks haemoglobin in the image is sex- "
+      "and age-linked colour. Both signals survive a permutation test because they are "
+      "real; both fail a cheap-baseline comparison because a demographic variable carries "
+      "most of the same information for free; and both fail the decision test because the "
+      "residual error (1.1-1.3 g/dL) is the width of a WHO severity band.\n\n")
+    A("The general form: **a permutation test asks whether the model learned anything; a "
+      "cheap-baseline comparison asks whether it learned anything a form would not have "
+      "told you; a decision-threshold test asks whether anyone should act on it.** A paper "
+      "that reports only the first has answered the least informative of the three "
+      "questions.\n\n")
+
+    A("## 4. The reporting standard that would have caught both\n\n")
+    A("Four items, each cheap, each already computable from the predictions a paper "
+      "claims to have made:\n\n")
+    A("1. **A cheap-baseline comparison on identical folds**, where the baseline uses every "
+      "non-signal variable the data carries that the model could have learned - sex, age, "
+      "site or device, collection cohort - fitted with the same cross-validation. Report the "
+      "model's MAE beside it, the increment when the model is *added* to it, and the "
+      "fraction of the baseline's own advantage the model reaches. (This project's own "
+      "first CNN run omitted site from its baseline and appeared to beat demographics by "
+      "0.3 g/dL; with site included the margin was -0.03.)\n")
+    A("2. **A permutation test with the empirical p reported beside any parametric z, and "
+      "the floor 1/(n+1) stated when no draw reaches the real value.** If the model was "
+      "selected from candidates, the selection is re-run inside every permutation.\n")
+    A("3. **An explicit decision-threshold statement:** for the clinical thresholds the "
+      "paper invokes (WHO 12/13 g/dL, or the severity bands), the sensitivity and "
+      "specificity of the model's predictions *and of the cheap baseline's*, and whether "
+      "any subject's classification changes. 'MAE 1.1 g/dL' does not say which of these "
+      "moves; 'separates no WHO band' does.\n")
+    A("4. **Cross-site or cross-device numbers whenever more than one exists**, with the bias "
+      "reported: a pooled score on two sites with different means rewards recognising the "
+      "site.\n\n")
+    A("The audit harness this project ships (`hemosight.audit`) implements 1, 2 and 4 as "
+      "checks that return PASS / FAIL / INSUFFICIENT DATA on a predictions table; item 3 is "
+      "computed in `scripts/statistical_vs_clinical_analysis_phase7.py` and belongs in any results "
+      "table that quotes an MAE.\n\n")
+
+    A("## 5. Does the framing reach beyond these two results? A retrospective\n\n")
+    A("Every quantitative result in the project was placed in the same 2x2 - "
+      "*statistically real?* x *clinically useful?* - to measure the pattern's reach "
+      "rather than assert it.\n\n")
+    A(row(["result", "statistically real", "clinically useful", "cell", "evidence"]))
+    A(row(["---"] * 5))
+    for r in svc["retrospective_2x2"]:
+        A(row([r["result"], r["statistically_real"], r["clinically_useful"], r["cell"], r["evidence"]]))
+    pr = svc["pattern_reach"]
+    A(f"\n**Honest reach.** The specific cell - real *and* useless - has exactly "
+      f"{pr['results_in_the_real_and_useless_cell']} members, the two this report is about. "
+      "What generalises is the separation itself: of the "
+      f"{pr['results_placed']} results placed, three sit in an *apparent utility* cell that only a "
+      "cheap-baseline comparison exposed (a PPG+demographics score inside the VIABLE band "
+      "that was entirely the sex covariate; an image CNN that 'beat demographics' until "
+      "site was added; and, by construction, sex itself as the yardstick), and two sit in "
+      "*real but worse than the cheap baseline* (the sclera and specular references, each "
+      "significantly better than nothing and significantly worse than grey-world). "
+      "Detectability and utility came apart in seven of nine results. The pattern is not "
+      "peculiar to the two headline cases; the two headline cases are its cleanest "
+      "instances.\n\n")
+    A("## 6. What this does and does not claim\n\n")
+    A("- It does not claim that the field's published models are in this cell. The "
+      "project's literature table records that 0 of 5 applicable sources report a cheap "
+      "baseline and 0 report a duplicate check, over a sample too small to generalise "
+      "from (`reports/literature_gap.md`). The external-audit path built in Phase 7 "
+      "Task 3 is how that would become a measurement.\n")
+    A("- It does not claim the two signals are useless in principle: a signal worth "
+      "0.05-0.08 g/dL over demographics on 216-252 subjects is a signal a larger, "
+      "multi-site, controlled-capture study could grow. It claims that *as reported by "
+      "the usual metrics* it is indistinguishable from a working estimator, and that "
+      "three cheap additions to a results table make the distinction visible.\n")
+    A("- Both results carry the limitations of their data: one device (PPG), one phone "
+      "model in two variants and no severe cases (Eyes-Defy). Nothing here is a clinical "
+      "validation.\n")
+    (paths.REPORTS / "statistical_vs_clinical.md").write_text("".join(L), encoding="utf-8")
+
+
+def write_phase7(cc: dict, svc: dict) -> None:
+    L: list[str] = []
+    A = L.append
+    A("# Phase 7 - three additions before the write-up\n\n")
+    A("Generated by `scripts/capture_and_clinical_report_phase7.py` from `data/interim/phase7/`. Thresholds for "
+      "Task 1 were declared in CLAUDE.md before it ran.\n\n")
+    # ------------------------------------------------------------ Task 1
+    A("## 1. TASK 1 - is the refutation about photographs, or about uncontrolled photographs?\n\n")
+    conds, best, gate, be, eyes = cc["conditions"], cc["best_residual_per_condition"], cc["gate"], cc["breakeven"], cc["eyes_defy"]
+    A("### Measured residuals by capture condition (within-subject sclera colour spread, dE2000)\n\n")
+    A(row(["condition", "no correction", "grey-world full frame", "grey-world 25% crop", "best", "groups / captures"]))
+    A(row(["---"] * 6))
+    names = {"mobius_across_phone_x_lighting": "MOBIUS, across 3 phones x 3 lighting (uncontrolled)",
+             "mobius_within_cell_gaze_only": "MOBIUS, same phone + lighting, gaze varies (geometry only)",
+             "sbvpi_studio": "SBVPI studio rig (controlled)"}
+    for k, d in conds.items():
+        A(row([names[k], f"{d['none']['within_dE']:.3f}", f"{d['grey_world_full']['within_dE']:.3f}",
+               f"{d['grey_world_crop25']['within_dE']:.3f}",
+               f"**{best[k]['residual_dE2000']:.3f}** ({best[k]['correction']})",
+               f"{d['none']['n_groups']} / {d['none']['n_captures']}"]))
+    sig = eyes["empirical_signal_dE_per_g_dl"]
+    A(f"\nNoise over the measured empirical signal ({sig:.2f} dE2000/g/dL): " +
+      "; ".join(f"{names[k].split(',')[0]} {v['over_empirical_signal']:.1f}x" for k, v in cc["noise_over_signal"].items()) + ".\n\n")
+    A("### The Phase 3 gate at each measured residual\n\n")
+    A("Every MAE below is a POINT ESTIMATE from a forward model whose 14 tissue parameters "
+      "were held fixed and known. The column beside it is Phase 9C's propagation of the "
+      "declared prior over those parameters. **No measured or interpolated row here may "
+      "be quoted without its interval, least of all the studio row.** The two bare "
+      "reference rows are points on the curve by construction, not results.\n\n")
+    A(row(["residual (measured)", "dE2000", "Hb MAE g/dL",
+           "95% over the parameter prior (9C)", "p90", "band"]))
+    A(row(["---"] * 6))
+    for k in conds:
+        g = gate[k]
+        A(row([names[k], f"{g['residual_dE2000']:.3f}", f"**{g['mae_g_dl']:.3f}**",
+               P9C_INTERVAL.get(k, "-"), f"{g['p90_g_dl']:.2f}", f"**{g['band']}**"]))
+    for k, lab in (("reference_3.935", "Phase 3 reference: grey-world 25% FOV, MOBIUS iris"),
+                   ("reference_2.0", "reference 2.0"), ("reference_1.0", "reference 1.0")):
+        g = gate[k]
+        A(row([lab, f"{g['residual_dE2000']:.3f}", f"{g['mae_g_dl']:.3f}",
+               P9C_INTERVAL.get(k, "-"), f"{g['p90_g_dl']:.2f}", g["band"]]))
+    guided_row(A, gate)
+    A("\n> **Phase 9C (2026-09-20): these are point estimates, and the studio one is "
+      "FRAGILE.** Propagating the forward model's own parameter uncertainty (declared prior "
+      "over its 14 fixed tissue parameters) gives, at the three measured residuals: "
+      "uncontrolled 3.456 -> median 4.28, 95% [2.09, 7.90] (ROBUST, entirely above 2.0); "
+      "Phase 3 reference 3.935 -> median 4.67, 95% [2.37, 8.02] (ROBUST); "
+      "**studio 1.062 -> median 1.52, 95% [0.60, 4.90] - spanning VIABLE, MARGINAL and NOT "
+      "RECOVERABLE, so its MARGINAL label is not robust to parameter uncertainty** "
+      "(27.1% of the prior VIABLE, 37.0% NOT RECOVERABLE). "
+      "See `reports/phase9c_uncertainty.md`.\n\n")
+    A(f"\n**Residual required for VIABLE (< 1.0 g/dL): < {be['residual_for_viable_1.0']:.2f} dE2000; "
+      f"for MARGINAL (< 2.0): < {be['residual_for_marginal_2.0']:.2f}.** Measured conditions that "
+      "reach the VIABLE residual: " +
+      (", ".join(names[k] for k, v in cc["achieves_viable_residual"].items() if v) or "**none**") + ".\n\n")
+    A("### Within Eyes-Defy\n\n")
+    A(f"- Within-subject residual: {eyes['within_subject_residual']}. Capture: {eyes['capture']}.\n")
+    A(f"- The controlled-capture measurement Eyes-Defy does support - the empirical colour model "
+      f"under a fixed LED - is MAE **{eyes['colour_model_mae_pooled']:.3f}** (mean Lab, pooled), "
+      f"{eyes['colour_plus_site_sex_age_mae']:.3f} with site + sex + age, CNN {eyes['cnn_mae_pooled']:.3f}, "
+      f"cross-site {', '.join(f'{k} {v:.2f}' for k, v in eyes['cnn_cross_site'].items())}: "
+      f"**{eyes['band_colour_model']}**, against site + sex + age alone at {eyes['site_sex_age_mae']:.3f}.\n")
+    A(f"- Between-subject colour at fixed Hb, sex, age and site: {eyes['between_subject_residual_at_fixed_hb_sex_age_site_dE']:.2f} dE2000 - "
+      "a second noise term the gate never modelled, present with the calibration term removed.\n\n")
+    A(f"### Outcome: **{cc['outcome']} - {cc['outcome_key'][cc['outcome']]}**\n\n")
+    if cc["outcome"] == "B":
+        A("Controlled capture cuts the residual by a factor of "
+          f"{best['mobius_across_phone_x_lighting']['residual_dE2000'] / best['sbvpi_studio']['residual_dE2000']:.1f} "
+          f"and moves the gate from NOT RECOVERABLE ({gate['reference_3.935']['mae_g_dl']:.2f} g/dL) to "
+          f"MARGINAL ({gate['sbvpi_studio']['mae_g_dl']:.2f}), and the one controlled-illuminant "
+          "dataset with haemoglobin labels lands in the same band empirically "
+          f"({eyes['colour_model_mae_pooled']:.2f}). It does not reach VIABLE: the studio residual is "
+          f"{best['sbvpi_studio']['residual_dE2000'] / be['residual_for_viable_1.0']:.1f}x the residual VIABLE needs, and "
+          "Eyes-Defy shows that even at zero calibration residual a between-subject tissue "
+          "term of ~4.5 dE2000 remains. **The boundary reading is the most fragile number in "
+          "this project, and it is never stated without its interval:** at the studio residual "
+          f"the gate returns {gate['sbvpi_studio']['mae_g_dl']:.2f} g/dL at NOMINAL PARAMETERS, "
+          f"{gate['sbvpi_studio']['mae_g_dl'] - 1.0:+.2f} from the VIABLE line - a residual "
+          f"{best['sbvpi_studio']['residual_dE2000'] / be['residual_for_viable_1.0']:.2f}x what "
+          "VIABLE needs, which reads as 'within 8% of viable'. **That reading survives only at "
+          "the nominal parameter choice. Over the declared prior the same residual gives median "
+          "1.52 g/dL, 95% [0.60, 4.90], spanning VIABLE, MARGINAL and NOT RECOVERABLE (27.1% / "
+          "35.9% / 37.0%), so the band is a property of the parameter choice as much as of the "
+          "capture condition and the figure must never be quoted as 1.04 alone.** What keeps "
+          "the empirical result in "
+          "MARGINAL is the other term: between-subject conjunctival colour at fixed haemoglobin, "
+          "which no amount of capture control removes and which the gate model never contained. "
+          "In the controlled regime the limiting factor shifts from calibration to tissue. "
+          "**The refutation is restated in two parts:** from "
+          "uncontrolled photographs the inversion is NOT RECOVERABLE; from controlled capture "
+          "it reaches screening bands at best and does not beat site + sex + age. "
+          "**The clause \"and moves no clinical threshold\" stood here until Phase 9A "
+          "retired it, and it is removed:** re-scored as the referral decision the product "
+          "actually makes, the image cuts the referral rate from 0.634 to 0.519 at the same "
+          "~0.90 detection rate within site - a margin the colour model clears with a CI "
+          "excluding zero. What controlled capture does not rescue is transfer between "
+          "sites. The distinction a reviewer would raise is real and is now "
+          "measured, and it does not rescue the claim.\n\n")
+    elif cc["outcome"] == "A":
+        A("Controlled capture closes the gap. The refutation must be restated as being about "
+          "uncontrolled capture specifically.\n\n")
+    else:
+        A("Controlled capture does not move the gate out of NOT RECOVERABLE. The refutation generalises.\n\n")
+    # ------------------------------------------------------------ Task 2
+    A("## 2. TASK 2 - the statistically-real / clinically-useless pattern\n\n")
+    A("Written up as a standalone report: `reports/statistical_vs_clinical.md` "
+      "(from `data/interim/phase7/statistical_vs_clinical.json`). Headline: both results are "
+      "distinguishable from chance at the permutation floor and worth "
+      f"{svc['ppg_waveform']['utility']['increment_when_added_to_baseline']:+.3f} (PPG) and "
+      f"{svc['conjunctival_colour']['utility']['increment_when_added_to_baseline']:+.3f} (conjunctiva) g/dL "
+      "when added to the cheapest baseline; a four-item reporting standard is proposed; "
+      f"the retrospective places {svc['pattern_reach']['results_placed']} project results in the 2x2, with "
+      f"{svc['pattern_reach']['results_in_the_real_and_useless_cell']} in the headline cell and detectability "
+      "separating from utility in seven of nine.\n\n")
+    # ------------------------------------------------------------ Task 3
+    A("## 3. TASK 3 - external audit path, built and not run\n\n")
+    A("- `hemosight.audit.ingest`: `IngestSpec` / `ingest()` convert per-image tables with "
+      "present, derivable or ABSENT subject ids, missing splits, missing demographics, g/L "
+      "units and word-encoded sex; classification-only releases raise `NotAuditable`. Every "
+      "assumption is recorded in an `IngestRecord`.\n")
+    A("- `run_audit(..., unsupported=...)`: checks that depend on an ASSUMED column are forced "
+      "to INSUFFICIENT DATA. `tests/test_phase7.py` demonstrates that a table with one "
+      "'subject' per image would otherwise PASS split integrity.\n")
+    A("- `to_external_markdown`: Part 1 (checked) and Part 2 (could not be checked, and "
+      "what would be needed) at equal prominence, with the ingestion assumptions above both.\n")
+    A("- `scripts/external_audit.py ingest | run | register`; `configs/external_audit_register.json` "
+      "(empty); `reports/external_audit_procedure.md`; `reports/external_audit_register.md`.\n")
+    A("- Smoke-tested on a SYNTHETIC release-shaped table only. No external result exists "
+      "and none is simulated.\n")
+    (paths.REPORTS / "phase7.md").write_text("".join(L), encoding="utf-8")
+
+
+def main() -> int:
+    svc = load("phase7/statistical_vs_clinical.json")
+    cc = load("phase7/controlled_capture.json")
+    assert svc, "run scripts/statistical_vs_clinical_analysis_phase7.py"
+    write_statistical_vs_clinical(svc)
+    print(f"wrote {paths.REPORTS / 'statistical_vs_clinical.md'}")
+    if cc:
+        write_phase7(cc, svc)
+        print(f"wrote {paths.REPORTS / 'phase7.md'}")
+    else:
+        print("controlled_capture.json absent - phase7.md not written")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

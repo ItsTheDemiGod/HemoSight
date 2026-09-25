@@ -73,6 +73,6 @@ select = ["E", "F", "I", "UP", "B"]
 [tool.ruff.lint.per-file-ignores]
 # Report generators emit markdown tables and prose; wrapping those source lines
 # would make the generated output harder to read than the source.
-"scripts/phase1_audit.py" = ["E501"]
-"scripts/phase1_summary.py" = ["E501"]
-"scripts/phase1_5_remediation_report.py" = ["E501"]
+"scripts/data_audit_report_phase1.py" = ["E501"]
+"scripts/data_summary_report_phase1.py" = ["E501"]
+"scripts/remediation_report_phase1_5.py" = ["E501"]

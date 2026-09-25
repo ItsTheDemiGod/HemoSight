@@ -2,8 +2,8 @@
 
 Everything here was lifted from a Phase 1-5 script rather than written fresh, so the
 harness measures what this project measured. Provenance is named per function.
-`scripts/phase4_5_ceiling.py` imports benjamini_hochberg() from this module for the
-same reason `scripts/phase5_harden.py` imports its CV driver from `hemosight.ppg.cv`:
+`scripts/ppg_ceiling_analysis_phase4_5.py` imports benjamini_hochberg() from this module for the
+same reason `scripts/permutation_hardening_phase5.py` imports its CV driver from `hemosight.ppg.cv`:
 two copies of a statistical routine drift, and the drift is invisible.
 """
 
@@ -31,7 +31,7 @@ def r2(y_true: np.ndarray, y_pred: np.ndarray) -> float:
 def benjamini_hochberg(p: np.ndarray, q: float = 0.05):
     """Return (rejected, adjusted p) under BH FDR control.
 
-    Provenance: Phase 4.5 ceiling analysis (scripts/phase4_5_ceiling.py), where 4 of
+    Provenance: Phase 4.5 ceiling analysis (scripts/ppg_ceiling_analysis_phase4_5.py), where 4 of
     51 features cleared raw p<0.05 against 2.6 expected by chance and none survived
     this correction.
     """
@@ -103,7 +103,7 @@ def grouped_cv_predict(X: np.ndarray, y: np.ndarray, groups: np.ndarray,
                        n_splits: int = N_SPLITS, seed: int = SEED) -> np.ndarray:
     """Out-of-fold ridge predictions under whole-group folds.
 
-    Provenance: the baseline estimator of Phase 4 Gate B (scripts/phase4_gate_b.py) -
+    Provenance: the baseline estimator of Phase 4 Gate B (scripts/ppg_hb_estimation_gate_phase4.py) -
     median imputation, standardisation, RidgeCV over logspace(-3, 3, 25). It is
     deliberately the same weak, well-regularised learner that produced the sex-alone
     MAE of 0.831 g/dL, so a submitted model is compared against the baseline this

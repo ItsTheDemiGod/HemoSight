@@ -4,6 +4,11 @@ import { api, Run } from "../api";
 import { Notice, SectionTitle, VerdictMark } from "../components/ui";
 import { readSession } from "../store";
 
+/* Exports a finished run as Markdown (fetched inline, always available) or PDF (best
+   effort - reportlab may be absent, in which case the server says so and this page
+   shows that message rather than a broken download). Both layers - plain and
+   technical - are in the one file the server renders; nothing is re-formatted here. */
+
 export default function ReportPage() {
   const { runId } = useParams();
   const [run, setRun] = useState<Run | null>(null);

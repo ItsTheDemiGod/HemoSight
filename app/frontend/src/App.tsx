@@ -1,3 +1,7 @@
+/* The shell: nav, page routes, and the two always-on overlays (the reticle cursor and
+   the motion toggle). The eight routes below are the same eight steps the landing page
+   walks through, in the same order, so NAV and the scrollytelling never disagree. */
+
 import { NavLink, Route, Routes, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import PreRegPage from "./pages/PreReg";

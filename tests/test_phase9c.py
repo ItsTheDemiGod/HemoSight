@@ -76,7 +76,7 @@ def test_ranges_are_at_least_as_wide_as_the_phase3_task4_envelope():
 # ------------------------------------------------------- the run is valid
 def _result():
     if not RESULT.exists():
-        pytest.skip("run scripts/phase9c_uncertainty.py first")
+        pytest.skip("run scripts/parameter_uncertainty_propagation_phase9c.py first")
     return json.loads(RESULT.read_text(encoding="utf-8"))
 
 
@@ -125,7 +125,7 @@ def test_sobol_totals_are_reported_for_every_parameter_and_ranked():
 # ------------------------------------------------------- the record
 def test_report_keeps_the_point_estimate_beside_the_interval():
     if not REPORT.exists():
-        pytest.skip("run scripts/phase9c_report.py first")
+        pytest.skip("run scripts/parameter_uncertainty_report_phase9c.py first")
     txt = REPORT.read_text(encoding="utf-8")
     for rec in ("3.893", "3.471", "1.040"):
         assert rec in txt, f"the point estimate {rec} must be retained, not replaced"

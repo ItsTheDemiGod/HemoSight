@@ -51,7 +51,7 @@ EXTRA = [
 ]
 
 # Datasets whose haemoglobin labels were REJECTED by the Phase 1.5 arbitration
-# (scripts/phase1_5_label_arbitration.py, DECISION LOG 2026-09-11). CP-AnemiC's Hb
+# (scripts/ghana_label_arbitration_phase1_5.py, DECISION LOG 2026-09-11). CP-AnemiC's Hb
 # conflicts on byte-identical images - one image carries up to 10 different values,
 # spread as wide as 7.1 g/dL - and the Ghana sets ship no Hb at all. The whole pool is
 # BINARY-LABEL-ONLY.
@@ -104,7 +104,7 @@ def trusted_hb(df: pd.DataFrame) -> pd.DataFrame:
     """Rows usable for Hb regression. Use this instead of `df.hb_g_dl.notna()`."""
     if "hb_label_trusted" not in df.columns:
         raise KeyError(
-            "manifest lacks hb_label_trusted - rebuild it with scripts/phase1_manifests.py"
+            "manifest lacks hb_label_trusted - rebuild it with scripts/dataset_manifests_phase1.py"
         )
     return df[df["hb_label_trusted"].astype(bool)]
 

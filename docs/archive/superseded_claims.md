@@ -1,3 +1,5 @@
+*Renamed files and folders since this text was written are mapped in [docs/CODE_MAP.md](../CODE_MAP.md); nothing below is rewritten to match new names.*
+
 # SUPERSEDED AND REFUTED CLAIM TEXT — HemoSight
 
 > **Provenance.** Moved verbatim out of `CLAUDE.md` on 2026-09-17, when that file

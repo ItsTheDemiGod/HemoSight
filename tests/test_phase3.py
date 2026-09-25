@@ -169,7 +169,7 @@ def test_ratio_cancels_a_diagonal_illuminant_exactly():
     import sys
 
     sys.path.insert(0, "scripts")
-    from phase3_5_task1_cancellation import ratio_feature
+    from illuminant_ratio_cancellation_phase3_5 import ratio_feature
 
     rng = np.random.default_rng(0)
     region_a = rng.uniform(0.1, 0.6, size=(500, 3))
@@ -187,7 +187,7 @@ def test_ratio_does_not_cancel_a_non_diagonal_transform():
     import sys
 
     sys.path.insert(0, "scripts")
-    from phase3_5_task1_cancellation import ratio_feature
+    from illuminant_ratio_cancellation_phase3_5 import ratio_feature
 
     rng = np.random.default_rng(1)
     a = rng.uniform(0.1, 0.6, size=(500, 3))
@@ -199,7 +199,7 @@ def test_ratio_does_not_cancel_a_non_diagonal_transform():
 
 
 # ------------------------------------------------- Phase 6.5 Task 1: the empirical signal
-# The "~0.70 dE2000 per g/dL" figure was a string constant in phase3_report.py with no
+# The "~0.70 dE2000 per g/dL" figure was a string constant in tissue_simulator_gate_report_phase3.py with no
 # producing script (audit 2026-09-12). These keep it from ever becoming one again.
 def _root():
     from pathlib import Path
@@ -207,7 +207,7 @@ def _root():
 
 
 def test_phase3_report_holds_no_copy_of_the_empirical_signal():
-    src = (_root() / "scripts" / "phase3_report.py").read_text(encoding="utf-8")
+    src = (_root() / "scripts" / "tissue_simulator_gate_report_phase3.py").read_text(encoding="utf-8")
     # The withdrawn figure may be NAMED in the correction paragraph; it may not be
     # PRESENTED as the value (the old table cell was "**~0.70 dE2000 per g/dL**").
     assert "**~0.70 dE2000" not in src, (
@@ -218,7 +218,7 @@ def test_phase3_report_holds_no_copy_of_the_empirical_signal():
 
 def test_empirical_signal_is_a_reproduce_stage():
     src = (_root() / "scripts" / "reproduce_all.py").read_text(encoding="utf-8")
-    assert "phase3_empirical_signal.py" in src
+    assert "empirical_colour_hb_signal_phase3.py" in src
 
 
 def test_empirical_signal_output_carries_its_own_null():
@@ -228,7 +228,7 @@ def test_empirical_signal_output_carries_its_own_null():
     import json
     p = _root() / "data" / "interim" / "phase3" / "empirical_signal.json"
     if not p.exists():
-        pytest.skip("run scripts/phase3_empirical_signal.py")
+        pytest.skip("run scripts/empirical_colour_hb_signal_phase3.py")
     d = json.loads(p.read_text(encoding="utf-8"))
     h, pn = d["headline"], d["permutation_null"]
     assert h["estimator"].startswith("OLS Lab ~ Hb + site + sex + age")

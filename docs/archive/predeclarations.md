@@ -1,3 +1,5 @@
+*Renamed files and folders since these declarations were written are mapped in [docs/CODE_MAP.md](../CODE_MAP.md); nothing below is rewritten to match new names.*
+
 # Pre-declarations, verbatim
 
 **Every threshold, gate, operating-point criterion and interpretation rule this project

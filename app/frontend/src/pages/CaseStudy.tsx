@@ -6,6 +6,10 @@ import { Reveal } from "../components/disclosure";
 import type { ContentCatalogue } from "../api";
 import type { Verdict } from "../api";
 
+/* The worked example: this project's own PPG result run back through its own harness,
+   served by GET /api/case-study, so a first-time visitor sees what a check catching a
+   real problem looks like before uploading anything of their own. */
+
 interface CaseCheck {
   check_id: string;
   verdict: Verdict;

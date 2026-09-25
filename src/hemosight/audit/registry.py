@@ -12,8 +12,14 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from typing import Callable
 
-from . import (baselines, ceiling, duplicates, permutation, proxy, seeds,
-               split_integrity, subgroups)
+from . import check1_leakage_duplicates as duplicates
+from . import check2_split_integrity as split_integrity
+from . import check3_demographic_baseline as baselines
+from . import check4_demographic_proxy_probe as proxy
+from . import check5_permutation_test as permutation
+from . import check6_seed_stability as seeds
+from . import check7_subgroup_robustness as subgroups
+from . import check8_ceiling_analysis as ceiling
 from .contract import AuditInput
 from .jsonsafe import to_jsonable
 from .prereg import EMPTY, PreRegistration
